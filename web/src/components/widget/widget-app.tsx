@@ -33,6 +33,9 @@ export function WidgetApp({ publicKey, host, mode }: Props) {
   const [error, setError] = useState<string>();
   const [sending, setSending] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(open);
 
   // Sessão
   useEffect(() => {
@@ -90,6 +93,14 @@ export function WidgetApp({ publicKey, host, mode }: Props) {
     endRef.current?.scrollIntoView({ block: "end" });
   }, [messages.length, typing]);
 
+  // Ao abrir, o foco vai para o primeiro campo; ao fechar, volta para a bolha.
+  useEffect(() => {
+    if (mode !== "bubble" || !config) return;
+    if (open && !wasOpen.current) panelRef.current?.querySelector<HTMLElement>("input")?.focus();
+    if (!open && wasOpen.current) bubbleRef.current?.focus();
+    wasOpen.current = open;
+  }, [open, mode, config]);
+
   const needsFields = !!config && config.collectFields.length > 0 && !fieldsDone;
 
   const send = async () => {
@@ -123,7 +134,7 @@ export function WidgetApp({ publicKey, host, mode }: Props) {
   const side = config.position === "bottom-left" ? "left-0 items-start" : "right-0 items-end";
 
   const panel = (
-    <div role={mode === "bubble" ? "dialog" : undefined} aria-label={config.title} className={cn("flex flex-col overflow-hidden bg-bg", mode === "bubble" ? "h-[calc(100%-80px)] w-full rounded-lg shadow-pop max-[479px]:h-full max-[479px]:rounded-none" : "h-full w-full rounded-lg border border-border")}>
+    <div ref={panelRef} role={mode === "bubble" ? "dialog" : undefined} aria-label={config.title} onKeyDown={(e) => mode === "bubble" && e.key === "Escape" && setOpen(false)} className={cn("flex flex-col overflow-hidden bg-bg", mode === "bubble" ? "h-[calc(100%-80px)] w-full rounded-lg shadow-pop max-[479px]:h-full max-[479px]:rounded-none" : "h-full w-full rounded-lg border border-border")}>
       <div className="flex items-center justify-between gap-2 px-4 py-3" style={{ background: color, color: fg }}>
         <span className="truncate text-sm font-semibold">{config.title}</span>
         {mode === "bubble" && (
@@ -160,6 +171,7 @@ export function WidgetApp({ publicKey, host, mode }: Props) {
             if (config.collectFields.includes("email") && fields.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fields.email)) return setError("Confira o e-mail.");
             setError(undefined);
             setFieldsDone(true);
+            requestAnimationFrame(() => document.getElementById("widget-input")?.focus());
           }}
         >
           <p className="text-xs text-muted">Antes de começar, como podemos te chamar?</p>
@@ -192,6 +204,7 @@ export function WidgetApp({ publicKey, host, mode }: Props) {
     <div className={cn("fixed inset-0 flex flex-col justify-end gap-3 p-3 max-[479px]:p-0", side)}>
       {open && panel}
       <button
+        ref={bubbleRef}
         type="button"
         aria-expanded={open}
         aria-label={open ? "Fechar conversa" : "Abrir conversa"}

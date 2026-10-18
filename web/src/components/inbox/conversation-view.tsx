@@ -37,7 +37,7 @@ function Bubble({ m, members }: { m: Message; members: Detail["members"] }) {
   const time = formatTime(m.createdAt);
   if (m.author === "system") return <MessageBubble author="system" time={time}>{m.body} · {time}</MessageBubble>;
   if (m.kind === "note") return <MessageBubble author="note" authorName={author} time={time}>{m.body}</MessageBubble>;
-  const attachment = m.kind === "audio" ? <AudioAttachment duration="áudio" transcript={m.transcript} /> : m.kind === "file" ? <FileAttachment name={m.fileName ?? "arquivo"} size="" /> : undefined;
+  const attachment = m.kind === "audio" ? <AudioAttachment transcript={m.transcript} /> : m.kind === "file" ? <FileAttachment name={m.fileName ?? "arquivo"} size="" /> : undefined;
   return (
     <MessageBubble
       author={m.author}

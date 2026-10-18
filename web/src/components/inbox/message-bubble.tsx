@@ -96,11 +96,11 @@ export function MessageBubble({ author, authorName, time, status, scheduledFor, 
   );
 }
 
-export function AudioAttachment({ duration, transcript }: { duration: string; transcript?: string }) {
+export function AudioAttachment({ duration, transcript }: { duration?: string; transcript?: string }) {
   return (
     <div className="flex flex-col gap-1">
       <span className="inline-flex items-center gap-2 text-sm">
-        <Mic className="size-4" aria-hidden /> Áudio · {duration}
+        <Mic className="size-4" aria-hidden /> Áudio{duration ? ` · ${duration}` : ""}
       </span>
       {transcript && (
         <details className="text-xs opacity-90">
