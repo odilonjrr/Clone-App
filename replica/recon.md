@@ -3,7 +3,7 @@
 Escopo: agentes de IA que atendem no WhatsApp, Instagram, Telegram e num widget
 de chat no site do cliente, com todas as configurações do agente, a caixa de
 entrada para humanos assumirem e o roteamento de conversas.
-Para: a confirmar com o usuário (proposta: produto SaaS próprio para vender).
+Para: produto SaaS próprio para vender (aprovado em 2026-10-18).
 Data: 2026-10-18
 
 > **Como este mapa foi feito.** A política de rede deste ambiente bloqueou o
