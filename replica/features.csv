@@ -1,37 +1,37 @@
 feature,area,priority,original,clone,notes
-Criar conta e entrar (e-mail ou Google),conta,must,yes,no,
-Workspace com membros e papéis,conta,must,yes,no,assentos por plano
-Gerar rascunho de agente colando a URL do site,onboarding,must,yes,no,~2 min no original
-Lista de agentes com liga/desliga por agente,agentes,must,yes,no,
-Editar agente em rascunho e publicar,agentes,must,yes,no,
-Playground Try Out com o rascunho,agentes,must,yes,no,sem gastar créditos no original
-Instruções e persona do agente,agentes,must,yes,no,
-Tom de voz configurável,agentes,must,yes,no,
-Idioma principal do agente,agentes,must,yes,no,
-Playbook de vendas com etapas,agentes,should,yes,no,
-Horário ativo por dia da semana,agentes,must,yes,no,
-Toggle Ativo 24/7 (padrão),agentes,must,yes,no,
-Reter mensagens fora do horário e responder na abertura,agentes,must,yes,no,
-Tags do agente com regra em texto aplicadas pela IA,agentes,should,yes,no,
-Follow-ups automáticos 1-3 mensagens com atrasos,agentes,must,yes,no,
-Follow-ups rápidos dentro de 24 h,agentes,must,yes,no,necessário no Instagram
-Mídia que o agente pode enviar (PDF/imagens),agentes,should,yes,no,
-Vincular bases de conhecimento ao agente,conhecimento,must,yes,no,
-FAQ manual (pergunta e resposta),conhecimento,must,yes,no,
-Gerar FAQ/conhecimento a partir do site,conhecimento,must,yes,no,
-Upload de arquivos (PDF) para conhecimento,conhecimento,should,yes,no,confiança média
-Busca no conhecimento (RAG) na resposta,conhecimento,must,yes,no,
-Habilidade: agendar no Google Calendar,habilidades,should,yes,no,
-Habilidade: função customizada via webhook,habilidades,should,yes,no,
+Criar conta e entrar (e-mail ou Google),conta,must,yes,partial,S01 com a tela pronta; login real (Supabase Auth) no backend
+Workspace com membros e papéis,conta,must,yes,partial,assentos por plano; S21 lista membros do seed; convites e papéis no backend
+Gerar rascunho de agente colando a URL do site,onboarding,must,yes,partial,~2 min no original; S02 cria agente e base; a leitura do site é simulada até o backend
+Lista de agentes com liga/desliga por agente,agentes,must,yes,yes,S07
+Editar agente em rascunho e publicar,agentes,must,yes,yes,"S08: autosave do rascunho, publicar, descartar, abas com marca de mudança"
+Playground Try Out com o rascunho,agentes,must,yes,partial,sem gastar créditos no original; S09 usa o rascunho; respostas da IA falsa até a API Claude
+Instruções e persona do agente,agentes,must,yes,yes,S08a
+Tom de voz configurável,agentes,must,yes,yes,"S08a, inclui tom personalizado"
+Idioma principal do agente,agentes,must,yes,yes,S08a
+Playbook de vendas com etapas,agentes,should,yes,yes,S08c; uso pela IA real no backend
+Horário ativo por dia da semana,agentes,must,yes,yes,S08b com fuso; cálculo de abertura testado
+Toggle Ativo 24/7 (padrão),agentes,must,yes,yes,S08b
+Reter mensagens fora do horário e responder na abertura,agentes,must,yes,partial,Funciona no falso com setTimeout; job do Inngest no backend
+Tags do agente com regra em texto aplicadas pela IA,agentes,should,yes,partial,Regras editáveis em S08e e tags criadas; aplicação automática depende da IA real
+Follow-ups automáticos 1-3 mensagens com atrasos,agentes,must,yes,partial,Configuração completa em S08f e agendamento visível; envio real no backend
+Follow-ups rápidos dentro de 24 h,agentes,must,yes,partial,necessário no Instagram; Configuração e agendamento; envio no backend
+Mídia que o agente pode enviar (PDF/imagens),agentes,should,yes,partial,S08g por link; upload no backend
+Vincular bases de conhecimento ao agente,conhecimento,must,yes,yes,S08h
+FAQ manual (pergunta e resposta),conhecimento,must,yes,yes,"S10: criar, editar, excluir com desfazer"
+Gerar FAQ/conhecimento a partir do site,conhecimento,must,yes,partial,Fonte de site simulada em S10; geração real no backend
+Upload de arquivos (PDF) para conhecimento,conhecimento,should,yes,no,confiança média; Backend (Storage)
+Busca no conhecimento (RAG) na resposta,conhecimento,must,yes,partial,IA falsa casa palavras do FAQ; busca real com a API Claude no backend
+Habilidade: agendar no Google Calendar,habilidades,should,yes,partial,Configuração em S08i; Google Agenda no backend
+Habilidade: função customizada via webhook,habilidades,should,yes,partial,Cadastro em S08i; chamada real no backend
 Habilidade: ferramentas MCP,habilidades,could,yes,no,
-Habilidade: busca na web,habilidades,could,yes,no,
-Entender áudio (transcrição),ia,must,yes,no,
+Habilidade: busca na web,habilidades,could,yes,partial,Toggle em S08i; ferramenta real no backend
+Entender áudio (transcrição),ia,must,yes,partial,Balão de áudio com transcrição na caixa de entrada; transcrição real no backend
 Entender imagens e PDFs recebidos,ia,should,yes,no,
 Entender vídeos recebidos,ia,could,yes,no,
-Dividir respostas longas em várias mensagens,ia,must,yes,no,
-Atraso de digitação humano (modos de velocidade),ia,should,yes,no,
-Aviso de uso de IA (transparência),ia,must,yes,no,EU AI Act
-Página de canais com status por canal,canais,must,yes,no,
+Dividir respostas longas em várias mensagens,ia,must,yes,yes,"Divisão por parágrafo/frase, testada no widget"
+Atraso de digitação humano (modos de velocidade),ia,should,yes,yes,"4 velocidades, indicador de digitando no widget e na caixa de entrada"
+Aviso de uso de IA (transparência),ia,must,yes,yes,EU AI Act; Aviso configurável na primeira resposta
+Página de canais com status por canal,canais,must,yes,yes,S11
 WhatsApp via Cloud API oficial (Embedded Signup),whatsapp,must,yes,no,depende de app Meta aprovado
 Respeitar janela de 24 h e usar templates no WhatsApp,whatsapp,must,yes,no,
 Enviar e receber mídia no WhatsApp,whatsapp,must,yes,no,
@@ -47,39 +47,39 @@ Responder menções em posts,instagram,could,yes,no,
 Comment-to-DM com palavra-chave ou qualquer comentário,instagram,must,yes,no,Private Reply: 1 por comentário em até 7 dias
 Resposta pública ao comentário,instagram,should,yes,no,
 Entry point por novo seguidor do Instagram,instagram,could,yes,no,
-Conectar bot do Telegram por token (Bot API),telegram,must,partial,no,original usa conta pessoal; Bot API está como em breve
-Responder DMs no Telegram,telegram,must,yes,no,
+Conectar bot do Telegram por token (Bot API),telegram,must,partial,partial,original usa conta pessoal; Bot API está como em breve; S14 valida formato e cria o canal; getMe/setWebhook no backend
+Responder DMs no Telegram,telegram,must,yes,partial,Fluxo de mensagem de canal pronto no data layer; webhook real no backend
 Menções em grupos e comentários de canal no Telegram,telegram,could,partial,no,anunciado como em breve
 Telegram por conta pessoal (telefone e código),telegram,could,yes,skip,não oficial; risco de ban
-Widget de chat no site (bolha flutuante),widget,must,yes,no,
-Layout inline do widget,widget,should,yes,no,
-Cor tema canto e fonte do widget,widget,must,yes,no,
-Mensagem de boas-vindas do widget,widget,should,yes,no,palpite
-Whitelist de domínios (com curinga),widget,must,yes,no,vazio = qualquer domínio
-Código de instalação copiável,widget,must,yes,no,
-Link de demo do widget num site sem instalar,widget,could,yes,no,
-Capturar nome/e-mail/telefone no widget,widget,must,yes,no,
+Widget de chat no site (bolha flutuante),widget,must,yes,yes,"widget.js + iframe, testado no site de demonstração"
+Layout inline do widget,widget,should,yes,yes,data-mode=inline
+Cor tema canto e fonte do widget,widget,must,yes,partial,"Cor, tema, canto; escolha de fonte ficou de fora (usa a fonte do sistema de design)"
+Mensagem de boas-vindas do widget,widget,should,yes,yes,palpite; S15
+Whitelist de domínios (com curinga),widget,must,yes,yes,vazio = qualquer domínio; S15 + CSP frame-ancestors no proxy + checagem na sessão
+Código de instalação copiável,widget,must,yes,yes,S15
+Link de demo do widget num site sem instalar,widget,could,yes,partial,Página de demonstração própria; não carrega o site do cliente por trás
+Capturar nome/e-mail/telefone no widget,widget,must,yes,yes,Formulário antes da primeira mensagem
 Reengajar visitante por e-mail/telefone quando some,widget,should,yes,no,
 Agendamento com slots dentro do widget,widget,should,yes,no,
-Widget responsivo no celular,widget,must,yes,no,
-Caixa de entrada unificada de todos os canais,inbox,must,yes,no,
-Atualização em tempo real da conversa,inbox,must,yes,no,
-Toggle IA ligada / IA pausada por contato,inbox,must,yes,no,
-Responder manualmente com anexos,inbox,must,yes,no,
-Notas internas (não enviadas),inbox,must,yes,no,
-Fixar e marcar estrela na conversa,inbox,could,yes,no,
+Widget responsivo no celular,widget,must,yes,yes,Tela cheia abaixo de 480px
+Caixa de entrada unificada de todos os canais,inbox,must,yes,yes,S04
+Atualização em tempo real da conversa,inbox,must,yes,partial,"Consulta a cada 1,5–2,5 s; Supabase Realtime no backend"
+Toggle IA ligada / IA pausada por contato,inbox,must,yes,yes,Cabeçalho e painel; pausa interrompe resposta em andamento
+Responder manualmente com anexos,inbox,must,yes,partial,Texto pronto; anexos no backend (Storage)
+Notas internas (não enviadas),inbox,must,yes,yes,Testado: não chega ao visitante
+Fixar e marcar estrela na conversa,inbox,could,yes,yes,
 Criar tarefa a partir da conversa,inbox,could,yes,no,
-Filtros e busca na caixa de entrada,inbox,must,yes,no,
+Filtros e busca na caixa de entrada,inbox,must,yes,yes,"Todas, não lidas, minhas, IA pausada + busca"
 Auto-tag com IA sob demanda,inbox,could,yes,no,
-Atribuir conversa a membro da equipe,inbox,should,yes,no,
-Barra de status fora do horário com próxima abertura,inbox,must,yes,no,
-Painel do contato com próximo follow-up e preferências,contatos,must,yes,no,
-Desligar follow-ups por contato,contatos,must,yes,no,
-Lista de contatos com tags e filtros,contatos,should,yes,no,
-Um contato com várias identidades de canal,contatos,should,yes,no,palpite
-Entry point padrão por canal,roteamento,must,yes,no,
+Atribuir conversa a membro da equipe,inbox,should,yes,yes,Painel do contato
+Barra de status fora do horário com próxima abertura,inbox,must,yes,yes,Testado num domingo: mostra a abertura de segunda
+Painel do contato com próximo follow-up e preferências,contatos,must,yes,yes,S06; gaveta no celular
+Desligar follow-ups por contato,contatos,must,yes,yes,
+Lista de contatos com tags e filtros,contatos,should,yes,partial,S19 lista com tags; filtros ainda não
+Um contato com várias identidades de canal,contatos,should,yes,no,palpite; Uma identidade por contato no falso; junção no backend
+Entry point padrão por canal,roteamento,must,yes,yes,S16
 Entry point por número de WhatsApp,roteamento,should,yes,no,
-Entry point por palavra-chave (só 1ª mensagem),roteamento,should,yes,no,
+Entry point por palavra-chave (só 1ª mensagem),roteamento,should,yes,yes,S16 + roteamento no data layer
 Trocar agente no meio da conversa,roteamento,should,yes,no,
 Automação tag aplicada -> atribuir agente/membro,automações,should,yes,no,
 Parar automação quando o contato responde,automações,should,yes,no,
