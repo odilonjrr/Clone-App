@@ -12,9 +12,9 @@ const statusBadge: Record<Status, { tone: "neutral" | "success" | "danger" | "ac
   soon: { tone: "accent", text: "Em breve" },
 };
 
-type ChannelCardProps = { kind: ChannelKind; status: Status; description: string; detail?: string };
+type ChannelCardProps = { kind: ChannelKind; status: Status; description: string; detail?: string; title?: string; action?: React.ReactNode };
 
-export function ChannelCard({ kind, status, description, detail }: ChannelCardProps) {
+export function ChannelCard({ kind, status, description, detail, title, action }: ChannelCardProps) {
   const b = statusBadge[status];
   return (
     <Card className="flex flex-col gap-3">
@@ -22,16 +22,17 @@ export function ChannelCard({ kind, status, description, detail }: ChannelCardPr
         <ChannelBadge kind={kind} />
         <Badge tone={b.tone}>{b.text}</Badge>
       </div>
+      {title && <p className="text-sm font-semibold break-words">{title}</p>}
       <p className="text-sm text-muted">{description}</p>
       {detail && <p className={status === "error" ? "text-xs text-danger" : "text-xs text-muted"}>{detail}</p>}
       <div className="mt-auto">
-        {status === "connected" ? (
+        {action ?? (status === "connected" ? (
           <Button variant="secondary" size="sm">Configurar</Button>
         ) : status === "error" ? (
           <Button size="sm">Reconectar</Button>
         ) : (
           <Button size="sm" disabled={status === "soon"}>Conectar {channels[kind].label}</Button>
-        )}
+        ))}
       </div>
     </Card>
   );
