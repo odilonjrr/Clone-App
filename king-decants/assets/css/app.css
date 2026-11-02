@@ -310,3 +310,54 @@ a:hover > .collection-ring, .collection-ring.is-active {
 .star-input label { cursor: pointer; font-size: 28px; line-height: 1; color: rgba(255,255,255,.15); transition: color .15s; }
 .star-input input:checked ~ label, .star-input label:hover, .star-input label:hover ~ label { color: #d4af37; }
 .star-input input:focus-visible + label { outline: 1px solid #d4af37; outline-offset: 2px; }
+
+/* =========================================================================
+   Minha conta
+   ========================================================================= */
+.account-aside { border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: linear-gradient(180deg, #111 0%, #0a0a0a 100%); }
+.avatar-ring {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border-radius: 9999px; border: 2px solid var(--gold-2);
+  background: radial-gradient(circle at 35% 30%, #3a2e10 0%, #121008 70%);
+  color: #f1dfa6; font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; letter-spacing: .04em;
+  box-shadow: 0 0 0 4px rgba(212,175,55,.08), 0 10px 30px -10px rgba(212,175,55,.45);
+}
+.account-nav { display: flex; align-items: center; gap: .9rem; padding: .75rem .9rem; border-radius: 10px; color: #ece9e3; transition: background .25s, color .25s; }
+.account-nav:hover { background: rgba(255,255,255,.04); }
+.account-nav.is-active { background: linear-gradient(90deg, rgba(212,175,55,.32), rgba(212,175,55,.12)); color: #f1dfa6; }
+.account-card {
+  display: flex; align-items: center; gap: 1.25rem; padding: 1.4rem 1.4rem;
+  border: 1px solid rgba(212,175,55,.28); border-radius: 12px;
+  background: linear-gradient(135deg, #121212 0%, #0b0b0b 100%);
+  transition: border-color .3s, transform .3s, box-shadow .3s;
+}
+a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(-2px); box-shadow: 0 20px 40px -24px rgba(212,175,55,.35); }
+.icon-ring { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; height: 72px; width: 72px; border-radius: 9999px; border: 1.5px solid rgba(212,175,55,.65); color: #e6c76f; }
+.count-ring { display: inline-flex; align-items: center; justify-content: center; height: 40px; min-width: 40px; padding: 0 .5rem; border-radius: 9999px; border: 1.5px solid rgba(212,175,55,.7); color: #f1dfa6; font-size: 1.05rem; }
+@media (max-width: 480px) { .account-card { gap: 1rem; padding: 1.1rem; } .icon-ring { height: 60px; width: 60px; } .icon-ring svg { height: 1.6rem; width: 1.6rem; } }
+
+/* =========================================================================
+   Home: banner com raios dourados e cards horizontais
+   ========================================================================= */
+.hero-rays {
+  background-size: cover; background-position: center;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 100%);
+  animation: kd-rays 9s ease-in-out infinite;
+}
+@keyframes kd-rays { 0%, 100% { opacity: .9; } 50% { opacity: 1; filter: brightness(1.12); } }
+@media (max-width: 1023px) { .hero-rays { -webkit-mask-image: none; mask-image: none; opacity: .75; } }
+.btn-hero { padding: 1.05rem 3.6rem; font-size: 15px; letter-spacing: .08em; }
+
+.wide-card {
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+  background: linear-gradient(135deg, #111 0%, #090909 100%);
+  transition: border-color .4s, box-shadow .4s;
+}
+.wide-card:hover { border-color: rgba(212,175,55,.45); box-shadow: 0 30px 60px -36px rgba(212,175,55,.4); }
+.wide-card-media { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: #0b0b0b; }
+@media (min-width: 640px) {
+  .wide-card { flex-direction: row; min-height: 230px; }
+  .wide-card-media { width: 48%; flex-shrink: 0; aspect-ratio: auto; }
+}

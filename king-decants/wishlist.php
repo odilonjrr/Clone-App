@@ -11,7 +11,7 @@
 require __DIR__ . '/inc/bootstrap.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect(url('account.php#favoritos'));
+    redirect(url('account.php?secao=favoritos'));
 }
 csrf_require();
 
@@ -43,4 +43,4 @@ if (wants_json()) {
     json_response(['ok' => true, 'in_wishlist' => $in, 'message' => $message]);
 }
 flash('success', $message);
-redirect(($_POST['back'] ?? '') === 'account' ? url('account.php#favoritos') : url('product.php?slug=' . urlencode($product['slug'])));
+redirect(($_POST['back'] ?? '') === 'account' ? url('account.php?secao=favoritos') : url('product.php?slug=' . urlencode($product['slug'])));

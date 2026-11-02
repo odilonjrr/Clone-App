@@ -312,6 +312,22 @@
     toggleNewTab();
   }
 
+  // Checkout: preenche o endereço a partir de um endereço salvo.
+  $$('select[data-address-picker]').forEach((sel) =>
+    sel.addEventListener('change', () => {
+      const opt = sel.selectedOptions[0];
+      if (!opt || !opt.dataset.address) return;
+      const a = JSON.parse(opt.dataset.address);
+      const form = sel.form;
+      Object.entries(a).forEach(([k, v]) => {
+        const f = form.elements[k];
+        if (f) f.value = v || '';
+      });
+      if (form.elements.cep) form.elements.cep.value = masks.cep(form.elements.cep.value);
+      form.dispatchEvent(new CustomEvent('kd:cep', { detail: { cep: (a.cep || '').replace(/\D/g, '') } }));
+    })
+  );
+
   // ---------------------------------------------------------------- 8. PIX
   $$('[data-copy]').forEach((btn) =>
     btn.addEventListener('click', async () => {

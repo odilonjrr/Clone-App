@@ -22,18 +22,25 @@ if (!isset($allCollections[$collection])) {
 }
 
 // Monta a consulta com prepared statements (filtros são sempre parâmetros).
-$where = ['is_active = 1'];
+$where = ['p.is_active = 1'];
 $params = [];
 if ($q !== '') {
-    $where[] = '(name LIKE ? OR sku LIKE ? OR short_description LIKE ? OR tagline LIKE ?)';
+    $where[] = '(p.name LIKE ? OR p.sku LIKE ? OR p.short_description LIKE ? OR p.tagline LIKE ?)';
     $like = '%' . $q . '%';
     array_push($params, $like, $like, $like, $like);
 }
 if ($collection !== '') {
-    $where[] = 'collection = ?';
+    $where[] = 'p.collection = ?';
     $params[] = $collection;
 }
-$stmt = db()->prepare('SELECT * FROM products WHERE ' . implode(' AND ', $where) . ' ORDER BY sort_order ASC, sold_count DESC LIMIT 24');
+// Inclui média e total de avaliações reais (visíveis) para as estrelas dos cards.
+$stmt = db()->prepare(
+    'SELECT p.*, r.rating_avg, COALESCE(r.rating_count, 0) AS rating_count
+       FROM products p
+       LEFT JOIN (SELECT product_id, AVG(rating) AS rating_avg, COUNT(*) AS rating_count
+                    FROM product_reviews WHERE is_visible = 1 GROUP BY product_id) r ON r.product_id = p.id
+      WHERE ' . implode(' AND ', $where) . ' ORDER BY p.sort_order ASC, p.sold_count DESC LIMIT 24'
+);
 $stmt->execute($params);
 $products = $stmt->fetchAll();
 
@@ -44,63 +51,56 @@ require __DIR__ . '/inc/header.php';
 ?>
 
 <!-- ======================= BANNER PRINCIPAL ======================= -->
-<section class="relative overflow-hidden">
-    <!-- Brilho de fundo que integra a imagem ao preto da página -->
-    <div class="pointer-events-none absolute -right-40 top-0 h-[720px] w-[720px] rounded-full bg-gold-400/10 blur-[140px]"></div>
+<!-- Banner de largura total: raios de luz dourada à direita com o frasco ao centro
+     dessa luz; texto editorial à esquerda. Troque assets/img/hero-bottle.svg por
+     uma fotografia (PNG/WebP com fundo preto) quando tiver. -->
+<section class="hero relative overflow-hidden border-b border-white/10">
+    <div class="hero-rays pointer-events-none absolute inset-y-0 right-0 w-full lg:w-[68%]" style="background-image:url('<?= e(asset('img/hero-rays.svg')) ?>')"></div>
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/70 to-transparent lg:via-ink-950/40"></div>
 
-    <div class="mx-auto grid max-w-7xl items-center gap-6 px-5 pb-10 pt-10 sm:pt-16 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:pb-20 lg:pt-20">
-        <!-- Área esquerda: texto -->
+    <div class="relative mx-auto grid min-h-[520px] max-w-7xl items-center gap-4 px-5 py-12 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:py-16">
         <div class="relative z-10 order-2 text-center lg:order-1 lg:text-left">
-            <p class="eyebrow animate-fade-up">Decants de alta perfumaria</p>
-            <h1 class="mt-6 font-serif text-5xl font-normal leading-[1.02] text-white animate-fade-up sm:text-6xl xl:text-7xl" style="animation-delay:.1s">
-                Criado para<br>
-                <em class="font-light text-gold-gradient">marcar presença.</em>
+            <h1 class="font-serif leading-[.95] text-white animate-fade-up">
+                <span class="block text-5xl sm:text-6xl xl:text-7xl">Criado para</span>
+                <em class="block text-6xl sm:text-7xl xl:text-[5.6rem]">marcar presença.</em>
             </h1>
-            <div class="mx-auto mt-8 h-px w-16 bg-gold-400/60 lg:mx-0"></div>
-            <p class="mt-8 text-lg font-light tracking-wide text-ink-300 animate-fade-up" style="animation-delay:.2s">Luxo em cada gota.</p>
-            <div class="mt-10 flex flex-col items-center gap-4 animate-fade-up sm:flex-row sm:justify-center lg:justify-start" style="animation-delay:.3s">
-                <a href="#mais-vendidos" class="btn-gold">Comprar agora <?= icon('arrow', 'h-4 w-4') ?></a>
-                <a href="#colecoes" class="text-xs uppercase tracking-[0.22em] text-ink-400 transition-colors hover:text-gold-300">Explorar coleções</a>
+            <p class="mt-6 text-xl font-light text-ink-100 animate-fade-up sm:text-2xl" style="animation-delay:.15s">Luxo em cada gota.</p>
+            <div class="mt-9 animate-fade-up" style="animation-delay:.3s">
+                <a href="#mais-vendidos" class="btn-gold btn-hero">Comprar agora</a>
             </div>
         </div>
-
-        <!-- Área direita: frasco preto cercado por luz dourada (sem "bloco") -->
-        <div class="relative order-1 mx-auto w-full max-w-md lg:order-2 lg:max-w-none">
-            <div class="hero-glow animate-glow"></div>
-            <img src="<?= e(asset('img/hero-bottle.svg')) ?>"
-                 alt="Frasco de perfume preto com tampa dourada envolto em luz dourada"
-                 class="blend-edges relative mx-auto w-[78%] animate-fade-up lg:w-[88%]" width="600" height="720">
+        <div class="relative order-1 mx-auto w-full max-w-[320px] lg:order-2 lg:max-w-[400px]">
+            <img src="<?= e(asset('img/hero-bottle.svg')) ?>" alt="Frasco de perfume preto com tampa dourada envolto em luz dourada"
+                 class="blend-edges relative mx-auto w-full animate-fade-up" width="600" height="720">
         </div>
     </div>
 </section>
 
-<div class="gold-divider mx-auto max-w-7xl"></div>
-
-<!-- ======================= COLEÇÕES ======================= -->
-<section id="colecoes" class="mx-auto max-w-7xl scroll-mt-24 px-5 py-14 lg:px-8">
-    <div class="mb-10 flex items-end justify-between gap-4">
-        <h2 class="text-xs font-medium uppercase tracking-[0.28em] text-white">Coleções</h2>
-        <a href="<?= e(url('index.php#mais-vendidos')) ?>" class="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-gold-400 hover:text-gold-300">
-            Ver todas <?= icon('arrow', 'h-4 w-4 transition-transform group-hover:translate-x-1') ?>
-        </a>
-    </div>
-    <div class="grid grid-cols-3 gap-y-10 sm:grid-cols-5">
-        <?php foreach ($allCollections as $slug => $c): ?>
-            <a href="<?= e(url('index.php?colecao=' . $slug . '#mais-vendidos')) ?>" class="group flex flex-col items-center gap-4 text-center reveal">
-                <span class="collection-ring <?= $collection === $slug ? 'is-active' : '' ?>"><?= icon($c['icon'], 'h-8 w-8') ?></span>
-                <span class="text-[11px] uppercase tracking-[0.2em] <?= $collection === $slug ? 'text-gold-300' : 'text-ink-300 group-hover:text-white' ?>"><?= e($c['label']) ?></span>
+<!-- ======================= EXPLORAR COLEÇÕES ======================= -->
+<section id="colecoes" class="scroll-mt-24 border-b border-white/10">
+    <div class="mx-auto max-w-7xl px-5 py-8 lg:px-8">
+        <div class="mb-6 flex items-center justify-between gap-4">
+            <h2 class="text-sm font-medium uppercase tracking-[0.22em] text-white">Explorar coleções</h2>
+            <a href="<?= e(url('index.php#mais-vendidos')) ?>" class="group inline-flex items-center gap-1 text-sm text-ink-200 hover:text-gold-300">
+                Ver todas <?= icon('chevron', 'h-4 w-4 transition-transform group-hover:translate-x-0.5') ?>
             </a>
-        <?php endforeach; ?>
+        </div>
+        <div class="grid grid-cols-3 gap-y-8 sm:grid-cols-5">
+            <?php foreach ($allCollections as $slug => $c): ?>
+                <a href="<?= e(url('index.php?colecao=' . $slug . '#mais-vendidos')) ?>" class="group flex flex-col items-center gap-3 text-center">
+                    <span class="collection-ring <?= $collection === $slug ? 'is-active' : '' ?>"><?= icon($c['icon'], 'h-9 w-9') ?></span>
+                    <span class="text-[15px] <?= $collection === $slug ? 'text-gold-300' : 'text-ink-100 group-hover:text-white' ?>"><?= e($c['label']) ?></span>
+                </a>
+            <?php endforeach; ?>
+        </div>
     </div>
 </section>
 
-<div class="gold-divider mx-auto max-w-7xl"></div>
-
 <!-- ======================= MAIS VENDIDOS ======================= -->
-<section id="mais-vendidos" class="mx-auto max-w-7xl scroll-mt-24 px-5 py-16 lg:px-8">
-    <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+<section id="mais-vendidos" class="mx-auto max-w-7xl scroll-mt-24 px-5 py-10 lg:px-8">
+    <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h2 class="text-xs font-medium uppercase tracking-[0.28em] text-white">
+            <h2 class="text-sm font-medium uppercase tracking-[0.22em] text-white">
                 <?php if ($q !== ''): ?>
                     Resultados para “<?= e($q) ?>”
                 <?php elseif ($collection !== ''): ?>
@@ -109,15 +109,14 @@ require __DIR__ . '/inc/header.php';
                     Mais vendidos
                 <?php endif; ?>
             </h2>
-            <p class="mt-3 font-serif text-3xl italic text-ink-300 sm:text-4xl">Escolhas que <span class="text-gold-gradient">ficam na memória</span></p>
         </div>
         <?php if ($isFiltered): ?>
             <a href="<?= e(url('index.php#mais-vendidos')) ?>" class="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-gold-400 hover:text-gold-300">
                 Limpar filtros <?= icon('close', 'h-4 w-4') ?>
             </a>
         <?php else: ?>
-            <a href="#mais-vendidos" class="group inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-gold-400 hover:text-gold-300">
-                Visualizar todos <?= icon('arrow', 'h-4 w-4 transition-transform group-hover:translate-x-1') ?>
+            <a href="#mais-vendidos" class="group inline-flex items-center gap-1 text-sm text-ink-200 hover:text-gold-300">
+                Ver todos <?= icon('chevron', 'h-4 w-4 transition-transform group-hover:translate-x-0.5') ?>
             </a>
         <?php endif; ?>
     </div>
@@ -129,9 +128,9 @@ require __DIR__ . '/inc/header.php';
             <a href="<?= e(url('index.php')) ?>" class="btn-outline mt-6">Ver todos</a>
         </div>
     <?php else: ?>
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid gap-5 lg:grid-cols-2">
             <?php foreach ($products as $index => $product): ?>
-                <?php include __DIR__ . '/inc/product_card.php'; ?>
+                <?php include __DIR__ . '/inc/product_card_wide.php'; ?>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>

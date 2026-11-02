@@ -151,6 +151,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
             }
 
             // 5) Sucesso: limpa a sacola, guarda o último pedido na sessão e avisa por e-mail
+            // Cliente logado pode salvar o endereço em Minha conta (se ainda não existir igual).
+            if ($user && isset($_POST['save_address'])) {
+                $same = db()->prepare('SELECT COUNT(*) FROM user_addresses WHERE user_id = ? AND cep = ? AND number = ? AND street = ?');
+                $same->execute([$user['id'], $old['cep'], $old['number'], $old['street']]);
+                if (!(int) $same->fetchColumn()) {
+                    address_save((int) $user['id'], ['label' => 'Entrega', 'recipient' => $old['name']] + $old);
+                }
+            }
             cart_clear();
             unset($_SESSION['guest_checkout']);
             $_SESSION['last_order'] = ['id' => $order['id'], 'token' => $order['access_token']];
@@ -180,10 +188,14 @@ if (!$old) {
     $old = ['payment_method' => 'pix'];
     if ($user) {
         $old += ['name' => $user['name'], 'email' => $user['email'], 'phone' => $user['phone'], 'cpf' => $user['cpf']];
-        // Reaproveita o endereço do último pedido
-        $last = db()->prepare('SELECT cep, street, number, complement, district, city, state FROM orders WHERE user_id = ? AND is_guest_order = 0 ORDER BY id DESC LIMIT 1');
-        $last->execute([$user['id']]);
-        $old += $last->fetch() ?: [];
+        // Endereço padrão salvo em Minha conta; se não houver, o do último pedido feito com a conta.
+        if ($def = user_default_address((int) $user['id'])) {
+            $old += array_intersect_key($def, array_flip(['cep', 'street', 'number', 'complement', 'district', 'city', 'state']));
+        } else {
+            $last = db()->prepare('SELECT cep, street, number, complement, district, city, state FROM orders WHERE user_id = ? AND is_guest_order = 0 ORDER BY id DESC LIMIT 1');
+            $last->execute([$user['id']]);
+            $old += $last->fetch() ?: [];
+        }
     }
 }
 $v = fn(string $k) => e($old[$k] ?? '');
@@ -270,6 +282,20 @@ require __DIR__ . '/inc/header.php';
             <fieldset class="panel p-6 sm:p-8">
                 <legend class="sr-only">Endereço de entrega</legend>
                 <h2 class="text-xs font-medium uppercase tracking-[0.24em] text-white">2 · Endereço de entrega</h2>
+                <?php $savedAddresses = $user ? user_addresses((int) $user['id']) : []; ?>
+                <?php if ($savedAddresses): ?>
+                    <div class="mt-4">
+                        <label class="field-label" for="saved-address">Usar endereço salvo</label>
+                        <select id="saved-address" class="field" data-address-picker>
+                            <option value="">— Escolha —</option>
+                            <?php foreach ($savedAddresses as $sa): ?>
+                                <option value="<?= (int) $sa['id'] ?>" data-address='<?= e(json_encode(array_intersect_key($sa, array_flip(['cep', 'street', 'number', 'complement', 'district', 'city', 'state'])), JSON_UNESCAPED_UNICODE)) ?>'>
+                                    <?= e($sa['label'] . ' — ' . $sa['street'] . ', ' . $sa['number'] . ' · ' . $sa['city'] . '/' . $sa['state']) ?><?= (int) $sa['is_default'] ? ' (padrão)' : '' ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php endif; ?>
                 <div class="mt-6 grid gap-5 sm:grid-cols-6">
                     <div class="sm:col-span-2">
                         <label class="field-label" for="cep">CEP *</label>
@@ -312,6 +338,11 @@ require __DIR__ . '/inc/header.php';
                         </select>
                         <?= $err('state') ?>
                     </div>
+                    <?php if ($user): ?>
+                        <label class="flex items-center gap-3 text-sm text-ink-300 sm:col-span-6">
+                            <input type="checkbox" name="save_address" value="1" class="accent-[#d4af37]" <?= $savedAddresses ? '' : 'checked' ?>> Salvar este endereço em Minha conta
+                        </label>
+                    <?php endif; ?>
                 </div>
             </fieldset>
 

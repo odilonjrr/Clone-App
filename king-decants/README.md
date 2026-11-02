@@ -122,7 +122,7 @@ Sem as chaves do Mercado Pago a loja funciona normalmente (vitrine, sacola, cont
 ---
 
 ### Atualizando um site que já está no ar
-Quando uma versão nova trouxer arquivos em `migrations/`, **primeiro** importe no phpMyAdmin os `.sql` que ainda não rodaram (em ordem numérica, uma única vez cada) e **depois** envie os arquivos novos. Ex.: `migrations/001_pagina_produto.sql` adiciona concentração, pirâmide olfativa, galeria, avaliações e favoritos.
+Quando uma versão nova trouxer arquivos em `migrations/`, **primeiro** importe no phpMyAdmin os `.sql` que ainda não rodaram (em ordem numérica, uma única vez cada) e **depois** envie os arquivos novos. Ex.: `migrations/001_pagina_produto.sql` adiciona concentração, pirâmide olfativa, galeria, avaliações e favoritos; `migrations/002_conta_cliente.sql` adiciona os endereços salvos do cliente.
 
 ## 4. Configuração e proteção das chaves
 
@@ -236,7 +236,13 @@ Sem JavaScript, o formulário faz POST normal e o servidor redireciona.
 
 ---
 
-## 6. Painel admin
+## 6. Área do cliente (Minha conta)
+
+`account.php?secao=` → `painel` (cards), `pedidos`, `favoritos`, `enderecos` (CRUD, endereço padrão usado no checkout), `pagamentos` (informativo: cartões não são armazenados pela loja, tudo via Mercado Pago) e `fidelidade`.
+
+**Fidelidade:** pontos e nível são **calculados** dos pedidos pagos/enviados/entregues feitos com a conta (1 ponto por R$ 1). Níveis: Bronze (0), Prata (500), Ouro (1.500), Platina (5.000). Ajuste em `inc/account.php` (`LOYALTY_POINTS_PER_REAL` e `loyalty_tiers()`). Ainda não há troca de pontos por desconto.
+
+## 6.1 Painel admin
 
 Acesse `/admin`. O login é **separado** do de clientes (tabela `admin_users` e cookie de sessão `KDADMINSESS`).
 

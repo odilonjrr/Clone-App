@@ -82,8 +82,12 @@ $navItems = [
             </a>
 
             <?php if ($user): ?>
-                <a href="<?= e(url('account.php')) ?>" class="icon-btn" aria-label="Minha conta" title="<?= e($user['name']) ?>"><?= icon('user') ?></a>
+                <a href="<?= e(url('account.php?secao=favoritos')) ?>" class="icon-btn hidden sm:inline-flex" aria-label="Favoritos"><?= icon('heart') ?></a>
+                <a href="<?= e(url('account.php')) ?>" class="ml-1 inline-flex items-center gap-1" aria-label="Minha conta" title="<?= e($user['name']) ?>">
+                    <span class="avatar-ring h-9 w-9 text-xs"><?= e(user_initials($user['name'])) ?></span>
+                </a>
             <?php else: ?>
+                <button type="button" data-open-modal="login-modal" class="icon-btn hidden sm:inline-flex" aria-label="Favoritos"><?= icon('heart') ?></button>
                 <button type="button" data-open-modal="login-modal" class="icon-btn" aria-label="Entrar"><?= icon('user') ?></button>
             <?php endif; ?>
 
