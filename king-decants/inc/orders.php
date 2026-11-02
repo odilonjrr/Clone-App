@@ -34,18 +34,22 @@ function order_can_transition(string $from, string $to): bool
 
 /**
  * Cria (ou reaproveita) o registro de cliente para o mini-CRM.
- * - Se já existe usuário com o e-mail, retorna o id dele (e completa CPF/telefone vazios).
+ * - Se já existe usuário com o e-mail, retorna o id dele (completa CPF/telefone apenas se for convidado).
  * - Senão, cria um registro "convidado" (is_guest = 1, sem senha).
  */
 function customer_upsert(string $name, string $email, string $phone, string $cpf): int
 {
     $pdo = db();
-    $stmt = $pdo->prepare('SELECT id, phone, cpf FROM users WHERE email = ?');
+    $stmt = $pdo->prepare('SELECT id, is_guest FROM users WHERE email = ?');
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     if ($user) {
-        $pdo->prepare('UPDATE users SET phone = COALESCE(NULLIF(phone, \'\'), ?), cpf = COALESCE(cpf, ?) WHERE id = ?')
-            ->execute([$phone, $cpf, $user['id']]);
+        // Só completa dados de registros de convidado: um checkout como convidado não pode
+        // gravar telefone/CPF numa conta registrada (quem digita o e-mail pode não ser o dono).
+        if ((int) $user['is_guest']) {
+            $pdo->prepare('UPDATE users SET phone = COALESCE(NULLIF(phone, \'\'), ?), cpf = COALESCE(cpf, ?) WHERE id = ?')
+                ->execute([$phone, $cpf, $user['id']]);
+        }
         return (int) $user['id'];
     }
     $pdo->prepare('INSERT INTO users (name, email, phone, cpf, is_guest) VALUES (?, ?, ?, ?, 1)')
@@ -68,13 +72,18 @@ function order_create(array $customer, array $cart, array $shipping, string $met
     $pdo = db();
     $pdo->beginTransaction();
     try {
-        // Revalida estoque com lock de linha (evita vender além do disponível em pedidos simultâneos).
+        // RESERVA de estoque: revalida com lock de linha e já baixa a quantidade dentro da
+        // mesma transação. Assim dois clientes não conseguem gerar pagamento para a última
+        // unidade. A reserva é devolvida se o pedido for cancelado (inclusive por expiração,
+        // ver orders_expire_stale()).
+        $reserve = $pdo->prepare('UPDATE products SET stock = stock - ? WHERE id = ?');
         foreach ($cart['items'] as $item) {
             $stmt = $pdo->prepare('SELECT stock FROM products WHERE id = ? FOR UPDATE');
             $stmt->execute([$item['id']]);
             if ((int) $stmt->fetchColumn() < (int) $item['quantity']) {
                 throw new RuntimeException('Estoque insuficiente para "' . $item['name'] . '".');
             }
+            $reserve->execute([(int) $item['quantity'], $item['id']]);
         }
 
         $userId = $isGuest
@@ -90,8 +99,8 @@ function order_create(array $customer, array $cart, array $shipping, string $met
             'INSERT INTO orders (user_id, is_guest_order, access_token, status, payment_method,
                 customer_name, customer_email, customer_phone, customer_cpf,
                 cep, street, number, complement, district, city, state,
-                subtotal, shipping, total)
-             VALUES (?, ?, ?, \'pending\', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                subtotal, shipping, total, stock_applied)
+             VALUES (?, ?, ?, \'pending\', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)'
         )->execute([
             $userId, $isGuest ? 1 : 0, $token, $method,
             $customer['name'], $customer['email'], $customer['phone'], $customer['cpf'],
@@ -175,22 +184,38 @@ function order_change_status(int $orderId, string $to, string $source, ?int $adm
         $sql = 'UPDATE orders SET status = ?' . ($timestampColumn ? ", {$timestampColumn} = NOW()" : '') . ' WHERE id = ?';
         $pdo->prepare($sql)->execute([$to, $orderId]);
 
-        // Estoque: baixa ao ser pago; devolve se um pedido pago for cancelado.
-        if ($to === 'paid' && !(int) $order['stock_applied']) {
-            $items = order_items($orderId);
-            $upd = $pdo->prepare('UPDATE products SET stock = GREATEST(stock - ?, 0), sold_count = sold_count + ? WHERE id = ?');
+        // Estoque: reservado na criação do pedido (stock_applied = 1).
+        //  - pago: contabiliza a venda (sold_count). Se a reserva tinha sido liberada
+        //    (pedido cancelado e depois pago), reserva de novo e avisa se faltar estoque.
+        //  - cancelado: devolve a reserva; se estava pago, desfaz a contagem de venda.
+        $items = order_items($orderId);
+        if ($to === 'paid') {
             foreach ($items as $it) {
-                if ($it['product_id']) {
-                    $upd->execute([$it['quantity'], $it['quantity'], $it['product_id']]);
+                if (!$it['product_id']) {
+                    continue;
                 }
+                if (!(int) $order['stock_applied']) {
+                    $s = $pdo->prepare('SELECT stock FROM products WHERE id = ? FOR UPDATE');
+                    $s->execute([$it['product_id']]);
+                    if ((int) $s->fetchColumn() < (int) $it['quantity']) {
+                        $note = trim(($note ?? '') . ' · ATENÇÃO: estoque insuficiente para ' . $it['sku'] . ', verificar.');
+                        app_log('payments', 'Pedido pago sem estoque reservado', ['order' => $orderId, 'sku' => $it['sku']]);
+                    }
+                    $pdo->prepare('UPDATE products SET stock = GREATEST(stock - ?, 0) WHERE id = ?')->execute([$it['quantity'], $it['product_id']]);
+                }
+                $pdo->prepare('UPDATE products SET sold_count = sold_count + ? WHERE id = ?')->execute([$it['quantity'], $it['product_id']]);
             }
             $pdo->prepare('UPDATE orders SET stock_applied = 1 WHERE id = ?')->execute([$orderId]);
-        } elseif ($to === 'cancelled' && (int) $order['stock_applied']) {
-            $items = order_items($orderId);
-            $upd = $pdo->prepare('UPDATE products SET stock = stock + ?, sold_count = GREATEST(CAST(sold_count AS SIGNED) - ?, 0) WHERE id = ?');
+        } elseif ($to === 'cancelled') {
             foreach ($items as $it) {
-                if ($it['product_id']) {
-                    $upd->execute([$it['quantity'], $it['quantity'], $it['product_id']]);
+                if (!$it['product_id']) {
+                    continue;
+                }
+                if ((int) $order['stock_applied']) {
+                    $pdo->prepare('UPDATE products SET stock = stock + ? WHERE id = ?')->execute([$it['quantity'], $it['product_id']]);
+                }
+                if ($order['status'] === 'paid') {
+                    $pdo->prepare('UPDATE products SET sold_count = GREATEST(CAST(sold_count AS SIGNED) - ?, 0) WHERE id = ?')->execute([$it['quantity'], $it['product_id']]);
                 }
             }
             $pdo->prepare('UPDATE orders SET stock_applied = 0 WHERE id = ?')->execute([$orderId]);
@@ -219,6 +244,25 @@ function order_change_status(int $orderId, string $to, string $source, ?int $adm
         app_log('mail', 'Falha ao enviar e-mail de status', ['order' => $orderId, 'error' => $e->getMessage()]);
     }
     return true;
+}
+
+/**
+ * Cancela pedidos "pending" mais antigos que $hours horas e libera a reserva de estoque.
+ * 24h acompanha a expiração da preferência do Checkout Pro (o PIX expira em 30 min).
+ * Executada de forma oportunista (início do checkout e dashboard do admin), sem cron.
+ * Se um pagamento for aprovado depois, o pedido reabre (cancelled -> paid).
+ */
+function orders_expire_stale(int $hours = 24): int
+{
+    $stmt = db()->prepare("SELECT id FROM orders WHERE status = 'pending' AND created_at < (NOW() - INTERVAL ? HOUR) LIMIT 50");
+    $stmt->execute([$hours]);
+    $count = 0;
+    foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $id) {
+        if (order_change_status((int) $id, 'cancelled', 'system', null, "Expirado: sem pagamento em {$hours}h (reserva de estoque liberada)")) {
+            $count++;
+        }
+    }
+    return $count;
 }
 
 /** Converte status do Mercado Pago no status do pedido (ou null = não muda). */
@@ -274,6 +318,16 @@ function payment_process_mp(array $mp, string $source): array
     $target = mp_status_to_order_status($status);
     if ($status === 'rejected') {
         $target = null; // ver regra acima
+    }
+    // Um pedido pode ter várias tentativas (PIX regenerado, troca cartão -> PIX).
+    // Se OUTRA tentativa já foi aprovada, o cancelamento/expiração desta não cancela o pedido.
+    // (Estorno/chargeback da tentativa aprovada atualiza a própria linha, então cancela normalmente.)
+    if ($target === 'cancelled') {
+        $other = db()->prepare("SELECT COUNT(*) FROM payments WHERE order_id = ? AND status = 'approved' AND mp_payment_id <> ?");
+        $other->execute([$orderId, $mpId]);
+        if ((int) $other->fetchColumn() > 0) {
+            $target = null;
+        }
     }
     $changed = false;
     if ($target) {

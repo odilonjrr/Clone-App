@@ -122,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
     if (!$errors) {
         $shipping = shipping_quote($old['cep'], $cart['subtotal']);
         $orderRef = null;
+        orders_expire_stale(); // libera reservas de pedidos abandonados antes de reservar
         try {
             // 3) Pedido "pending"
             $orderRef = order_create($old, $cart, $shipping, $old['payment_method'], $isGuest);
@@ -180,7 +181,7 @@ if (!$old) {
     if ($user) {
         $old += ['name' => $user['name'], 'email' => $user['email'], 'phone' => $user['phone'], 'cpf' => $user['cpf']];
         // Reaproveita o endereço do último pedido
-        $last = db()->prepare('SELECT cep, street, number, complement, district, city, state FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1');
+        $last = db()->prepare('SELECT cep, street, number, complement, district, city, state FROM orders WHERE user_id = ? AND is_guest_order = 0 ORDER BY id DESC LIMIT 1');
         $last->execute([$user['id']]);
         $old += $last->fetch() ?: [];
     }

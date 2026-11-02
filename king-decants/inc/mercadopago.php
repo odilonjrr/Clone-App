@@ -250,16 +250,25 @@ function mp_create_pix_payment(array $order): array
     return $json;
 }
 
-/** Consulta um pagamento (fonte da verdade para o status). */
+/**
+ * Consulta um pagamento (fonte da verdade para o status).
+ * @return array|null  null = pagamento não existe (404)
+ * @throws RuntimeException em falha transitória (rede, 429, 5xx)
+ */
 function mp_get_payment(string $paymentId): ?array
 {
     if (!preg_match('/^\d{1,20}$/', $paymentId)) {
         return null;
     }
     [$status, $json, $raw] = mp_request('GET', '/v1/payments/' . $paymentId);
+    if ($status === 404) {
+        return null; // pagamento inexistente (ex.: notificação de teste do painel)
+    }
     if ($status !== 200 || !$json) {
+        // 429/5xx/resposta inválida: falha TRANSITÓRIA. Lança exceção para o webhook
+        // responder 500 e o Mercado Pago reenviar a notificação depois.
         app_log('mercadopago', 'Erro ao consultar pagamento', ['id' => $paymentId, 'status' => $status, 'body' => mb_substr($raw, 0, 1000)]);
-        return null;
+        throw new RuntimeException("Falha transitória ao consultar pagamento {$paymentId} (HTTP {$status})");
     }
     return $json;
 }
@@ -270,9 +279,13 @@ function mp_get_merchant_order_payment_ids(string $merchantOrderId): array
     if (!preg_match('/^\d{1,20}$/', $merchantOrderId)) {
         return [];
     }
-    [$status, $json] = mp_request('GET', '/merchant_orders/' . $merchantOrderId);
-    if ($status !== 200 || !$json) {
+    [$status, $json, $raw] = mp_request('GET', '/merchant_orders/' . $merchantOrderId);
+    if ($status === 404) {
         return [];
+    }
+    if ($status !== 200 || !$json) {
+        app_log('mercadopago', 'Erro ao consultar merchant_order', ['id' => $merchantOrderId, 'status' => $status, 'body' => mb_substr($raw, 0, 1000)]);
+        throw new RuntimeException("Falha transitória ao consultar merchant_order {$merchantOrderId} (HTTP {$status})");
     }
     return array_map(fn($p) => (string) $p['id'], $json['payments'] ?? []);
 }

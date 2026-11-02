@@ -9,8 +9,9 @@
  *  - CSRF obrigatório
  *  - Senha com password_hash() (bcrypt/argon conforme PHP; nunca texto puro)
  *  - E-mail já usado por CONVIDADO: a conta é "promovida" (define a senha),
- *    mantendo o histórico do mini-CRM. Pedidos feitos como convidado NÃO
- *    aparecem em "Minha conta" (não há verificação de e-mail neste MVP).
+ *    mantendo o vínculo no mini-CRM. Como não há verificação de e-mail neste
+ *    MVP, a nova conta NÃO herda telefone/CPF do convidado e não vê pedidos
+ *    nem endereços de compras feitas como convidado.
  *  - Após criar a conta: login_user() -> session_regenerate_id() + migra o carrinho.
  * ---------------------------------------------------------------------------
  */
@@ -63,9 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($existing && !(int) $existing['is_guest']) {
             $errors['email'] = 'Este e-mail já possui conta. Faça login.';
         } elseif ($existing) {
-            // Promove o registro de convidado a conta
-            db()->prepare('UPDATE users SET name = ?, password_hash = ?, phone = COALESCE(NULLIF(?, \'\'), phone), cpf = COALESCE(NULLIF(?, \'\'), cpf), is_guest = 0 WHERE id = ?')
-                ->execute([$old['name'], $hash, $old['phone'], $old['cpf'], $existing['id']]);
+            // Promove o registro de convidado a conta. Sem verificação de e-mail não dá
+            // para provar que quem se cadastra é o dono das compras como convidado, então
+            // telefone/CPF do convidado NÃO são herdados (ficam só nos pedidos, visíveis ao admin).
+            db()->prepare('UPDATE users SET name = ?, password_hash = ?, phone = ?, cpf = ?, is_guest = 0 WHERE id = ?')
+                ->execute([$old['name'], $hash, $old['phone'] ?: null, $old['cpf'] ?: null, $existing['id']]);
             $userId = (int) $existing['id'];
         } else {
             db()->prepare('INSERT INTO users (name, email, password_hash, phone, cpf, is_guest) VALUES (?, ?, ?, ?, ?, 0)')

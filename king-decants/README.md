@@ -313,7 +313,7 @@ server {
 - **Rate limit** de login (tabela `login_attempts`): 5 falhas por IP **ou** e-mail em 15 minutos bloqueiam novas tentativas; o sucesso limpa o contador. Para mais robustez: fail2ban, Cloudflare Rate Limiting ou Redis.
 - **Sanitização** server-side (`clean_string`, `only_digits`) + **validações** (CPF com dígitos verificadores, CEP, e-mail, telefone com DDD, UF, senha forte).
 - **Escape de saída** com `e()` (htmlspecialchars) em todo dado exibido.
-- Preços e frete **sempre recalculados no servidor**; estoque revalidado com `SELECT … FOR UPDATE`.
+- Preços e frete **sempre recalculados no servidor**; estoque revalidado com `SELECT … FOR UPDATE` e **reservado** na criação do pedido.
 - Webhook com **assinatura HMAC**, consulta à API e conferência do valor pago.
 - Página do pedido de convidado protegida por **token aleatório de 160 bits**.
 - `.htaccess` bloqueia `inc/`, `storage/`, `tools/`, `vendor/`, `.sql`, `.md`, `.log` e dotfiles; cabeçalhos `nosniff`, `X-Frame-Options` e `Referrer-Policy`.
@@ -350,9 +350,9 @@ Dica: em hospedagem compartilhada, se o `session.save_path` for compartilhado, o
 
 **Finalizar compra sem login:** modal (ou tela no checkout) com **Criar conta & pagar**, **Entrar** ou **Continuar como convidado**.
 
-**Pedido:** é criado como `pending` **antes** de chamar o MP (o id vira `external_reference`). Se o MP falhar, o pedido é cancelado automaticamente com a nota do erro. O estoque é baixado apenas quando o pagamento é aprovado (flag `stock_applied` evita baixa dupla).
+**Pedido:** é criado como `pending` **antes** de chamar o MP (o id vira `external_reference`). Se o MP falhar, o pedido é cancelado automaticamente com a nota do erro. O estoque é **reservado na criação do pedido** (dois clientes não conseguem gerar pagamento para a última unidade) e devolvido se o pedido for cancelado. Pedidos `pending` há mais de 24h são cancelados automaticamente por `orders_expire_stale()`, chamada no checkout e no dashboard (sem cron), liberando a reserva. Se um pagamento for aprovado depois disso, o pedido reabre. Um pedido pode ter várias tentativas de pagamento; o cancelamento ou a expiração de uma tentativa não cancela o pedido se outra já foi aprovada. No webhook, falhas transitórias da API do MP (429/5xx) respondem 500 para o MP reenviar.
 
-**Convidados no CRM:** compras como convidado criam/atualizam um registro em `users` com `is_guest=1`. Se a pessoa se cadastrar depois com o mesmo e-mail, o registro vira conta. Por segurança (não há verificação de e-mail no MVP), pedidos feitos como convidado **não** aparecem em "Minha conta"; o cliente acessa pelo link do e-mail.
+**Convidados no CRM:** compras como convidado criam/atualizam um registro em `users` com `is_guest=1`. Se a pessoa se cadastrar depois com o mesmo e-mail, o registro vira conta. Por segurança (não há verificação de e-mail no MVP), a nova conta **não herda** telefone/CPF do convidado e **não vê** pedidos nem endereços de compras feitas como convidado; o cliente acessa esses pedidos pelo link do e-mail. Da mesma forma, um checkout como convidado com o e-mail de uma conta existente não altera os dados dessa conta.
 
 **Frete:** `shipping_quote()` em `inc/helpers.php` usa uma tabela fictícia pelo 1º dígito do CEP, com frete grátis acima de `FREE_SHIPPING_FROM`. Troque pela API dos Correios, Melhor Envio ou Frenet quando precisar.
 

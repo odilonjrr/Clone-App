@@ -16,6 +16,7 @@ require dirname(__DIR__) . '/inc/bootstrap.php';
 $admin = require_admin();
 
 $pdo = db();
+orders_expire_stale(); // libera reservas de pedidos pendentes há mais de 24h
 $paidStatuses = "('paid','shipped','delivered')";
 
 $metrics = $pdo->query(

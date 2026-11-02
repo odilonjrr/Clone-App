@@ -242,7 +242,8 @@
   if (checkoutForm) {
     checkoutForm.addEventListener('kd:cep', async (ev) => {
       try {
-        const url = checkoutForm.dataset.shippingUrl + '?cep=' + ev.detail.cep;
+        const base = checkoutForm.dataset.shippingUrl;
+        const url = base + (base.includes('?') ? '&' : '?') + 'cep=' + encodeURIComponent(ev.detail.cep);
         const res = await fetch(url, { headers: { Accept: 'application/json' } });
         const d = await res.json();
         if (d.ok) {

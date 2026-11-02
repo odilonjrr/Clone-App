@@ -65,12 +65,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = db()->prepare('SELECT mp_payment_id FROM payments WHERE order_id = ? AND mp_payment_id IS NOT NULL ORDER BY id DESC LIMIT 1');
         $stmt->execute([$id]);
         $pid = (string) $stmt->fetchColumn();
-        if ($pid && mp_is_configured() && ($payment = mp_get_payment($pid))) {
-            $res = payment_process_mp($payment, 'admin');
-            admin_log('order_sync', 'order', $id, $res['message']);
-            flash('success', 'Sincronizado: ' . $res['message']);
-        } else {
-            flash('error', 'Nenhum pagamento para sincronizar (ou credenciais não configuradas).');
+        try {
+            $payment = ($pid && mp_is_configured()) ? mp_get_payment($pid) : null;
+            if ($payment) {
+                $res = payment_process_mp($payment, 'admin');
+                admin_log('order_sync', 'order', $id, $res['message']);
+                flash('success', 'Sincronizado: ' . $res['message']);
+            } else {
+                flash('error', 'Nenhum pagamento para sincronizar (ou credenciais não configuradas).');
+            }
+        } catch (Throwable $e) {
+            flash('error', 'Mercado Pago indisponível no momento. Tente novamente em instantes.');
         }
         redirect($selfUrl);
     }
