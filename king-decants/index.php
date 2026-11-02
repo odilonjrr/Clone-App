@@ -55,18 +55,24 @@ require __DIR__ . '/inc/header.php';
      dessa luz; texto editorial à esquerda. Troque assets/img/hero-bottle.svg por
      uma fotografia (PNG/WebP com fundo preto) quando tiver. -->
 <section class="hero relative overflow-hidden border-b border-white/10">
-    <div class="hero-rays pointer-events-none absolute inset-y-0 right-0 w-full lg:w-[68%]" style="background-image:url('<?= e(asset('img/hero-rays.svg')) ?>')"></div>
+    <!-- Luzes animadas (SVG inline para as animações CSS internas rodarem em todos os navegadores) -->
+    <div class="hero-rays pointer-events-none absolute inset-y-0 right-0 w-full lg:w-[68%]">
+        <?= file_get_contents(__DIR__ . '/assets/img/hero-lights.svg') ?>
+    </div>
     <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/70 to-transparent lg:via-ink-950/40"></div>
 
     <div class="relative mx-auto grid min-h-[520px] max-w-7xl items-center gap-4 px-5 py-12 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:py-16">
         <div class="relative z-10 order-2 text-center lg:order-1 lg:text-left">
-            <h1 class="font-serif leading-[.95] text-white animate-fade-up">
-                <span class="block text-5xl sm:text-6xl xl:text-7xl">Criado para</span>
-                <em class="block text-6xl sm:text-7xl xl:text-[5.6rem]">marcar presença.</em>
+            <p class="eyebrow animate-fade-up">Decants de alta perfumaria</p>
+            <h1 class="mt-6 font-serif text-5xl font-normal leading-[1.02] text-white animate-fade-up sm:text-6xl xl:text-7xl" style="animation-delay:.1s">
+                Criado para<br>
+                <em class="font-light text-gold-gradient">marcar presença.</em>
             </h1>
-            <p class="mt-6 text-xl font-light text-ink-100 animate-fade-up sm:text-2xl" style="animation-delay:.15s">Luxo em cada gota.</p>
-            <div class="mt-9 animate-fade-up" style="animation-delay:.3s">
-                <a href="#mais-vendidos" class="btn-gold btn-hero">Comprar agora</a>
+            <div class="mx-auto mt-8 h-px w-16 bg-gold-400/60 lg:mx-0"></div>
+            <p class="mt-8 text-lg font-light tracking-wide text-ink-300 animate-fade-up" style="animation-delay:.2s">Luxo em cada gota.</p>
+            <div class="mt-10 flex flex-col items-center gap-4 animate-fade-up sm:flex-row sm:justify-center lg:justify-start" style="animation-delay:.3s">
+                <a href="#mais-vendidos" class="btn-gold">Comprar agora <?= icon('arrow', 'h-4 w-4') ?></a>
+                <a href="#colecoes" class="text-xs uppercase tracking-[0.22em] text-ink-400 transition-colors hover:text-gold-300">Explorar coleções</a>
             </div>
         </div>
         <div class="relative order-1 mx-auto w-full max-w-[320px] lg:order-2 lg:max-w-[400px]">
