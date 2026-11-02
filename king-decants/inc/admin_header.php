@@ -16,6 +16,7 @@ $adminLinks = [
     'orders'    => ['Pedidos', 'admin/orders.php', 'box'],
     'customers' => ['Clientes', 'admin/customers.php', 'users'],
     'products'  => ['Produtos', 'admin/products.php', 'gift'],
+    'appearance'=> ['Aparência', 'admin/appearance.php', 'crown'],
     'account'   => ['Minha conta', 'admin/account.php', 'user'],
 ];
 ?>

@@ -255,6 +255,7 @@ Acesse `/admin`. O login é **separado** do de clientes (tabela `admin_users` e 
 | **Página de produto** | Galeria (miniaturas na lateral), concentração – volume, estrelas de **avaliações reais** (só compradores verificados, admin pode ocultar), pirâmide olfativa topo/coração/fundo com imagem por nível e botão de favoritos (lista em *Minha conta*) |
 | **Produtos** | Lista com busca por nome/SKU, filtro ativo/oculto, botão para mostrar/ocultar na loja e destaque de estoque baixo |
 | **Cadastro / edição de produto** | Nome, SKU, slug (automático), subtítulo, descrições, coleção, preço (aceita `49,90`), estoque, volume, ordem e **upload de foto** (JPG/PNG/WebP até 5 MB) ou URL https. Produtos já vendidos não podem ser excluídos, apenas ocultados |
+| **Aparência** | Troca a imagem do frasco do banner da home (upload seguro), texto alternativo e link opcional para um produto; "Voltar ao padrão" restaura o frasco ilustrado |
 | **Minha conta (admin)** | Trocar nome, e-mail de acesso e senha (exige a senha atual). Um aviso aparece em todo o painel enquanto o acesso padrão estiver em uso |
 | **Ficha do cliente** | Métricas, histórico de pedidos, últimos contatos (nota/telefone/WhatsApp/e-mail), último endereço e CSV dos pedidos |
 

@@ -670,3 +670,30 @@ function icon(string $name, string $class = 'h-5 w-5'): string
     $svg = $paths[$name] ?? $paths['info'];
     return '<svg class="' . e($class) . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $svg . '</svg>';
 }
+
+// ===========================================================================
+// CONFIGURAÇÕES DA LOJA (tabela settings) — ex.: imagem do banner da home
+// ===========================================================================
+
+/** Lê uma configuração (com cache por requisição). */
+function setting(string $key, ?string $default = null): ?string
+{
+    static $cache = null;
+    if ($cache === null) {
+        $cache = [];
+        try {
+            foreach (db()->query('SELECT setting_key, setting_value FROM settings')->fetchAll() as $row) {
+                $cache[$row['setting_key']] = $row['setting_value'];
+            }
+        } catch (Throwable $e) {
+            // Tabela ainda não criada: usa padrões.
+        }
+    }
+    return array_key_exists($key, $cache) && $cache[$key] !== null && $cache[$key] !== '' ? $cache[$key] : $default;
+}
+
+function setting_set(string $key, ?string $value): void
+{
+    db()->prepare('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)')
+        ->execute([$key, $value]);
+}

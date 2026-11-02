@@ -76,8 +76,17 @@ require __DIR__ . '/inc/header.php';
             </div>
         </div>
         <div class="relative order-1 mx-auto w-full max-w-[320px] lg:order-2 lg:max-w-[400px]">
-            <img src="<?= e(asset('img/hero-bottle.svg')) ?>" alt="Frasco de perfume preto com tampa dourada envolto em luz dourada"
-                 class="blend-edges relative mx-auto w-full animate-fade-up" width="600" height="720">
+            <?php
+            // Imagem do banner: a enviada em Admin -> Aparência, ou o frasco ilustrado padrão.
+            $heroImage = setting('hero_image');
+            $heroAlt = setting('hero_image_alt', 'Frasco de perfume envolto em luz dourada');
+            $heroLink = setting('hero_link');
+            ?>
+            <?php if ($heroLink): ?><a href="<?= e(url($heroLink)) ?>" class="block" aria-label="<?= e($heroAlt) ?>"><?php endif; ?>
+            <img src="<?= e($heroImage ? product_image_src($heroImage) : asset('img/hero-bottle.svg')) ?>" alt="<?= e($heroAlt) ?>"
+                 class="hero-bottle <?= $heroImage ? 'is-photo' : 'blend-edges' ?> relative mx-auto w-full animate-fade-up" width="600" height="720"
+                 onerror="this.onerror=null;this.src='<?= e(asset('img/hero-bottle.svg')) ?>'">
+            <?php if ($heroLink): ?></a><?php endif; ?>
         </div>
     </div>
 </section>

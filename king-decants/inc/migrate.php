@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const KD_SCHEMA_VERSION = 2;
+const KD_SCHEMA_VERSION = 3;
 
 function kd_schema_marker(): string
 {
@@ -125,6 +125,13 @@ function kd_ensure_schema(): void
         updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
         KEY idx_addresses_user (user_id, is_default),
         CONSTRAINT fk_addresses_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    // ---------------- Versão 3: configurações da loja (banner da home etc.)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS settings (
+        setting_key VARCHAR(60) NOT NULL PRIMARY KEY,
+        setting_value TEXT NULL,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
     @file_put_contents($marker, (string) KD_SCHEMA_VERSION, LOCK_EX);

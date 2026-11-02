@@ -382,3 +382,12 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
   .hero-rays svg.hero-lights { transform: translateX(-56px) scale(1.4); transform-origin: 50% 80%; }
   .hero-rays::after { top: 62%; width: 90%; }
 }
+
+/* Foto enviada no admin para o banner: integra ao fundo (bordas suavizadas e
+   reflexo dourado). Funciona melhor com PNG/WebP de fundo transparente. */
+.hero-bottle.is-photo {
+  max-height: 560px; object-fit: contain;
+  filter: drop-shadow(0 30px 40px rgba(0,0,0,.6)) drop-shadow(0 0 40px rgba(212,175,55,.25));
+  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 70%, transparent 100%);
+  mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 70%, transparent 100%);
+}
