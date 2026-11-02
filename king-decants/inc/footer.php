@@ -10,7 +10,11 @@
  * mantendo o usuário onde estava (o carrinho de convidado é migrado no login).
  * ---------------------------------------------------------------------------
  */
-$currentPath = ltrim(substr(strtok($_SERVER['REQUEST_URI'] ?? '', '?') ?: '', strlen(base_path())), '/');
+// Página atual (com query string) para voltar a ela após o login rápido.
+$currentPath = ltrim(substr((string) ($_SERVER['REQUEST_URI'] ?? ''), strlen(base_path())), '/');
+if (strlen($currentPath) > 300) {
+    $currentPath = 'index.php';
+}
 ?>
 </main>
 

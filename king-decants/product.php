@@ -3,9 +3,16 @@
  * King Decants — product.php (Detalhe do produto)
  * ---------------------------------------------------------------------------
  * Acesso: product.php?slug=decants-basicos  (ou ?id=1)
- * Mostra imagem, descrição completa, SKU, preço, estoque e seletor de
- * quantidade. "Adicionar à sacola" usa AJAX (contador atualiza sem recarregar);
- * "Comprar agora" adiciona e leva direto para o carrinho.
+ *
+ * Layout (desktop):  [miniaturas] [foto principal com luz dourada] [informações]
+ *   Informações: nome, concentração – volume, estrelas (avaliações reais),
+ *   preço, descrição, PIRÂMIDE OLFATIVA (topo / coração / fundo com imagem por
+ *   nível) e os botões "Favoritos" e "Adicionar à sacola".
+ * Abaixo: descrição completa e avaliações de compradores verificados.
+ * No celular: foto, miniaturas em linha e informações empilhadas.
+ *
+ * POST action=review (CSRF): cria/atualiza a avaliação do cliente logado,
+ * somente se ele comprou o produto com a conta (user_can_review()).
  * ---------------------------------------------------------------------------
  */
 require __DIR__ . '/inc/bootstrap.php';
@@ -31,14 +38,50 @@ if (!$product) {
     exit;
 }
 
-// Relacionados: outros produtos ativos
-$rel = db()->prepare('SELECT * FROM products WHERE is_active = 1 AND id <> ? ORDER BY sold_count DESC LIMIT 3');
-$rel->execute([$product['id']]);
-$related = $rel->fetchAll();
+$productId = (int) $product['id'];
+$selfUrl = url('product.php?slug=' . urlencode($product['slug']));
+$user = current_user();
 
+// ------------------------------------------------------------------ Avaliação (POST)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'review') {
+    csrf_require();
+    if (!$user) {
+        flash('error', 'Entre na sua conta para avaliar.');
+    } elseif (!user_can_review((int) $user['id'], $productId)) {
+        flash('error', 'Apenas clientes que compraram este decant podem avaliá-lo.');
+    } else {
+        $rating = int_param($_POST, 'rating');
+        $comment = clean_text($_POST['comment'] ?? '', 1000);
+        if ($rating < 1 || $rating > 5) {
+            flash('error', 'Escolha de 1 a 5 estrelas.');
+        } else {
+            db()->prepare('INSERT INTO product_reviews (product_id, user_id, rating, comment) VALUES (?, ?, ?, ?)
+                           ON DUPLICATE KEY UPDATE rating = VALUES(rating), comment = VALUES(comment), is_visible = 1')
+                ->execute([$productId, $user['id'], $rating, $comment !== '' ? $comment : null]);
+            flash('success', 'Obrigado pela sua avaliação!');
+        }
+    }
+    redirect($selfUrl . '#avaliacoes');
+}
+
+// ------------------------------------------------------------------ Dados
+$gallery = product_gallery($product);
+$pyramid = product_pyramid($product);
+$rating = product_rating($productId);
+$reviews = product_reviews($productId, 10);
 $inStock = (int) $product['stock'] > 0;
-$maxQty = min(CART_MAX_QTY_PER_ITEM, (int) $product['stock']);
 $collectionLabel = collections()[$product['collection']]['label'] ?? '';
+$inWishlist = $user ? wishlist_has((int) $user['id'], $productId) : false;
+$canReview = $user ? user_can_review((int) $user['id'], $productId) : false;
+$myReview = ($user && $canReview) ? user_review((int) $user['id'], $productId) : null;
+
+// "Eau de Parfum – 10 ml" (cai no subtítulo se não houver concentração)
+$subtitleParts = array_filter([trim((string) $product['concentration']), $product['volume_ml'] ? (int) $product['volume_ml'] . ' ml' : '']);
+$subtitle = $subtitleParts ? implode(' – ', $subtitleParts) : (string) $product['tagline'];
+
+$rel = db()->prepare('SELECT * FROM products WHERE is_active = 1 AND id <> ? ORDER BY sold_count DESC LIMIT 3');
+$rel->execute([$productId]);
+$related = $rel->fetchAll();
 
 $pageTitle = $product['name'] . ' — King Decants';
 $metaDescription = $product['short_description'];
@@ -46,8 +89,8 @@ $activeNav = 'descobrir';
 require __DIR__ . '/inc/header.php';
 ?>
 
-<section class="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-16">
-    <nav class="mb-8 text-[11px] uppercase tracking-[0.2em] text-ink-500" aria-label="Breadcrumb">
+<section class="mx-auto max-w-7xl px-5 py-8 lg:px-8 lg:py-12">
+    <nav class="mb-6 text-[11px] uppercase tracking-[0.2em] text-ink-500" aria-label="Breadcrumb">
         <a href="<?= e(url('index.php')) ?>" class="hover:text-gold-300">Início</a>
         <span class="mx-2 text-gold-600">/</span>
         <a href="<?= e(url('index.php?colecao=' . $product['collection'] . '#mais-vendidos')) ?>" class="hover:text-gold-300"><?= e($collectionLabel) ?></a>
@@ -55,63 +98,168 @@ require __DIR__ . '/inc/header.php';
         <span class="text-ink-300"><?= e($product['name']) ?></span>
     </nav>
 
-    <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
-        <!-- Imagem -->
-        <div class="relative animate-fade-up">
-            <div class="pointer-events-none absolute inset-10 rounded-full bg-gold-400/15 blur-[90px]"></div>
-            <div class="skeleton relative overflow-hidden rounded-2xl border border-white/5">
-                <?= str_replace('<img ', '<img data-skeleton ', product_img($product, 'aspect-[4/5] w-full object-cover')) ?>
+    <div class="grid gap-6 lg:grid-cols-[96px_minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-8">
+
+        <!-- ======================= MINIATURAS (lateral esquerda) ======================= -->
+        <?php if (count($gallery) > 1): ?>
+            <div class="order-2 flex gap-3 overflow-x-auto pb-1 lg:order-1 lg:max-h-[640px] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0" role="tablist" aria-label="Fotos do produto">
+                <?php foreach ($gallery as $i => $src): ?>
+                    <button type="button" role="tab" aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" aria-label="Foto <?= $i + 1 ?>"
+                            data-gallery-thumb="<?= e($src) ?>"
+                            class="gallery-thumb aspect-[4/5] w-20 shrink-0 overflow-hidden rounded-lg border bg-ink-900 transition lg:w-full <?= $i === 0 ? 'is-active' : '' ?>">
+                        <img src="<?= e($src) ?>" alt="" loading="lazy" class="h-full w-full object-cover"
+                             onerror="this.onerror=null;this.src='<?= e(url('assets/img/product-placeholder.svg')) ?>'">
+                    </button>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="hidden lg:order-1 lg:block"></div>
+        <?php endif; ?>
+
+        <!-- ======================= FOTO PRINCIPAL ======================= -->
+        <div class="relative order-1 lg:order-2">
+            <div class="product-stage skeleton relative overflow-hidden rounded-2xl border border-white/10">
+                <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,.28),transparent_65%)]"></div>
+                <img id="gallery-main" data-skeleton src="<?= e($gallery[0]) ?>" alt="<?= e($product['name']) ?>"
+                     class="relative aspect-[4/5] w-full object-cover transition-opacity duration-300"
+                     onerror="this.onerror=null;this.src='<?= e(url('assets/img/product-placeholder.svg')) ?>'">
             </div>
         </div>
 
-        <!-- Informações -->
-        <div class="flex flex-col justify-center animate-fade-up" style="animation-delay:.1s">
-            <p class="eyebrow"><?= e($product['tagline']) ?></p>
-            <h1 class="mt-4 font-serif text-5xl leading-tight text-white"><?= e($product['name']) ?></h1>
-            <p class="mt-6 font-serif text-4xl text-gold-300"><?= money($product['price']) ?></p>
-            <p class="mt-1 text-sm text-ink-500">em até 12x no cartão ou à vista no PIX via Mercado Pago</p>
-
-            <div class="gold-divider my-8"></div>
-
-            <p class="leading-relaxed text-ink-300"><?= nl2br(e($product['description'] ?: $product['short_description'])) ?></p>
-
-            <dl class="mt-8 grid grid-cols-3 gap-4 text-sm">
-                <div class="panel px-4 py-3"><dt class="text-[10px] uppercase tracking-[0.2em] text-ink-500">SKU</dt><dd class="mt-1 text-white"><?= e($product['sku']) ?></dd></div>
-                <div class="panel px-4 py-3"><dt class="text-[10px] uppercase tracking-[0.2em] text-ink-500">Volume</dt><dd class="mt-1 text-white"><?= (int) $product['volume_ml'] ?> ml</dd></div>
-                <div class="panel px-4 py-3"><dt class="text-[10px] uppercase tracking-[0.2em] text-ink-500">Estoque</dt><dd class="mt-1 <?= $inStock ? 'text-white' : 'text-red-300' ?>"><?= $inStock ? (int) $product['stock'] . ' unid.' : 'Esgotado' ?></dd></div>
-            </dl>
-
-            <?php if ($inStock): ?>
-                <form action="<?= e(url('cart.php')) ?>" method="post" class="mt-10 flex flex-col gap-4 sm:flex-row" data-add-to-cart>
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
-                    <label class="sr-only" for="qty">Quantidade</label>
-                    <select id="qty" name="quantity" class="field sm:w-28">
-                        <?php for ($i = 1; $i <= $maxQty; $i++): ?>
-                            <option value="<?= $i ?>"><?= $i ?></option>
-                        <?php endfor; ?>
-                    </select>
-                    <button type="submit" class="btn-gold flex-1" data-loading-text="Adicionando…"><?= icon('bag', 'h-4 w-4') ?> Adicionar à sacola</button>
-                </form>
-                <!-- Comprar agora: POST normal (sem AJAX) que adiciona e redireciona ao carrinho -->
-                <form action="<?= e(url('cart.php')) ?>" method="post" class="mt-3">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
-                    <input type="hidden" name="quantity" value="1">
-                    <input type="hidden" name="go" value="cart">
-                    <button type="submit" class="btn-outline w-full">Comprar agora</button>
-                </form>
-            <?php else: ?>
-                <div class="alert mt-10">Este decant está esgotado no momento. Volte em breve.</div>
+        <!-- ======================= INFORMAÇÕES ======================= -->
+        <div class="order-3 flex flex-col animate-fade-up">
+            <h1 class="font-serif text-4xl leading-[1.05] text-white sm:text-5xl"><?= e($product['name']) ?></h1>
+            <?php if ($subtitle !== ''): ?>
+                <p class="mt-3 text-lg text-ink-200"><?= e($subtitle) ?></p>
             <?php endif; ?>
 
-            <ul class="mt-10 space-y-3 text-sm text-ink-400">
-                <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('shield', 'h-5 w-5') ?></span> Pagamento seguro via Mercado Pago (PIX e cartão)</li>
-                <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('truck', 'h-5 w-5') ?></span> Frete grátis acima de <?= money(FREE_SHIPPING_FROM) ?></li>
-            </ul>
+            <!-- Avaliações (somente reais) -->
+            <a href="#avaliacoes" class="mt-4 inline-flex w-fit items-center gap-3 text-ink-200 hover:text-white">
+                <?= stars_html($rating['avg']) ?>
+                <?php if ($rating['count'] > 0): ?>
+                    <span><?= e(number_format($rating['avg'], 1, ',', '')) ?> <span class="text-ink-400">(<?= (int) $rating['count'] ?> <?= $rating['count'] === 1 ? 'avaliação' : 'avaliações' ?>)</span></span>
+                <?php else: ?>
+                    <span class="text-sm text-ink-400">Ainda sem avaliações</span>
+                <?php endif; ?>
+            </a>
+
+            <p class="mt-5 font-serif text-5xl font-semibold text-gold-gradient"><?= money($product['price']) ?></p>
+            <p class="mt-1 text-xs text-ink-500">em até 12x no cartão ou à vista no PIX via Mercado Pago</p>
+
+            <p class="mt-6 max-w-md text-lg leading-relaxed text-ink-200"><?= e($product['short_description']) ?></p>
+
+            <!-- Pirâmide olfativa -->
+            <?php if ($pyramid): ?>
+                <h2 class="mt-8 text-lg font-medium uppercase tracking-[0.06em] text-white">Notas olfativas</h2>
+                <ul class="mt-4 space-y-2.5">
+                    <?php foreach ($pyramid as $level): ?>
+                        <li class="note-row">
+                            <span class="note-label"><?= e($level['label']) ?></span>
+                            <span class="note-body">
+                                <span class="flex-1 text-[15px] text-ink-100"><?= e($level['notes']) ?></span>
+                                <img src="<?= e($level['image']) ?>" alt="" loading="lazy" class="h-14 w-28 shrink-0 object-contain">
+                            </span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <!-- Ações -->
+            <div class="mt-8 grid gap-3 sm:grid-cols-2">
+                <?php if ($user): ?>
+                    <form action="<?= e(url('wishlist.php')) ?>" method="post" data-wishlist>
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="product_id" value="<?= $productId ?>">
+                        <button type="submit" class="btn-wishlist w-full <?= $inWishlist ? 'is-active' : '' ?>" aria-pressed="<?= $inWishlist ? 'true' : 'false' ?>">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none" aria-hidden="true"><path d="M12 20s-7-4.4-9.2-8.6C1.3 8.4 3.2 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.4 0 5.3 3.4 3.8 6.4C19 15.6 12 20 12 20z"/></svg>
+                            <span data-wishlist-label><?= $inWishlist ? 'Nos favoritos' : 'Adicionar aos favoritos' ?></span>
+                        </button>
+                    </form>
+                <?php else: ?>
+                    <button type="button" class="btn-wishlist w-full" data-open-modal="login-modal">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none" aria-hidden="true"><path d="M12 20s-7-4.4-9.2-8.6C1.3 8.4 3.2 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.4 0 5.3 3.4 3.8 6.4C19 15.6 12 20 12 20z"/></svg>
+                        Adicionar aos favoritos
+                    </button>
+                <?php endif; ?>
+
+                <form action="<?= e(url('cart.php')) ?>" method="post" data-add-to-cart>
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="product_id" value="<?= $productId ?>">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn-gold btn-lg w-full" <?= $inStock ? '' : 'disabled' ?> data-loading-text="Adicionando…">
+                        <?= $inStock ? 'Adicionar à sacola' : 'Esgotado' ?>
+                    </button>
+                </form>
+            </div>
+            <p class="mt-4 text-xs tracking-wider text-ink-500">
+                SKU <?= e($product['sku']) ?> ·
+                <?= $inStock ? ((int) $product['stock'] <= 10 ? 'Últimas ' . (int) $product['stock'] . ' unidades' : 'Em estoque') : 'Sem estoque no momento' ?>
+                · Frete grátis acima de <?= money(FREE_SHIPPING_FROM) ?>
+            </p>
         </div>
+    </div>
+</section>
+
+<div class="gold-divider mx-auto max-w-7xl"></div>
+
+<!-- ======================= DESCRIÇÃO + AVALIAÇÕES ======================= -->
+<section class="mx-auto grid max-w-7xl gap-12 px-5 py-14 lg:grid-cols-2 lg:px-8">
+    <div>
+        <h2 class="text-xs font-medium uppercase tracking-[0.28em] text-white">Sobre este decant</h2>
+        <p class="mt-5 leading-relaxed text-ink-300"><?= nl2br(e($product['description'] ?: $product['short_description'])) ?></p>
+        <ul class="mt-8 space-y-3 text-sm text-ink-400">
+            <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('shield', 'h-5 w-5') ?></span> Envasado a partir do frasco original, com lote registrado</li>
+            <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('truck', 'h-5 w-5') ?></span> Envio para todo o Brasil</li>
+            <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('card', 'h-5 w-5') ?></span> Pagamento seguro via Mercado Pago (PIX e cartão)</li>
+        </ul>
+    </div>
+
+    <div id="avaliacoes" class="scroll-mt-28">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+            <h2 class="text-xs font-medium uppercase tracking-[0.28em] text-white">Avaliações</h2>
+            <?php if ($rating['count'] > 0): ?>
+                <p class="flex items-center gap-2 text-sm text-ink-300"><?= stars_html($rating['avg'], 'h-4 w-4') ?> <?= e(number_format($rating['avg'], 1, ',', '')) ?> de 5 · <?= (int) $rating['count'] ?></p>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($reviews): ?>
+            <ul class="mt-6 space-y-5">
+                <?php foreach ($reviews as $rv): ?>
+                    <li class="panel p-5">
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-sm text-white"><?= e(explode(' ', trim($rv['name']))[0]) ?> <span class="ml-1 text-[10px] uppercase tracking-wider text-gold-500">compra verificada</span></span>
+                            <?= stars_html((float) $rv['rating'], 'h-4 w-4') ?>
+                        </div>
+                        <?php if ($rv['comment']): ?><p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink-300"><?= e($rv['comment']) ?></p><?php endif; ?>
+                        <p class="mt-2 text-xs text-ink-500"><?= date_br($rv['created_at'], false) ?></p>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p class="mt-6 text-sm text-ink-400">Este decant ainda não recebeu avaliações.</p>
+        <?php endif; ?>
+
+        <!-- Formulário: somente compradores verificados -->
+        <?php if ($canReview): ?>
+            <form method="post" class="panel mt-8 space-y-4 p-5" data-loading>
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="review">
+                <p class="text-sm text-white"><?= $myReview ? 'Editar sua avaliação' : 'Avalie este decant' ?></p>
+                <fieldset class="star-input" aria-label="Nota">
+                    <?php for ($i = 5; $i >= 1; $i--): ?>
+                        <input type="radio" id="rate-<?= $i ?>" name="rating" value="<?= $i ?>" <?= (int) ($myReview['rating'] ?? 0) === $i ? 'checked' : '' ?> required>
+                        <label for="rate-<?= $i ?>" title="<?= $i ?> estrela<?= $i > 1 ? 's' : '' ?>">★</label>
+                    <?php endfor; ?>
+                </fieldset>
+                <textarea name="comment" rows="3" maxlength="1000" class="field" placeholder="Conte como foi sua experiência (opcional)"><?= e($myReview['comment'] ?? '') ?></textarea>
+                <button class="btn-gold btn-sm" data-loading-text="Enviando…">Publicar avaliação</button>
+            </form>
+        <?php elseif ($user): ?>
+            <p class="mt-8 text-xs text-ink-500">Somente clientes que compraram este decant com a conta podem avaliá-lo.</p>
+        <?php else: ?>
+            <p class="mt-8 text-xs text-ink-500">Comprou este decant? <button type="button" class="text-gold-400 hover:text-gold-300" data-open-modal="login-modal">Entre na sua conta</button> para avaliar.</p>
+        <?php endif; ?>
     </div>
 </section>
 

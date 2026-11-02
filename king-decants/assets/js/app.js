@@ -339,6 +339,49 @@
     setTimeout(tick, 5000);
   }
 
+  // ---------------------------------------------------------------- 8b. Galeria do produto
+  const mainImg = document.getElementById('gallery-main');
+  $$('[data-gallery-thumb]').forEach((thumb) =>
+    thumb.addEventListener('click', () => {
+      if (!mainImg) return;
+      $$('[data-gallery-thumb]').forEach((t) => {
+        t.classList.remove('is-active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      thumb.classList.add('is-active');
+      thumb.setAttribute('aria-selected', 'true');
+      mainImg.style.opacity = '0';
+      setTimeout(() => {
+        mainImg.src = thumb.dataset.galleryThumb;
+        mainImg.onload = () => (mainImg.style.opacity = '1');
+      }, 150);
+    })
+  );
+
+  // ---------------------------------------------------------------- 8c. Favoritos
+  $$('form[data-wishlist]').forEach((form) =>
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const btn = form.querySelector('button');
+      btn.disabled = true;
+      try {
+        const data = await postForm(form);
+        if (data.ok) {
+          btn.classList.toggle('is-active', data.in_wishlist);
+          btn.setAttribute('aria-pressed', data.in_wishlist ? 'true' : 'false');
+          const label = form.querySelector('[data-wishlist-label]');
+          if (label) label.textContent = data.in_wishlist ? 'Nos favoritos' : 'Adicionar aos favoritos';
+          kdToast('success', data.message);
+        } else {
+          kdToast('error', data.error || 'Não foi possível atualizar os favoritos.');
+        }
+      } catch (e) {
+        kdToast('error', 'Falha de conexão.');
+      }
+      btn.disabled = false;
+    })
+  );
+
   // ---------------------------------------------------------------- 9. Revelação ao rolar
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(

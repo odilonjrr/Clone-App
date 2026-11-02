@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Notas de topo: cítricos e especiarias">
+  <!-- Ilustração padrão das NOTAS DE TOPO (cítricos). Substituível por foto no admin. -->
+  <defs>
+    <radialGradient id="pulp" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#f4f7c8"/><stop offset=".7" stop-color="#c9dc5a"/><stop offset="1" stop-color="#7fa82a"/></radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#d4af37" stop-opacity=".35"/><stop offset="1" stop-color="#d4af37" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse cx="80" cy="42" rx="78" ry="38" fill="url(#glow)"/>
+  <circle cx="72" cy="38" r="26" fill="#5c8a1e"/>
+  <circle cx="72" cy="38" r="23" fill="url(#pulp)"/>
+  <g stroke="#f4f7c8" stroke-width="1.6" opacity=".9">
+    <line x1="72" y1="16" x2="72" y2="60"/><line x1="50" y1="38" x2="94" y2="38"/>
+    <line x1="56.5" y1="22.5" x2="87.5" y2="53.5"/><line x1="87.5" y1="22.5" x2="56.5" y2="53.5"/>
+  </g>
+  <circle cx="72" cy="38" r="3" fill="#f4f7c8"/>
+  <g fill="#1a1410" stroke="#3a2a1a">
+    <circle cx="112" cy="52" r="5"/><circle cx="124" cy="56" r="4.5"/><circle cx="118" cy="62" r="4"/><circle cx="131" cy="48" r="3.5"/>
+  </g>
+  <g fill="#d4af37" opacity=".6"><circle cx="113" cy="50" r="1"/><circle cx="125" cy="54" r="1"/></g>
+</svg>

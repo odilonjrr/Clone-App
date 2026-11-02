@@ -25,7 +25,7 @@ const PRODUCT_UPLOAD_DIR = 'assets/uploads/products';
  * (ex.: "assets/uploads/products/9f2c…e1.webp"), ou null se nenhum arquivo foi enviado.
  * @throws RuntimeException com mensagem amigável em caso de arquivo inválido.
  */
-function product_image_upload(?array $file): ?string
+function product_image_upload(?array $file, int $minSide = 200): ?string
 {
     if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         return null;
@@ -47,8 +47,8 @@ function product_image_upload(?array $file): ?string
         throw new RuntimeException('Formato não suportado. Envie JPG, PNG ou WebP.');
     }
     [$width, $height] = $info;
-    if ($width < 200 || $height < 200 || $width > 8000 || $height > 8000) {
-        throw new RuntimeException('Use uma imagem entre 200 e 8000 pixels de lado.');
+    if ($width < $minSide || $height < $minSide || $width > 8000 || $height > 8000) {
+        throw new RuntimeException("Use uma imagem entre {$minSide} e 8000 pixels de lado.");
     }
 
     $dir = dirname(__DIR__) . '/' . PRODUCT_UPLOAD_DIR;
@@ -91,6 +91,28 @@ function product_image_upload(?array $file): ?string
     }
     @chmod($dir . '/' . $name, 0644);
     return PRODUCT_UPLOAD_DIR . '/' . $name;
+}
+
+/**
+ * Converte o formato de $_FILES de um <input type="file" name="x[]" multiple>
+ * (arrays paralelos) em uma lista de arquivos individuais. Ignora campos vazios.
+ */
+function uploaded_files_list(?array $files): array
+{
+    if (!$files || !isset($files['name']) || !is_array($files['name'])) {
+        return [];
+    }
+    $out = [];
+    foreach ($files['name'] as $i => $name) {
+        if (($files['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+        $out[] = [
+            'name' => $name, 'type' => $files['type'][$i] ?? '', 'tmp_name' => $files['tmp_name'][$i] ?? '',
+            'error' => $files['error'][$i], 'size' => $files['size'][$i] ?? 0,
+        ];
+    }
+    return $out;
 }
 
 /** Remove do disco uma imagem antiga, SOMENTE se ela estiver na pasta de uploads. */

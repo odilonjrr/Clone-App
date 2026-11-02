@@ -88,6 +88,7 @@ king-decants/
 ├── storage/logs/           Logs (webhook, mercadopago, mail, checkout) — bloqueado na web
 ├── tools/create_admin.php  Cria/atualiza admin via linha de comando
 ├── schema.sql              Tabelas + 4 produtos seed + admin inicial
+├── migrations/             Atualizações de banco para instalações existentes (rodar no phpMyAdmin)
 ├── composer.json           Dependências opcionais
 └── .htaccess               HTTPS (opcional), bloqueios e cabeçalhos de segurança
 ```
@@ -119,6 +120,9 @@ Sem as chaves do Mercado Pago a loja funciona normalmente (vitrine, sacola, cont
 **Hospedagem sem `CREATE DATABASE` (cPanel):** crie o banco pelo painel, apague as duas primeiras linhas do `schema.sql` (`CREATE DATABASE` e `USE`) e importe pelo phpMyAdmin dentro do banco criado.
 
 ---
+
+### Atualizando um site que já está no ar
+Quando uma versão nova trouxer arquivos em `migrations/`, **primeiro** importe no phpMyAdmin os `.sql` que ainda não rodaram (em ordem numérica, uma única vez cada) e **depois** envie os arquivos novos. Ex.: `migrations/001_pagina_produto.sql` adiciona concentração, pirâmide olfativa, galeria, avaliações e favoritos.
 
 ## 4. Configuração e proteção das chaves
 
@@ -242,6 +246,7 @@ Acesse `/admin`. O login é **separado** do de clientes (tabela `admin_users` e 
 | **Pedidos** | Abas por status com contadores, busca (nº, nome, e-mail, CPF, telefone), período, 20 por página, ações rápidas (enviado/entregue/cancelar) e exportação CSV com os filtros atuais |
 | **Detalhe do pedido** | Itens, cliente (link para WhatsApp), endereço, pagamentos MP, linha do tempo de status, notas internas, código de rastreio, "Sincronizar pagamento" |
 | **Clientes (mini-CRM)** | Busca por nome/e-mail/CPF/telefone, filtro conta/convidado, nº de pedidos, total pago, último pedido e CSV |
+| **Página de produto** | Galeria (miniaturas na lateral), concentração – volume, estrelas de **avaliações reais** (só compradores verificados, admin pode ocultar), pirâmide olfativa topo/coração/fundo com imagem por nível e botão de favoritos (lista em *Minha conta*) |
 | **Produtos** | Lista com busca por nome/SKU, filtro ativo/oculto, botão para mostrar/ocultar na loja e destaque de estoque baixo |
 | **Cadastro / edição de produto** | Nome, SKU, slug (automático), subtítulo, descrições, coleção, preço (aceita `49,90`), estoque, volume, ordem e **upload de foto** (JPG/PNG/WebP até 5 MB) ou URL https. Produtos já vendidos não podem ser excluídos, apenas ocultados |
 | **Minha conta (admin)** | Trocar nome, e-mail de acesso e senha (exige a senha atual). Um aviso aparece em todo o painel enquanto o acesso padrão estiver em uso |

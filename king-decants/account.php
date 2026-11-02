@@ -18,6 +18,10 @@ $stmt = db()->prepare('SELECT id, access_token, status, total, created_at FROM o
 $stmt->execute([$user['id']]);
 $orders = $stmt->fetchAll();
 
+$fav = db()->prepare('SELECT p.* FROM wishlists w JOIN products p ON p.id = w.product_id WHERE w.user_id = ? AND p.is_active = 1 ORDER BY w.created_at DESC');
+$fav->execute([$user['id']]);
+$favorites = $fav->fetchAll();
+
 $pageTitle = 'Minha conta — King Decants';
 require __DIR__ . '/inc/header.php';
 ?>
@@ -63,6 +67,32 @@ require __DIR__ . '/inc/header.php';
                 </table>
             <?php endif; ?>
         </div>
+    </div>
+
+    <!-- Favoritos -->
+    <div id="favoritos" class="mt-12 scroll-mt-28">
+        <h2 class="text-xs font-medium uppercase tracking-[0.24em] text-white">Favoritos</h2>
+        <?php if (!$favorites): ?>
+            <p class="mt-4 text-sm text-ink-400">Você ainda não salvou favoritos. Use o coração na página de cada decant.</p>
+        <?php else: ?>
+            <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <?php foreach ($favorites as $p): ?>
+                    <div class="panel flex gap-4 p-4">
+                        <a href="<?= e(url('product.php?slug=' . urlencode($p['slug']))) ?>" class="h-24 w-20 shrink-0 overflow-hidden rounded-md bg-ink-900"><?= product_img($p, 'h-full w-full object-cover') ?></a>
+                        <div class="flex min-w-0 flex-1 flex-col">
+                            <a href="<?= e(url('product.php?slug=' . urlencode($p['slug']))) ?>" class="truncate font-serif text-lg text-white hover:text-gold-300"><?= e($p['name']) ?></a>
+                            <span class="text-sm text-gold-300"><?= money($p['price']) ?></span>
+                            <form action="<?= e(url('wishlist.php')) ?>" method="post" class="mt-auto">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="product_id" value="<?= (int) $p['id'] ?>">
+                                <input type="hidden" name="back" value="account">
+                                <button class="text-[11px] uppercase tracking-[0.16em] text-ink-500 hover:text-red-300">Remover</button>
+                            </form>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </section>
 <?php require __DIR__ . '/inc/footer.php'; ?>

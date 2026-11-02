@@ -50,8 +50,12 @@ $errors = [];
 $old = $product ?: [
     'name' => '', 'sku' => '', 'slug' => '', 'tagline' => '', 'short_description' => '', 'description' => '',
     'collection' => 'assinatura', 'price' => '', 'stock' => '0', 'volume_ml' => '', 'sort_order' => '0',
-    'is_active' => 1, 'image_url' => '',
+    'is_active' => 1, 'image_url' => '', 'concentration' => '',
+    'notes_top' => '', 'notes_heart' => '', 'notes_base' => '',
+    'notes_top_image' => '', 'notes_heart_image' => '', 'notes_base_image' => '',
 ];
+$noteLevels = ['top' => 'Topo', 'heart' => 'Coração', 'base' => 'Fundo'];
+const GALLERY_MAX = 12;
 
 // postMaxSize excedido: o PHP descarta $_POST inteiro (inclusive o CSRF).
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
@@ -63,6 +67,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_require();
     $action = $_POST['action'] ?? 'save';
 
+    // ------------------------------------------------------------ Avaliações: ocultar/mostrar
+    if ($action === 'review_toggle' && $product) {
+        $rid = int_param($_POST, 'review_id');
+        db()->prepare('UPDATE product_reviews SET is_visible = 1 - is_visible WHERE id = ? AND product_id = ?')->execute([$rid, $id]);
+        admin_log('review_toggle', 'product', $id, 'avaliação #' . $rid);
+        flash('success', 'Visibilidade da avaliação atualizada.');
+        redirect(url('admin/product_edit.php?id=' . $id . '#avaliacoes'));
+    }
+
     // ------------------------------------------------------------ Excluir
     if ($action === 'delete' && $product) {
         $sold = db()->prepare('SELECT COUNT(*) FROM order_items WHERE product_id = ?');
@@ -71,8 +84,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('error', 'Este produto já tem pedidos e não pode ser excluído. Use "Ocultar da loja" para tirá-lo da vitrine.');
             redirect(url('admin/product_edit.php?id=' . $id));
         }
+        $extras = product_extra_images($id);
         db()->prepare('DELETE FROM products WHERE id = ?')->execute([$id]);
         product_image_delete($product['image_url']);
+        foreach ($extras as $img) {
+            product_image_delete($img['image_url']);
+        }
+        foreach (['top', 'heart', 'base'] as $lv) {
+            product_image_delete($product['notes_' . $lv . '_image'] ?? null);
+        }
         admin_log('product_delete', 'product', $id, $product['sku'] . ' · ' . $product['name']);
         flash('success', 'Produto excluído.');
         redirect(url('admin/products.php'));
@@ -98,7 +118,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'sort_order'        => (string) ($_POST['sort_order'] ?? '0'),
         'is_active'         => isset($_POST['is_active']) ? 1 : 0,
         'image_url'         => $product['image_url'] ?? '',
+        'concentration'     => clean_string($_POST['concentration'] ?? '', 60),
+        'notes_top'         => clean_string($_POST['notes_top'] ?? '', 255),
+        'notes_heart'       => clean_string($_POST['notes_heart'] ?? '', 255),
+        'notes_base'        => clean_string($_POST['notes_base'] ?? '', 255),
+        'notes_top_image'   => $product['notes_top_image'] ?? '',
+        'notes_heart_image' => $product['notes_heart_image'] ?? '',
+        'notes_base_image'  => $product['notes_base_image'] ?? '',
     ];
+    // Galeria: ids marcados para remover (somente deste produto)
+    $existingGallery = $product ? product_extra_images($id) : [];
+    $removeIds = array_map('intval', (array) ($_POST['gallery_remove'] ?? []));
+    $removeIds = array_values(array_intersect($removeIds, array_map('intval', array_column($existingGallery, 'id'))));
+    $galleryFiles = uploaded_files_list($_FILES['gallery'] ?? null);
+    if (count($existingGallery) - count($removeIds) + count($galleryFiles) > GALLERY_MAX) {
+        $errors['gallery'] = 'A galeria aceita no máximo ' . GALLERY_MAX . ' fotos extras.';
+    }
     if ($old['slug'] === '') {
         $old['slug'] = slugify($old['name']);
     }
@@ -143,12 +178,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Imagem: upload tem prioridade; depois URL externa; senão mantém a atual.
+    // $uploaded guarda tudo que foi salvo nesta requisição, para limpar se houver erro.
     $newImage = null;
+    $uploaded = [];
+    $newGallery = [];
+    $replacedNoteImages = [];
     if (!$errors) {
         try {
             $newImage = product_image_upload($_FILES['image'] ?? null);
+            if ($newImage) {
+                $uploaded[] = $newImage;
+            }
         } catch (RuntimeException $e) {
             $errors['image'] = $e->getMessage();
+        }
+    }
+    // Imagens da pirâmide olfativa (uma por nível; opcional; "remover" volta à ilustração padrão)
+    foreach ($noteLevels as $lv => $label) {
+        if ($errors) {
+            break;
+        }
+        $col = 'notes_' . $lv . '_image';
+        try {
+            $file = product_image_upload($_FILES['notes_' . $lv . '_file'] ?? null, 120);
+            if ($file) {
+                $uploaded[] = $file;
+                $replacedNoteImages[] = $old[$col];
+                $old[$col] = $file;
+            } elseif (isset($_POST['notes_' . $lv . '_remove'])) {
+                $replacedNoteImages[] = $old[$col];
+                $old[$col] = '';
+            }
+        } catch (RuntimeException $e) {
+            $errors['notes_' . $lv . '_file'] = $e->getMessage();
+        }
+    }
+    // Fotos extras da galeria
+    foreach ($galleryFiles as $gf) {
+        if ($errors) {
+            break;
+        }
+        try {
+            if ($path = product_image_upload($gf)) {
+                $uploaded[] = $path;
+                $newGallery[] = $path;
+            }
+        } catch (RuntimeException $e) {
+            $errors['gallery'] = $e->getMessage();
         }
     }
     if (!$errors) {
@@ -165,10 +241,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $old['sku'], $old['name'], $old['slug'], $old['tagline'] ?: null, $old['short_description'],
             $old['description'] ?: null, $old['collection'], round((float) $old['price'], 2), (int) $old['stock'],
             $old['image_url'], $old['volume_ml'] !== '' ? (int) $old['volume_ml'] : null, (int) $old['sort_order'], $old['is_active'],
+            $old['concentration'] ?: null, $old['notes_top'] ?: null, $old['notes_heart'] ?: null, $old['notes_base'] ?: null,
+            $old['notes_top_image'] ?: null, $old['notes_heart_image'] ?: null, $old['notes_base_image'] ?: null,
         ];
         if ($product) {
             db()->prepare('UPDATE products SET sku=?, name=?, slug=?, tagline=?, short_description=?, description=?, collection=?,
-                           price=?, stock=?, image_url=?, volume_ml=?, sort_order=?, is_active=? WHERE id=?')
+                           price=?, stock=?, image_url=?, volume_ml=?, sort_order=?, is_active=?,
+                           concentration=?, notes_top=?, notes_heart=?, notes_base=?,
+                           notes_top_image=?, notes_heart_image=?, notes_base_image=? WHERE id=?')
                 ->execute([...$data, $id]);
             if ($old['image_url'] !== $product['image_url']) {
                 product_image_delete($product['image_url']);
@@ -183,17 +263,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('success', 'Produto atualizado.');
         } else {
             db()->prepare('INSERT INTO products (sku, name, slug, tagline, short_description, description, collection,
-                           price, stock, image_url, volume_ml, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)')
+                           price, stock, image_url, volume_ml, sort_order, is_active,
+                           concentration, notes_top, notes_heart, notes_base, notes_top_image, notes_heart_image, notes_base_image)
+                           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
                 ->execute($data);
             $id = (int) db()->lastInsertId();
             admin_log('product_create', 'product', $id, $old['sku'] . ' · ' . $old['name']);
             flash('success', 'Produto cadastrado.');
         }
+
+        // Galeria: remove marcadas e adiciona novas ao final
+        foreach ($existingGallery as $img) {
+            if (in_array((int) $img['id'], $removeIds, true)) {
+                db()->prepare('DELETE FROM product_images WHERE id = ? AND product_id = ?')->execute([$img['id'], $id]);
+                product_image_delete($img['image_url']);
+            }
+        }
+        $maxOrder = db()->prepare('SELECT COALESCE(MAX(sort_order), 0) FROM product_images WHERE product_id = ?');
+        $maxOrder->execute([$id]);
+        $order = (int) $maxOrder->fetchColumn();
+        foreach ($newGallery as $path) {
+            db()->prepare('INSERT INTO product_images (product_id, image_url, sort_order) VALUES (?, ?, ?)')->execute([$id, $path, ++$order]);
+        }
+        foreach ($replacedNoteImages as $oldPath) {
+            product_image_delete($oldPath);
+        }
+        if ($newGallery || $removeIds) {
+            admin_log('product_gallery', 'product', $id, '+' . count($newGallery) . ' / -' . count($removeIds) . ' fotos');
+        }
         redirect(url('admin/product_edit.php?id=' . $id));
     }
-    // Se deu erro depois de um upload bem-sucedido, descarta o arquivo órfão.
-    if ($newImage) {
-        product_image_delete($newImage);
+    // Se deu erro depois de uploads bem-sucedidos, descarta os arquivos órfãos.
+    foreach ($uploaded as $path) {
+        product_image_delete($path);
     }
 }
 
@@ -202,6 +304,14 @@ $inv = fn(string $k) => isset($errors[$k]) ? ' is-invalid' : '';
 $v = fn(string $k) => e($old[$k] ?? '');
 $priceDisplay = is_numeric($old['price']) ? number_format((float) $old['price'], 2, ',', '') : $old['price'];
 $isExternal = preg_match('#^https?://#i', (string) $old['image_url']);
+$extraImages = $product ? product_extra_images((int) $product['id']) : [];
+$productReviews = [];
+if ($product) {
+    $rv = db()->prepare('SELECT r.id, r.rating, r.comment, r.is_visible, r.created_at, u.name, u.email
+                           FROM product_reviews r JOIN users u ON u.id = r.user_id WHERE r.product_id = ? ORDER BY r.id DESC LIMIT 50');
+    $rv->execute([$product['id']]);
+    $productReviews = $rv->fetchAll();
+}
 
 $pageTitle = $product ? 'Editar ' . $product['name'] : 'Novo produto';
 $adminNav = 'products';
@@ -242,9 +352,16 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 <input id="slug" name="slug" class="field<?= $inv('slug') ?>" placeholder="gerado a partir do nome" value="<?= $v('slug') ?>">
                 <?= $err('slug') ?>
             </div>
-            <div class="sm:col-span-2">
-                <label class="field-label" for="tagline">Subtítulo</label>
+            <div>
+                <label class="field-label" for="tagline">Subtítulo (cards da vitrine)</label>
                 <input id="tagline" name="tagline" class="field" placeholder="Ex.: Coleção Noir · 10 ml" value="<?= $v('tagline') ?>">
+            </div>
+            <div>
+                <label class="field-label" for="concentration">Concentração</label>
+                <input id="concentration" name="concentration" list="concentrations" class="field" placeholder="Ex.: Eau de Parfum" value="<?= $v('concentration') ?>">
+                <datalist id="concentrations">
+                    <option value="Eau de Cologne"><option value="Eau de Toilette"><option value="Eau de Parfum"><option value="Parfum"><option value="Extrait de Parfum">
+                </datalist>
             </div>
             <div class="sm:col-span-2">
                 <label class="field-label" for="short_description">Descrição curta * <span class="normal-case tracking-normal text-ink-500">(aparece no card)</span></label>
@@ -292,6 +409,33 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 Visível na loja
             </label>
         </div>
+
+        <!-- Pirâmide olfativa -->
+        <div class="gold-divider"></div>
+        <div>
+            <h2 class="text-xs font-medium uppercase tracking-[0.22em] text-white">Pirâmide olfativa</h2>
+            <p class="mt-1 text-xs text-ink-500">Separe as notas por vírgula. Níveis em branco não aparecem na loja. Sem imagem, a loja usa uma ilustração dourada padrão.</p>
+            <div class="mt-4 space-y-4">
+                <?php foreach ($noteLevels as $lv => $label): $imgCol = 'notes_' . $lv . '_image'; ?>
+                    <div class="grid gap-3 rounded-lg border border-white/5 p-4 sm:grid-cols-[110px_1fr_auto] sm:items-center">
+                        <span class="note-label !m-0 !h-10 !w-[110px]"><?= e($label) ?></span>
+                        <div>
+                            <input name="notes_<?= $lv ?>" class="field" maxlength="255" placeholder="Ex.: Bergamota, Pimenta-preta" value="<?= $v('notes_' . $lv) ?>" aria-label="Notas de <?= e($label) ?>">
+                            <div class="mt-2 flex flex-wrap items-center gap-3">
+                                <input type="file" name="notes_<?= $lv ?>_file" accept="image/jpeg,image/png,image/webp" aria-label="Imagem das notas de <?= e($label) ?>"
+                                       class="text-xs text-ink-400 file:mr-2 file:rounded file:border-0 file:bg-white/10 file:px-2 file:py-1 file:text-xs file:text-ink-100">
+                                <?php if (!empty($old[$imgCol])): ?>
+                                    <label class="flex items-center gap-2 text-xs text-ink-400"><input type="checkbox" name="notes_<?= $lv ?>_remove" value="1" class="accent-[#d4af37]"> usar ilustração padrão</label>
+                                <?php endif; ?>
+                            </div>
+                            <?= $err('notes_' . $lv . '_file') ?>
+                        </div>
+                        <img src="<?= e(!empty($old[$imgCol]) ? product_image_src($old[$imgCol]) : url('assets/img/notes/' . $lv . '.svg')) ?>" alt="" class="h-12 w-24 object-contain">
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <p class="mt-2 text-xs text-ink-500">Dica: imagens com fundo transparente (PNG/WebP) ficam melhores na faixa escura.</p>
+        </div>
     </div>
 
     <div class="space-y-6">
@@ -310,11 +454,61 @@ require dirname(__DIR__) . '/inc/admin_header.php';
             <?= $err('image_url_external') ?>
         </div>
 
+        <!-- Galeria (miniaturas na lateral da página do produto) -->
+        <div class="panel p-6">
+            <h2 class="text-xs font-medium uppercase tracking-[0.22em] text-white">Galeria · fotos extras</h2>
+            <p class="mt-1 text-xs text-ink-500">Aparecem como miniaturas ao lado da foto principal (máx. <?= GALLERY_MAX ?>).</p>
+            <?php if ($extraImages): ?>
+                <div class="mt-4 grid grid-cols-3 gap-3">
+                    <?php foreach ($extraImages as $img): ?>
+                        <label class="group relative block cursor-pointer overflow-hidden rounded-md border border-white/10">
+                            <img src="<?= e(product_image_src($img['image_url'])) ?>" alt="" class="aspect-[4/5] w-full object-cover">
+                            <span class="absolute inset-x-0 bottom-0 flex items-center gap-1 bg-black/75 px-2 py-1 text-[10px] uppercase tracking-wider text-ink-200">
+                                <input type="checkbox" name="gallery_remove[]" value="<?= (int) $img['id'] ?>" class="accent-[#d4af37]"> remover
+                            </span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+            <label class="field-label mt-5" for="gallery">Adicionar fotos</label>
+            <input id="gallery" name="gallery[]" type="file" multiple accept="image/jpeg,image/png,image/webp"
+                   class="block w-full text-sm text-ink-300 file:mr-3 file:rounded-md file:border-0 file:bg-gold-400 file:px-3 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-wider file:text-black<?= $inv('gallery') ?>">
+            <?= $err('gallery') ?>
+        </div>
+
         <button type="submit" class="btn-gold w-full" data-loading-text="Salvando…"><?= $product ? 'Salvar alterações' : 'Cadastrar produto' ?></button>
     </div>
 </form>
 
 <?php if ($product): ?>
+    <!-- Avaliações (moderação) -->
+    <section id="avaliacoes" class="panel mt-8 overflow-x-auto">
+        <h2 class="px-6 pt-6 text-xs font-medium uppercase tracking-[0.22em] text-white">Avaliações de clientes</h2>
+        <p class="px-6 pt-1 text-xs text-ink-500">Somente compradores verificados podem avaliar. Você pode ocultar avaliações impróprias (nunca editar a nota).</p>
+        <table class="table-lux mt-3">
+            <thead><tr><th>Cliente</th><th>Nota</th><th>Comentário</th><th>Data</th><th class="text-right">Ação</th></tr></thead>
+            <tbody>
+            <?php foreach ($productReviews as $r): ?>
+                <tr class="<?= (int) $r['is_visible'] ? '' : 'opacity-50' ?>">
+                    <td><?= e($r['name']) ?><p class="text-xs text-ink-500"><?= e($r['email']) ?></p></td>
+                    <td class="whitespace-nowrap"><?= stars_html((float) $r['rating'], 'h-4 w-4') ?></td>
+                    <td class="max-w-md text-ink-300"><?= e(mb_strimwidth((string) $r['comment'], 0, 160, '…')) ?></td>
+                    <td class="whitespace-nowrap text-ink-400"><?= date_br($r['created_at'], false) ?></td>
+                    <td class="text-right">
+                        <form method="post">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="action" value="review_toggle">
+                            <input type="hidden" name="review_id" value="<?= (int) $r['id'] ?>">
+                            <button class="btn-outline btn-sm"><?= (int) $r['is_visible'] ? 'Ocultar' : 'Mostrar' ?></button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            <?php if (!$productReviews): ?><tr><td colspan="5" class="py-8 text-center text-ink-500">Nenhuma avaliação ainda.</td></tr><?php endif; ?>
+            </tbody>
+        </table>
+    </section>
+
     <form method="post" class="mt-10 border-t border-white/5 pt-6"
           onsubmit="return confirm('Excluir definitivamente este produto? Esta ação não pode ser desfeita.')">
         <?= csrf_field() ?>
