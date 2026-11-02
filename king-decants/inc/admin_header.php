@@ -15,6 +15,8 @@ $adminLinks = [
     'dashboard' => ['Dashboard', 'admin/index.php', 'chart'],
     'orders'    => ['Pedidos', 'admin/orders.php', 'box'],
     'customers' => ['Clientes', 'admin/customers.php', 'users'],
+    'products'  => ['Produtos', 'admin/products.php', 'gift'],
+    'account'   => ['Minha conta', 'admin/account.php', 'user'],
 ];
 ?>
 <!DOCTYPE html>
@@ -66,6 +68,11 @@ $adminLinks = [
 
     <!-- Conteúdo -->
     <main class="min-w-0 flex-1 px-5 py-8 lg:px-10 lg:py-10">
+        <?php if ($admin['email'] === 'admin@kingdecants.local' && $adminNav !== 'account'): ?>
+            <a href="<?= e(url('admin/account.php')) ?>" class="alert alert-error mb-6 block">
+                Segurança: você está usando o acesso padrão de instalação. Clique aqui para trocar e-mail e senha.
+            </a>
+        <?php endif; ?>
         <div id="toast-stack" class="pointer-events-none fixed right-4 top-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-3" aria-live="polite">
             <?php foreach (flash_pull() as $f): ?>
                 <div class="toast pointer-events-auto" data-type="<?= e($f['type']) ?>">

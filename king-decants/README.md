@@ -61,6 +61,9 @@ king-decants/
 │   ├── customers.php       Mini-CRM: busca nome/e-mail/CPF/telefone, paginação
 │   ├── customer_view.php   Ficha do cliente: pedidos, métricas, últimos contatos
 │   ├── export.php          Exportação CSV (pedidos ou clientes, respeita filtros)
+│   ├── products.php        Catálogo: busca, ativar/ocultar
+│   ├── product_edit.php    Cadastro/edição de produto com upload de foto
+│   ├── account.php         Minha conta do admin (nome, e-mail, senha)
 │   └── logout.php
 ├── inc/
 │   ├── config.php          ⚙️ Configuração (DB, MP, e-mail) — placeholders
@@ -71,11 +74,13 @@ king-decants/
 │   ├── orders.php          Pedidos, máquina de status, estoque, processamento de pagamento
 │   ├── mercadopago.php     Opção A (SDK) e Opção B (cURL: createPreferenceCurl), PIX, assinatura
 │   ├── mailer.php          E-mails transacionais (log / mail() / SMTP)
+│   ├── uploads.php         Upload seguro de fotos (validação pelo conteúdo + recodificação com GD)
 │   ├── header.php, footer.php           Layout da loja + modal de login rápido
 │   ├── product_card.php                 Card de produto
 │   ├── admin_header.php, admin_footer.php, admin_pagination.php, admin_filters.php
 │   └── .htaccess           Bloqueia acesso web
 ├── assets/
+│   ├── uploads/products/   Fotos enviadas pelo admin (o .htaccess da pasta só serve imagens)
 │   ├── css/app.css         Componentes da identidade (botão dourado, campos, toasts, modal…)
 │   ├── js/app.js           UX: AJAX da sacola, modal, máscaras, ViaCEP, checkout, PIX
 │   ├── js/tailwind.config.js  Paleta ink/gold e fontes para o Tailwind CDN
@@ -106,8 +111,8 @@ php -S localhost:8000
 #    Admin: http://localhost:8000/admin   (admin@kingdecants.local / TroqueEstaSenha!2026)
 ```
 
-> **Troque a senha do admin imediatamente:**
-> `php tools/create_admin.php "Seu Nome" admin@kingdecants.local "NovaSenhaForte123"`
+> **Troque o e-mail e a senha do admin imediatamente** em `/admin` → **Minha conta**.
+> (Alternativa via terminal: `php tools/create_admin.php "Seu Nome" voce@dominio.com.br "NovaSenhaForte123"`.)
 
 Sem as chaves do Mercado Pago a loja funciona normalmente (vitrine, sacola, contas, admin); o checkout mostra um aviso pedindo a configuração.
 
@@ -237,6 +242,9 @@ Acesse `/admin`. O login é **separado** do de clientes (tabela `admin_users` e 
 | **Pedidos** | Abas por status com contadores, busca (nº, nome, e-mail, CPF, telefone), período, 20 por página, ações rápidas (enviado/entregue/cancelar) e exportação CSV com os filtros atuais |
 | **Detalhe do pedido** | Itens, cliente (link para WhatsApp), endereço, pagamentos MP, linha do tempo de status, notas internas, código de rastreio, "Sincronizar pagamento" |
 | **Clientes (mini-CRM)** | Busca por nome/e-mail/CPF/telefone, filtro conta/convidado, nº de pedidos, total pago, último pedido e CSV |
+| **Produtos** | Lista com busca por nome/SKU, filtro ativo/oculto, botão para mostrar/ocultar na loja e destaque de estoque baixo |
+| **Cadastro / edição de produto** | Nome, SKU, slug (automático), subtítulo, descrições, coleção, preço (aceita `49,90`), estoque, volume, ordem e **upload de foto** (JPG/PNG/WebP até 5 MB) ou URL https. Produtos já vendidos não podem ser excluídos, apenas ocultados |
+| **Minha conta (admin)** | Trocar nome, e-mail de acesso e senha (exige a senha atual). Um aviso aparece em todo o painel enquanto o acesso padrão estiver em uso |
 | **Ficha do cliente** | Métricas, histórico de pedidos, últimos contatos (nota/telefone/WhatsApp/e-mail), último endereço e CSV dos pedidos |
 
 Transições permitidas: `pending → paid|cancelled`, `paid → shipped|cancelled`, `shipped → delivered`, `cancelled → paid` (pagamento aprovado depois de um cancelamento). Cancelar um pedido pago **devolve o estoque**, mas o **estorno do dinheiro** deve ser feito no painel do Mercado Pago.
@@ -267,7 +275,7 @@ E-mails enviados: pedido recebido, pagamento confirmado, pedido enviado (com ras
 3. Crie `kingdecants-config.php` **fora** do `public_html` com os valores reais.
 4. Selecione PHP 8.x e habilite `pdo_mysql`, `curl` e `mbstring` (em "Selecionar versão do PHP").
 5. Ative o SSL gratuito (AutoSSL/Let's Encrypt) e descomente o bloco "Força HTTPS" no `.htaccess`.
-6. Dê permissão de escrita em `storage/logs` (755 ou 775, conforme o host).
+6. Dê permissão de escrita em `storage/logs` e `assets/uploads/products` (755 ou 775, conforme o host). Ao enviar uma versão nova do site, **não apague** `assets/uploads/products/`: ali ficam as fotos cadastradas pelo painel.
 7. Composer opcional: via terminal do cPanel, ou rode localmente e envie a pasta `vendor/`.
 
 ### VPS (Ubuntu + Nginx + PHP-FPM)
@@ -318,6 +326,8 @@ server {
 - Página do pedido de convidado protegida por **token aleatório de 160 bits**.
 - `.htaccess` bloqueia `inc/`, `storage/`, `tools/`, `vendor/`, `.sql`, `.md`, `.log` e dotfiles; cabeçalhos `nosniff`, `X-Frame-Options` e `Referrer-Policy`.
 - Redirecionamentos pós-login restritos a caminhos internos (anti open redirect).
+- **Upload de fotos:** tipo detectado pelo conteúdo (não pelo nome), nome aleatório, recodificação com GD (remove EXIF e conteúdo embutido, reduz para 1200 px de largura) e `assets/uploads/.htaccess` que só serve `.jpg/.png/.webp` e não executa scripts.
+- Troca de senha/e-mail do admin exige a senha atual.
 
 **Checklist de produção**
 - [ ] HTTPS obrigatório (descomente o bloco no `.htaccess`) e HSTS.
@@ -364,7 +374,7 @@ Dica: em hospedagem compartilhada, se o `session.save_path` for compartilhado, o
 
 - **Cores e fontes:** `assets/js/tailwind.config.js` (paletas `ink` e `gold`) e as variáveis no topo de `assets/css/app.css`.
 - **Imagem do banner:** substitua `assets/img/hero-bottle.svg` por uma fotografia publicitária com fundo preto (PNG/WebP); a máscara `.blend-edges` integra a imagem ao fundo.
-- **Imagens dos produtos:** atualize `products.image_url`. Os seeds usam `https://via.placeholder.com/…`; se esse serviço estiver fora do ar, cada `<img>` cai automaticamente em `assets/img/product-placeholder.svg`.
+- **Imagens dos produtos:** use `/admin` → **Produtos** → **Editar** → *Enviar nova foto*. Os seeds usam `https://via.placeholder.com/…`; se esse serviço estiver fora do ar, cada `<img>` cai automaticamente em `assets/img/product-placeholder.svg`.
 - **Coleções:** função `collections()` em `inc/helpers.php` + coluna `products.collection`.
 - **Textos institucionais e contato:** `index.php` (Descobrir / A marca) e `inc/footer.php`.
 
@@ -372,7 +382,6 @@ Dica: em hospedagem compartilhada, se o `session.save_path` for compartilhado, o
 
 ## 13. Limitações conhecidas
 
-- Não há CRUD de produtos no admin (edite pelo phpMyAdmin/SQL). É a próxima evolução natural.
 - Não há verificação de e-mail nem recuperação de senha.
 - O frete é ilustrativo.
 - O estorno de valores é feito no painel do Mercado Pago (o cancelamento no admin só ajusta o status e o estoque).

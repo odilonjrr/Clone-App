@@ -578,13 +578,25 @@ function status_badge(string $status): string
     return '<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider ' . $cls . '">' . e(status_label($status)) . '</span>';
 }
 
+/**
+ * URL pública da imagem do produto. Aceita URL absoluta (https://...) ou caminho
+ * relativo salvo pelo upload do admin (assets/uploads/products/arquivo.webp).
+ */
+function product_image_src(string $imageUrl): string
+{
+    if ($imageUrl === '') {
+        return url('assets/img/product-placeholder.svg');
+    }
+    return preg_match('#^https?://#i', $imageUrl) ? $imageUrl : url($imageUrl);
+}
+
 /** <img> de produto com fallback local caso o placeholder externo falhe. */
 function product_img(array $product, string $class = ''): string
 {
     $fallback = url('assets/img/product-placeholder.svg');
     return sprintf(
         '<img src="%s" alt="%s" loading="lazy" class="%s" onerror="this.onerror=null;this.src=\'%s\'">',
-        e($product['image_url']),
+        e(product_image_src((string) $product['image_url'])),
         e($product['name']),
         e($class),
         e($fallback)

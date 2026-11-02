@@ -3,3 +3,7 @@
 # Nunca versionar configuração com chaves reais
 /kingdecants-config.php
 .env
+
+# Imagens enviadas pelo admin em produção (não versionar)
+/assets/uploads/products/*
+!/assets/uploads/products/.gitkeep
