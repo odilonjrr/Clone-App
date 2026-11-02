@@ -7,3 +7,6 @@
 # Imagens enviadas pelo admin em produção (não versionar)
 /assets/uploads/products/*
 !/assets/uploads/products/.gitkeep
+
+# Marcador da versão do banco (gerado automaticamente)
+/storage/schema-version.txt

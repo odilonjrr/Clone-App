@@ -8,6 +8,9 @@
 --   - avaliações de compradores verificados (product_reviews)
 --   - favoritos (wishlists)
 --
+-- OBSERVAÇÃO: desde a versão com inc/migrate.php o site aplica isto SOZINHO
+-- na primeira visita. Importar manualmente é opcional (alternativa).
+--
 -- COMO APLICAR (Hostinger): phpMyAdmin -> selecione o banco -> Importar ->
 -- escolha este arquivo -> Importar. Rode UMA ÚNICA VEZ, ANTES de enviar os
 -- arquivos novos do site. Instalações novas não precisam (o schema.sql já inclui).

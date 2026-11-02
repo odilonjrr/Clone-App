@@ -122,7 +122,7 @@ Sem as chaves do Mercado Pago a loja funciona normalmente (vitrine, sacola, cont
 ---
 
 ### Atualizando um site que já está no ar
-Quando uma versão nova trouxer arquivos em `migrations/`, **primeiro** importe no phpMyAdmin os `.sql` que ainda não rodaram (em ordem numérica, uma única vez cada) e **depois** envie os arquivos novos. Ex.: `migrations/001_pagina_produto.sql` adiciona concentração, pirâmide olfativa, galeria, avaliações e favoritos; `migrations/002_conta_cliente.sql` adiciona os endereços salvos do cliente.
+Basta enviar os arquivos novos: na primeira visita, `inc/migrate.php` cria sozinho as tabelas/colunas que faltarem (seguro para rodar várias vezes) e grava `storage/schema-version.txt`. Os arquivos de `migrations/` ficam como documentação/alternativa manual. Ex.: `migrations/001_pagina_produto.sql` adiciona concentração, pirâmide olfativa, galeria, avaliações e favoritos; `migrations/002_conta_cliente.sql` adiciona os endereços salvos do cliente.
 
 ## 4. Configuração e proteção das chaves
 

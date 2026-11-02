@@ -5,6 +5,9 @@
 -- checkout). Os pontos de fidelidade são calculados a partir dos pedidos pagos,
 -- sem tabela própria.
 --
+-- OBSERVAÇÃO: desde a versão com inc/migrate.php o site aplica isto SOZINHO
+-- na primeira visita. Importar manualmente é opcional (alternativa).
+--
 -- COMO APLICAR: phpMyAdmin -> seu banco -> Importar -> este arquivo. Uma vez só,
 -- ANTES de enviar os arquivos novos. (Requer a 001 já aplicada.)
 -- ===========================================================================

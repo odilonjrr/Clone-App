@@ -42,6 +42,28 @@ require_once __DIR__ . '/account.php';
 require_once __DIR__ . '/orders.php';
 require_once __DIR__ . '/mercadopago.php';
 require_once __DIR__ . '/mailer.php';
+require_once __DIR__ . '/migrate.php';
+
+/**
+ * Erros não tratados: registra em storage/logs/php-errors.log e mostra uma
+ * página amigável (em vez de tela em branco). Em desenvolvimento mostra a mensagem.
+ */
+set_exception_handler(function (Throwable $e): void {
+    app_log('php-errors', get_class($e) . ': ' . $e->getMessage(), ['file' => $e->getFile() . ':' . $e->getLine()]);
+    error_log('[KingDecants] ' . $e);
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/html; charset=utf-8');
+    }
+    $detail = APP_ENV !== 'production'
+        ? '<pre style="white-space:pre-wrap;text-align:left;color:#fca5a5;font-size:12px;margin-top:24px">' . htmlspecialchars((string) $e) . '</pre>'
+        : '<p style="color:#8f8b83;font-size:13px">O erro foi registrado em storage/logs/php-errors.log.</p>';
+    echo '<!DOCTYPE html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Erro — King Decants</title>'
+        . '<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#070707;color:#ece9e3;font-family:Arial,sans-serif;padding:24px">'
+        . '<div style="max-width:640px;text-align:center"><p style="color:#d4af37;letter-spacing:4px;font-size:12px">KING DECANTS</p>'
+        . '<h1 style="font-family:Georgia,serif;font-weight:400">Algo não saiu como esperado</h1>'
+        . '<p style="color:#b8b4ab">Tente novamente em instantes.</p>' . $detail . '</div></body></html>';
+});
 
 /**
  * Inicia a sessão com parâmetros seguros.
@@ -88,6 +110,9 @@ function kd_start_session(): void
     }
     $_SESSION['_last_activity'] = $now;
 }
+
+// Atualiza o banco automaticamente após o envio de uma versão nova (inc/migrate.php).
+kd_ensure_schema();
 
 // Webhook (chamado servidor-a-servidor) não precisa de sessão.
 if (!defined('KD_NO_SESSION')) {
