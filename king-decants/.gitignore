@@ -1,0 +1,5 @@
+/vendor/
+/storage/logs/*.log
+# Nunca versionar configuração com chaves reais
+/kingdecants-config.php
+.env

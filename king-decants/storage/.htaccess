@@ -1,0 +1,2 @@
+# Bloqueia acesso web direto a esta pasta (defesa em profundidade).
+Require all denied
