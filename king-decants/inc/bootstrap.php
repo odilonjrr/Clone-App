@@ -18,6 +18,35 @@
 
 require_once __DIR__ . '/config.php';
 
+/**
+ * Erros FATAIS (ex.: arquivo do sistema faltando após uma atualização incompleta)
+ * não passam pelo set_exception_handler. Esta função mostra uma página clara em
+ * vez da tela branca e indica qual arquivo está faltando.
+ */
+register_shutdown_function(function (): void {
+    $err = error_get_last();
+    if (!$err || !in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        return;
+    }
+    $root = dirname(__DIR__);
+    $hint = '';
+    if (preg_match("/Failed opening required '([^']+)'/", $err['message'], $m)
+        || preg_match('/Failed opening required "([^"]+)"/', $err['message'], $m)) {
+        $missing = ltrim(str_replace($root, '', $m[1]), '/\\');
+        $hint = '<p style="color:#e6c76f">Arquivo do sistema não encontrado: <strong>public_html/' . htmlspecialchars($missing) . '</strong>.<br>Envie novamente o .zip mais recente e extraia em public_html, substituindo os arquivos.</p>';
+    }
+    @file_put_contents($root . '/storage/logs/php-errors.log', '[' . date('Y-m-d H:i:s') . '] FATAL ' . $err['message'] . ' em ' . $err['file'] . ':' . $err['line'] . "\n", FILE_APPEND);
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/html; charset=utf-8');
+    }
+    echo '<!DOCTYPE html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Erro — King Decants</title>'
+        . '<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#070707;color:#ece9e3;font-family:Arial,sans-serif;padding:24px">'
+        . '<div style="max-width:640px;text-align:center"><p style="color:#d4af37;letter-spacing:4px;font-size:12px">KING DECANTS</p>'
+        . '<h1 style="font-family:Georgia,serif;font-weight:400">Site em manutenção</h1>' . $hint
+        . '<p style="color:#8f8b83;font-size:13px">Detalhes em storage/logs/php-errors.log.</p></div></body></html>';
+});
+
 date_default_timezone_set(APP_TIMEZONE);
 
 // Em produção nunca exiba erros na tela (vão para o log do servidor).
