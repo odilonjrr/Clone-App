@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const KD_SCHEMA_VERSION = 3;
+const KD_SCHEMA_VERSION = 4;
 
 function kd_schema_marker(): string
 {
@@ -133,6 +133,18 @@ function kd_ensure_schema(): void
         setting_value TEXT NULL,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    // ---------------- Versão 4: InfinitePay (provedor no pedido, recibo e slug do pagamento)
+    if (!$hasColumn('orders', 'payment_provider')) {
+        $pdo->exec("ALTER TABLE orders ADD COLUMN payment_provider VARCHAR(20) NOT NULL DEFAULT 'mercadopago' AFTER payment_method");
+    }
+    $pdo->exec("ALTER TABLE orders MODIFY payment_method ENUM('pix','card','infinitepay') NOT NULL DEFAULT 'card'");
+    if (!$hasColumn('payments', 'receipt_url')) {
+        $pdo->exec("ALTER TABLE payments ADD COLUMN receipt_url VARCHAR(500) NULL AFTER pix_expires_at");
+    }
+    if (!$hasColumn('payments', 'external_slug')) {
+        $pdo->exec("ALTER TABLE payments ADD COLUMN external_slug VARCHAR(80) NULL AFTER mp_payment_id");
+    }
 
     @file_put_contents($marker, (string) KD_SCHEMA_VERSION, LOCK_EX);
     app_log('migrate', 'Banco atualizado para a versão ' . KD_SCHEMA_VERSION);

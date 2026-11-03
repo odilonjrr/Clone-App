@@ -47,9 +47,10 @@ if (($_GET['format'] ?? '') === 'json') {
 }
 
 // ---------------------------------------------------- Gerar novo PIX (POST)
+$isInfinitePay = ($order['payment_provider'] ?? '') === 'infinitepay';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_pix') {
     csrf_require();
-    if ($order['status'] === 'pending') {
+    if ($order['status'] === 'pending' && !$isInfinitePay) {
         try {
             payment_upsert($order['id'], mp_create_pix_payment($order));
             db()->prepare("UPDATE orders SET payment_method = 'pix' WHERE id = ?")->execute([$order['id']]);
@@ -61,9 +62,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'new_p
     redirect(url('callback.php?order=' . $order['id'] . '&token=' . $order['access_token']));
 }
 
-// ---------------------------------------------------- Retorno do Checkout Pro
+// ---------------------------------------------------- Retorno da InfinitePay
+// A InfinitePay volta com order_nsu, transaction_nsu, slug, capture_method e
+// receipt_url. Esses parâmetros podem ser forjados: confirmamos com payment_check.
+if ($isInfinitePay && $order['status'] === 'pending' && ip_is_configured()
+    && (isset($_GET['transaction_nsu']) || isset($_GET['slug']) || isset($_GET['order_nsu']))) {
+    try {
+        $check = ip_payment_check(ip_order_nsu($order), (string) ($_GET['transaction_nsu'] ?? ''), (string) ($_GET['slug'] ?? ''));
+        if ($check) {
+            ip_process_payment($order, $check, [
+                'transaction_nsu' => (string) ($_GET['transaction_nsu'] ?? ''),
+                'slug'            => (string) ($_GET['slug'] ?? ''),
+                'receipt_url'     => (string) ($_GET['receipt_url'] ?? ''),
+            ], 'callback');
+            $order = order_find($order['id']);
+        }
+    } catch (Throwable $e) {
+        app_log('callback', 'InfinitePay: erro ao confirmar no retorno', ['error' => $e->getMessage()]);
+    }
+}
+
+// ---------------------------------------------------- Retorno do Checkout Pro (Mercado Pago)
 $mpPaymentId = (string) ($_GET['payment_id'] ?? ($_GET['collection_id'] ?? ''));
-if ($mpPaymentId !== '' && $mpPaymentId !== 'null' && mp_is_configured()) {
+if (!$isInfinitePay && $mpPaymentId !== '' && $mpPaymentId !== 'null' && mp_is_configured()) {
     try {
         $payment = mp_get_payment($mpPaymentId);
         // Só processa se o pagamento pertence a ESTE pedido.
@@ -82,7 +103,7 @@ $pixExpired = $pix && $pix['pix_expires_at'] && strtotime($pix['pix_expires_at']
 $returnResult = $_GET['result'] ?? '';
 
 $headline = [
-    'pending'   => ['Aguardando pagamento', 'Assim que o Mercado Pago confirmar, você receberá um e-mail.'],
+    'pending'   => ['Aguardando pagamento', 'Assim que o pagamento for confirmado, você receberá um e-mail.'],
     'paid'      => ['Pagamento confirmado', 'Obrigado! Seu pedido já está sendo preparado.'],
     'shipped'   => ['Pedido enviado', 'Seu pedido está a caminho.'],
     'delivered' => ['Pedido entregue', 'Esperamos que cada gota seja memorável.'],
@@ -106,6 +127,15 @@ require __DIR__ . '/inc/header.php';
         <p class="eyebrow mt-6">Pedido #<?= (int) $order['id'] ?></p>
         <h1 class="mt-3 font-serif text-4xl text-white sm:text-5xl"><?= e($headline[0]) ?></h1>
         <p class="mt-3 text-ink-400"><?= e($headline[1]) ?></p>
+        <?php
+        // Comprovante da InfinitePay (quando disponível)
+        $receiptStmt = db()->prepare('SELECT receipt_url FROM payments WHERE order_id = ? AND receipt_url IS NOT NULL AND status = \'approved\' ORDER BY id DESC LIMIT 1');
+        $receiptStmt->execute([$order['id']]);
+        $receiptUrl = $receiptStmt->fetchColumn();
+        ?>
+        <?php if ($receiptUrl): ?>
+            <a href="<?= e($receiptUrl) ?>" target="_blank" rel="noopener" class="mt-3 inline-block text-xs uppercase tracking-[0.2em] text-gold-400 hover:text-gold-300">Ver comprovante</a>
+        <?php endif; ?>
         <div class="mt-4"><?= status_badge($order['status']) ?></div>
     </div>
 
@@ -146,11 +176,13 @@ require __DIR__ . '/inc/header.php';
             <!-- ======================= CARTÃO: tentar novamente no Checkout Pro ======================= -->
             <div class="mx-auto mt-10 flex max-w-xl flex-col items-center gap-3 sm:flex-row sm:justify-center" data-poll-status="<?= e($selfUrl . '&format=json') ?>">
                 <a href="<?= e($order['mp_init_point']) ?>" class="btn-gold">Ir para o pagamento</a>
+                <?php if (!$isInfinitePay): ?>
                 <form method="post" data-loading>
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="new_pix">
                     <button class="btn-outline" data-loading-text="Gerando…">Pagar com PIX</button>
                 </form>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
     <?php endif; ?>

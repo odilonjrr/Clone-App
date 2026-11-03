@@ -144,7 +144,7 @@ require __DIR__ . '/inc/header.php';
             </a>
 
             <p class="mt-5 font-serif text-5xl font-semibold text-gold-gradient"><?= money($product['price']) ?></p>
-            <p class="mt-1 text-xs text-ink-500">em até 12x no cartão ou à vista no PIX via Mercado Pago</p>
+            <p class="mt-1 text-xs text-ink-500">em até 12x no cartão ou à vista no PIX via <?= e(payment_provider_name()) ?></p>
 
             <p class="mt-6 max-w-md text-lg leading-relaxed text-ink-200"><?= e($product['short_description']) ?></p>
 
@@ -211,7 +211,7 @@ require __DIR__ . '/inc/header.php';
         <ul class="mt-8 space-y-3 text-sm text-ink-400">
             <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('shield', 'h-5 w-5') ?></span> Envasado a partir do frasco original, com lote registrado</li>
             <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('truck', 'h-5 w-5') ?></span> Envio para todo o Brasil</li>
-            <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('card', 'h-5 w-5') ?></span> Pagamento seguro via Mercado Pago (PIX e cartão)</li>
+            <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('card', 'h-5 w-5') ?></span> Pagamento seguro via <?= e(payment_provider_name()) ?> (PIX e cartão)</li>
         </ul>
     </div>
 

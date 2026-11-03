@@ -61,6 +61,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect($selfUrl . '#notas');
     }
 
+    if ($action === 'sync' && ($order['payment_provider'] ?? '') === 'infinitepay') {
+        $last = db()->prepare("SELECT mp_payment_id, external_slug FROM payments WHERE order_id = ? AND provider = 'infinitepay' ORDER BY id DESC LIMIT 1");
+        $last->execute([$id]);
+        $lp = $last->fetch() ?: [];
+        try {
+            $check = ip_is_configured() ? ip_payment_check(ip_order_nsu($order), (string) ($lp['mp_payment_id'] ?? ''), (string) ($lp['external_slug'] ?? '')) : null;
+            if ($check) {
+                $res = ip_process_payment($order, $check, ['transaction_nsu' => (string) ($lp['mp_payment_id'] ?? ''), 'slug' => (string) ($lp['external_slug'] ?? '')], 'admin');
+                admin_log('order_sync', 'order', $id, 'InfinitePay: ' . $res['message']);
+                flash('success', 'InfinitePay: ' . $res['message']);
+            } else {
+                flash('error', 'A InfinitePay não localizou pagamento para este pedido (ou a InfiniteTag não está configurada).');
+            }
+        } catch (Throwable $e) {
+            flash('error', 'InfinitePay indisponível no momento. Tente novamente em instantes.');
+        }
+        redirect($selfUrl);
+    }
+
     if ($action === 'sync') {
         $stmt = db()->prepare('SELECT mp_payment_id FROM payments WHERE order_id = ? AND mp_payment_id IS NOT NULL ORDER BY id DESC LIMIT 1');
         $stmt->execute([$id]);
@@ -75,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 flash('error', 'Nenhum pagamento para sincronizar (ou credenciais não configuradas).');
             }
         } catch (Throwable $e) {
-            flash('error', 'Mercado Pago indisponível no momento. Tente novamente em instantes.');
+            flash('error', 'Provedor de pagamento indisponível no momento. Tente novamente em instantes.');
         }
         redirect($selfUrl);
     }
@@ -103,7 +122,7 @@ require dirname(__DIR__) . '/inc/admin_header.php';
 <a href="<?= e(url('admin/orders.php')) ?>" class="text-xs uppercase tracking-[0.18em] text-ink-500 hover:text-gold-300">← Pedidos</a>
 <div class="mt-3 flex flex-wrap items-end justify-between gap-4">
     <div>
-        <p class="eyebrow"><?= date_br($order['created_at']) ?> · <?= $order['payment_method'] === 'pix' ? 'PIX' : 'Cartão' ?><?= $order['is_guest_order'] ? ' · convidado' : '' ?></p>
+        <p class="eyebrow"><?= date_br($order['created_at']) ?> · <?= e(payment_method_label($order['payment_method'])) ?><?= $order['is_guest_order'] ? ' · convidado' : '' ?></p>
         <h1 class="mt-2 flex flex-wrap items-center gap-4 font-serif text-4xl text-white">Pedido #<?= $id ?> <?= status_badge($order['status']) ?></h1>
     </div>
     <p class="font-serif text-4xl text-gold-300"><?= money($order['total']) ?></p>
@@ -131,7 +150,7 @@ require dirname(__DIR__) . '/inc/admin_header.php';
         </form>
     <?php endif; ?>
     <?php if (order_can_transition($order['status'], 'cancelled')): ?>
-        <form method="post" class="flex flex-wrap items-end gap-2" onsubmit="return confirm('Cancelar este pedido? Se já estava pago, o estoque será devolvido (o estorno no Mercado Pago deve ser feito no painel do MP).')">
+        <form method="post" class="flex flex-wrap items-end gap-2" onsubmit="return confirm('Cancelar este pedido? Se já estava pago, o estoque será devolvido (o estorno deve ser feito no painel do provedor de pagamento).')">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="status"><input type="hidden" name="to" value="cancelled">
             <input name="reason" class="field !py-2" placeholder="Motivo (opcional)">
@@ -141,7 +160,7 @@ require dirname(__DIR__) . '/inc/admin_header.php';
     <form method="post" class="ml-auto">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="sync">
-        <button class="btn-outline btn-sm" title="Reconsulta o status do pagamento na API do Mercado Pago">Sincronizar pagamento</button>
+        <button class="btn-outline btn-sm" title="Reconsulta o status do pagamento no provedor (InfinitePay ou Mercado Pago)">Sincronizar pagamento</button>
     </form>
 </div>
 
@@ -165,9 +184,9 @@ require dirname(__DIR__) . '/inc/admin_header.php';
 
         <!-- Pagamentos -->
         <section class="panel overflow-x-auto">
-            <h2 class="px-6 pt-6 text-xs font-medium uppercase tracking-[0.22em] text-white">Pagamentos (Mercado Pago)</h2>
+            <h2 class="px-6 pt-6 text-xs font-medium uppercase tracking-[0.22em] text-white">Pagamentos (<?= ($order['payment_provider'] ?? '') === 'infinitepay' ? 'InfinitePay' : 'Mercado Pago' ?>)</h2>
             <table class="table-lux mt-3">
-                <thead><tr><th>ID MP</th><th>Método</th><th>Status</th><th class="text-right">Valor</th><th>Atualizado</th></tr></thead>
+                <thead><tr><th>ID / transação</th><th>Método</th><th>Status</th><th class="text-right">Valor</th><th>Atualizado</th></tr></thead>
                 <tbody>
                 <?php foreach ($payments as $p): ?>
                     <tr>

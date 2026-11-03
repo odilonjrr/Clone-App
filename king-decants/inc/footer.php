@@ -49,7 +49,7 @@ if (strlen($currentPath) > 300) {
             <div class="flex items-center gap-3 text-gold-400">
                 <?= icon('pix', 'h-6 w-6') ?><?= icon('card', 'h-6 w-6') ?><?= icon('shield', 'h-6 w-6') ?>
             </div>
-            <p class="mt-3 text-sm text-ink-400">PIX e cartão via Mercado Pago.</p>
+            <p class="mt-3 text-sm text-ink-400">PIX e cartão via <?= e(payment_provider_name()) ?>.</p>
         </div>
     </div>
     <div class="gold-divider"></div>

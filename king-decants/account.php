@@ -142,7 +142,7 @@ $firstName = explode(' ', trim($user['name']))[0];
                     ['pedidos', 'receipt', 'Histórico de pedidos', 'Veja e acompanhe todos os seus pedidos.', (int) $counts['orders']],
                     ['favoritos', 'heart', 'Favoritos', 'Salve seus decants preferidos para depois.', (int) $counts['favorites']],
                     ['enderecos', 'pin', 'Endereços', 'Gerencie seus endereços de entrega.', (int) $counts['addresses']],
-                    ['pagamentos', 'card', 'Formas de pagamento', 'PIX e cartão com a segurança do Mercado Pago.', null],
+                    ['pagamentos', 'card', 'Formas de pagamento', 'PIX e cartão com a segurança da ' . payment_provider_name() . '.', null],
                 ];
                 foreach ($cards as $i => [$key, $ic, $title, $desc, $badge]): ?>
                     <a href="<?= e($sectionUrl($key)) ?>" class="account-card group animate-fade-up" style="animation-delay: <?= $i * 60 ?>ms">
@@ -288,7 +288,7 @@ $firstName = explode(' ', trim($user['name']))[0];
 <?php elseif ($section === 'pagamentos'): ?>
             <p class="eyebrow">Minha conta</p>
             <h1 class="mt-3 font-serif text-5xl text-white">Formas de pagamento</h1>
-            <p class="mt-4 text-lg text-ink-200">Todos os pagamentos são processados pelo Mercado Pago. Por segurança, a King Decants não armazena dados de cartão.</p>
+            <p class="mt-4 text-lg text-ink-200">Todos os pagamentos são processados pela <?= e(payment_provider_name()) ?>. Por segurança, a King Decants não armazena dados de cartão.</p>
             <div class="gold-divider my-8"></div>
             <div class="grid gap-5 md:grid-cols-2">
                 <div class="account-card !items-start">
@@ -299,12 +299,12 @@ $firstName = explode(' ', trim($user['name']))[0];
                 <div class="account-card !items-start">
                     <span class="icon-ring"><?= icon('card', 'h-9 w-9') ?></span>
                     <span class="flex-1"><span class="block font-serif text-2xl text-white">Cartão de crédito</span>
-                        <span class="mt-1 block text-ink-300">Em até 12x pelo checkout seguro do Mercado Pago. Se você tiver cartões salvos na sua conta Mercado Pago, eles aparecem lá.</span></span>
+                        <span class="mt-1 block text-ink-300">Em até 12x no ambiente de pagamento seguro da <?= e(payment_provider_name()) ?>.</span></span>
                 </div>
                 <div class="account-card !items-start md:col-span-2">
                     <span class="icon-ring"><?= icon('shield', 'h-9 w-9') ?></span>
                     <span class="flex-1"><span class="block font-serif text-2xl text-white">Segurança</span>
-                        <span class="mt-1 block text-ink-300">Conexão criptografada (HTTPS) em todo o site. Os dados do cartão são digitados diretamente no ambiente do Mercado Pago e nunca passam pelos nossos servidores.</span></span>
+                        <span class="mt-1 block text-ink-300">Conexão criptografada (HTTPS) em todo o site. Os dados do cartão são digitados diretamente no ambiente da <?= e(payment_provider_name()) ?> e nunca passam pelos nossos servidores.</span></span>
                 </div>
             </div>
 

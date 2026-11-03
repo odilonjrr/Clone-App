@@ -55,7 +55,25 @@ kd_define('DB_PASS', '');
 kd_define('DB_PORT', '3306');
 
 // ---------------------------------------------------------------------------
-// Mercado Pago
+// PROVEDOR DE PAGAMENTO: 'infinitepay' (padrão) ou 'mercadopago'
+// ---------------------------------------------------------------------------
+kd_define('PAYMENT_PROVIDER', 'infinitepay');
+
+// ---------------------------------------------------------------------------
+// InfinitePay — Checkout Integrado (link de pagamento: PIX e cartão em até 12x)
+//   App InfinitePay -> sua InfiniteTag (ex.: $kingdecants). Informe SEM o "$".
+//   A documentação oficial da InfinitePay indica que a InfiniteTag ("handle")
+//   identifica a loja. Se a sua conta exigir chave de API, preencha
+//   INFINITEPAY_API_KEY (enviada no cabeçalho X-Api-Key).
+//   INFINITEPAY_API_BASE: confirme na documentação oficial
+//   (https://www.infinitepay.io/checkout-documentacao).
+// ---------------------------------------------------------------------------
+kd_define('INFINITEPAY_HANDLE', 'COLOQUE_SUA_INFINITETAG_AQUI');
+kd_define('INFINITEPAY_API_KEY', '');
+kd_define('INFINITEPAY_API_BASE', 'https://api.checkout.infinitepay.io');
+
+// ---------------------------------------------------------------------------
+// Mercado Pago (usado somente se PAYMENT_PROVIDER = 'mercadopago')
 //   Painel: https://www.mercadopago.com.br/developers/panel/app
 //   -> Sua aplicação -> "Credenciais de teste" (sandbox) ou "Credenciais de produção".
 // ---------------------------------------------------------------------------

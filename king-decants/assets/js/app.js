@@ -265,7 +265,8 @@
       setLoading(btn, true);
 
       // Abrir em nova aba precisa ser síncrono ao clique (evita bloqueio de pop-up).
-      const newTab = checkoutForm.elements.open_new_tab?.checked && checkoutForm.elements.payment_method.value === 'card';
+      // Nova aba: para pagamentos em página externa (cartão no Mercado Pago ou InfinitePay).
+      const newTab = checkoutForm.elements.open_new_tab?.checked && checkoutForm.elements.payment_method.value !== 'pix';
       const popup = newTab ? window.open('', '_blank') : null;
 
       try {
@@ -307,7 +308,7 @@
     // Mostra a opção "nova aba" apenas para cartão.
     const toggleNewTab = () => {
       const box = $('[data-new-tab-option]');
-      if (box) box.classList.toggle('hidden', checkoutForm.elements.payment_method.value !== 'card');
+      if (box) box.classList.toggle('hidden', checkoutForm.elements.payment_method.value === 'pix');
     };
     $$('input[name=payment_method]', checkoutForm).forEach((r) => r.addEventListener('change', toggleNewTab));
     toggleNewTab();

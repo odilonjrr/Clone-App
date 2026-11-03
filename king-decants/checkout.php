@@ -69,7 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
         'district'       => clean_string($_POST['district'] ?? '', 120),
         'city'           => clean_string($_POST['city'] ?? '', 120),
         'state'          => strtoupper(clean_string($_POST['state'] ?? '', 2)),
-        'payment_method' => ($_POST['payment_method'] ?? 'card') === 'pix' ? 'pix' : 'card',
+        // InfinitePay: o cliente escolhe PIX ou cartão na própria página da InfinitePay.
+        'payment_method' => payment_provider() === 'infinitepay' ? 'infinitepay' : (($_POST['payment_method'] ?? 'card') === 'pix' ? 'pix' : 'card'),
     ];
 
     // Usuário logado: o e-mail do pedido é o da conta (evita "sequestro" de pedidos).
@@ -115,7 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
     if (!validate_uf($old['state'])) {
         $errors['state'] = 'Selecione o estado.';
     }
-    if (!mp_is_configured()) {
+    if (payment_provider() === 'infinitepay' && !ip_is_configured()) {
+        $errors['_global'] = 'Pagamentos ainda não configurados: defina INFINITEPAY_HANDLE (sua InfiniteTag) no arquivo de configuração (veja o README).';
+    } elseif (payment_provider() === 'mercadopago' && !mp_is_configured()) {
         $errors['_global'] = 'Pagamentos ainda não configurados: defina MP_ACCESS_TOKEN em inc/config.php (veja o README).';
     }
 
@@ -135,8 +138,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
                     ->execute([$old['phone'], $old['cpf'], $user['id']]);
             }
 
-            // 4) Mercado Pago
-            if ($old['payment_method'] === 'pix') {
+            // 4) Provedor de pagamento
+            if (payment_provider() === 'infinitepay') {
+                // Link do Checkout Integrado (PIX e cartão na página da InfinitePay)
+                $link = ip_create_checkout_link($order, order_items($order['id']));
+                db()->prepare("UPDATE orders SET payment_provider = 'infinitepay', mp_preference_id = ?, mp_init_point = ? WHERE id = ?")
+                    ->execute([$link['order_nsu'], $link['url'], $order['id']]);
+                $initPoint = $link['url'];
+                $redirectTo = $initPoint;
+            } elseif ($old['payment_method'] === 'pix') {
                 $payment = mp_create_pix_payment($order);
                 payment_upsert($order['id'], $payment);
                 $redirectTo = $orderUrl;
@@ -185,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
 
 // ------------------------------------------------------------------ Valores iniciais do formulário
 if (!$old) {
-    $old = ['payment_method' => 'pix'];
+    $old = ['payment_method' => payment_provider() === 'infinitepay' ? 'infinitepay' : 'pix'];
     if ($user) {
         $old += ['name' => $user['name'], 'email' => $user['email'], 'phone' => $user['phone'], 'cpf' => $user['cpf']];
         // Endereço padrão salvo em Minha conta; se não houver, o do último pedido feito com a conta.
@@ -350,6 +360,16 @@ require __DIR__ . '/inc/header.php';
             <fieldset class="panel p-6 sm:p-8">
                 <legend class="sr-only">Pagamento</legend>
                 <h2 class="text-xs font-medium uppercase tracking-[0.24em] text-white">3 · Pagamento</h2>
+                <?php if (payment_provider() === 'infinitepay'): ?>
+                    <input type="hidden" name="payment_method" value="infinitepay">
+                    <div class="choice mt-6 flex items-start gap-4 !cursor-default !border-gold-400/60 !bg-gold-400/5">
+                        <span class="flex gap-1 text-gold-400"><?= icon('pix') ?><?= icon('card') ?></span>
+                        <span>
+                            <span class="block text-white">PIX ou cartão de crédito em até 12x</span>
+                            <span class="mt-1 block text-xs text-ink-400">Você escolhe a forma de pagamento no ambiente seguro da InfinitePay e volta para a loja ao concluir.</span>
+                        </span>
+                    </div>
+                <?php else: ?>
                 <div class="mt-6 grid gap-4 sm:grid-cols-2">
                     <label class="choice flex items-start gap-4">
                         <input type="radio" name="payment_method" value="pix" class="mt-1 accent-[#d4af37]" <?= ($old['payment_method'] ?? '') === 'pix' ? 'checked' : '' ?>>
@@ -366,9 +386,10 @@ require __DIR__ . '/inc/header.php';
                         </span>
                     </label>
                 </div>
+                <?php endif; ?>
                 <label class="mt-5 flex items-center gap-3 text-sm text-ink-400" data-new-tab-option>
                     <input type="checkbox" name="open_new_tab" value="1" class="accent-[#d4af37]">
-                    Abrir o pagamento do Mercado Pago em uma nova aba
+                    Abrir o pagamento da <?= e(payment_provider_name()) ?> em uma nova aba
                 </label>
             </fieldset>
         </div>
@@ -399,7 +420,7 @@ require __DIR__ . '/inc/header.php';
                 <span class="text-xs uppercase tracking-[0.2em] text-ink-400">Total</span>
                 <span class="font-serif text-3xl text-white" data-total><?= money($cart['subtotal'] + $shippingPreview['price']) ?></span>
             </div>
-            <button type="submit" class="btn-gold mt-6 w-full" data-loading-text="Gerando pagamento…">Pagar com Mercado Pago</button>
+            <button type="submit" class="btn-gold mt-6 w-full" data-loading-text="Gerando pagamento…">Pagar com <?= e(payment_provider_name()) ?></button>
             <p class="mt-4 flex items-center justify-center gap-2 text-xs text-ink-500"><span class="text-gold-400"><?= icon('shield', 'h-4 w-4') ?></span> Dados protegidos · ambiente seguro</p>
         </aside>
     </form>

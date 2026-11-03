@@ -83,7 +83,7 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                     <tr class="cursor-pointer" onclick="location.href='<?= e(url('admin/order_view.php?id=' . $o['id'])) ?>'">
                         <td class="text-white">#<?= (int) $o['id'] ?></td>
                         <td class="text-ink-400"><?= date_br($o['created_at']) ?></td>
-                        <td class="text-ink-400"><?= $o['payment_method'] === 'pix' ? 'PIX' : 'Cartão' ?></td>
+                        <td class="text-ink-400"><?= e(payment_method_label($o['payment_method'])) ?></td>
                         <td><?= status_badge($o['status']) ?></td>
                         <td class="text-right"><?= money($o['total']) ?></td>
                     </tr>

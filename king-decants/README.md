@@ -176,7 +176,29 @@ Regras de ouro: nunca faça commit de chaves reais (o `.gitignore` já ignora `k
 
 ## 5. Mercado Pago
 
-### 5.1 Duas opções de integração (escolha automática)
+## 5.0 InfinitePay (provedor padrão)
+
+`PAYMENT_PROVIDER = 'infinitepay'` (padrão) usa o **Checkout Integrado da InfinitePay**: a loja cria um link de pagamento e o cliente escolhe **PIX ou cartão em até 12x** na página segura da InfinitePay. (Para voltar ao Mercado Pago, use `PAYMENT_PROVIDER = 'mercadopago'`; as instruções abaixo continuam válidas para ele.)
+
+**Configuração (`kingdecants-config.php`, fora do `public_html`):**
+
+| Constante | Valor |
+|---|---|
+| `PAYMENT_PROVIDER` | `'infinitepay'` |
+| `INFINITEPAY_HANDLE` | sua **InfiniteTag**, sem o `$` (app InfinitePay → perfil) |
+| `INFINITEPAY_API_KEY` | deixe vazio, a menos que sua conta exija chave (vai no cabeçalho `X-Api-Key`) |
+| `INFINITEPAY_API_BASE` | `https://api.checkout.infinitepay.io` — **confirme na [documentação oficial](https://www.infinitepay.io/checkout-documentacao)** |
+| `APP_URL` | `https://seudominio.com.br` (HTTPS é necessário para o webhook) |
+
+**Como funciona (`inc/infinitepay.php`):**
+1. `checkout.php` cria o pedido e chama `POST {base}/links` com `handle`, `order_nsu` (`KD-<id do pedido>`), itens **em centavos** (frete como item), `redirect_url` (`callback.php`), `webhook_url` (`webhook-infinitepay.php`) e dados do cliente.
+2. O cliente paga e volta para `callback.php`; a InfinitePay também chama `webhook-infinitepay.php`.
+3. **Nunca confiamos nos parâmetros recebidos**: o pedido só vira "pago" depois de `POST {base}/payment_check` confirmar (`paid = true`) e o valor bater com o total do pedido. Webhook responde 200 (ok) ou 400 (erro → a InfinitePay reenvia).
+4. No admin, "Sincronizar pagamento" reconsulta a InfinitePay. O comprovante (`receipt_url`) aparece para o cliente após a confirmação.
+
+**Teste antes de divulgar:** faça um pedido real de valor baixo (ex.: um produto de R$ 1,00 criado no admin e depois ocultado), pague com PIX e confira se o pedido muda para **Pago** sozinho. A InfinitePay não oferece ambiente de testes (sandbox) público na documentação que consultamos.
+
+### 5.1 Mercado Pago: duas opções de integração (escolha automática)
 
 | Opção | Como ativar | Onde está |
 |---|---|---|

@@ -88,7 +88,7 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                     <p class="text-xs text-ink-500"><?= e($o['customer_email']) ?></p>
                 </td>
                 <td class="text-ink-400"><?= (int) $o['items_count'] ?></td>
-                <td class="text-ink-400"><?= $o['payment_method'] === 'pix' ? 'PIX' : 'Cartão' ?></td>
+                <td class="text-ink-400"><?= e(payment_method_label($o['payment_method'])) ?></td>
                 <td><?= status_badge($o['status']) ?></td>
                 <td class="whitespace-nowrap text-ink-400"><?= date_br($o['created_at']) ?></td>
                 <td class="whitespace-nowrap text-right text-white"><?= money($o['total']) ?></td>
