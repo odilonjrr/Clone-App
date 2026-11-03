@@ -87,6 +87,39 @@ if (strlen($currentPath) > 300) {
 </div>
 <?php endif; ?>
 
+<?php
+// ======================= BARRA DE NAVEGAÇÃO INFERIOR (celular) =======================
+// Fixa no rodapé da tela em telas < 1024px. Item ativo em dourado.
+$script = basename($_SERVER['SCRIPT_NAME'] ?? '');
+$secao = $_GET['secao'] ?? '';
+$bnActive = match (true) {
+    $script === 'index.php' && ($activeNav ?? '') === 'inicio' => 'inicio',
+    $script === 'product.php'                                  => 'descobrir',
+    $script === 'account.php' && $secao === 'favoritos'        => 'favoritos',
+    in_array($script, ['cart.php', 'checkout.php'], true)       => 'sacola',
+    $script === 'account.php' || str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/auth/') => 'perfil',
+    default => '',
+};
+$bnUser = current_user();
+$bnCount = cart_count();
+$bnItem = function (string $key, string $label, string $iconName, ?string $href, bool $loginModal = false, string $extra = '') use ($bnActive): string {
+    $cls = 'bottom-nav-item' . ($bnActive === $key ? ' is-active' : '');
+    $inner = '<span class="relative">' . icon($iconName, 'h-6 w-6') . $extra . '</span><span>' . e($label) . '</span>';
+    if ($loginModal) {
+        return '<button type="button" data-open-modal="login-modal" class="' . $cls . '">' . $inner . '</button>';
+    }
+    return '<a href="' . e($href) . '" class="' . $cls . '"' . ($bnActive === $key ? ' aria-current="page"' : '') . '>' . $inner . '</a>';
+};
+$badge = '<span data-cart-count class="absolute -right-2 -top-1.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-gold-400 px-1 text-[10px] font-semibold text-black transition-transform ' . ($bnCount ? '' : 'scale-0') . '">' . (int) $bnCount . '</span>';
+?>
+<nav class="bottom-nav lg:hidden" aria-label="Navegação principal (celular)">
+    <?= $bnItem('inicio', 'Início', 'home', url('index.php')) ?>
+    <?= $bnItem('descobrir', 'Descobrir', 'search', url('index.php#colecoes')) ?>
+    <?= $bnItem('favoritos', 'Favoritos', 'heart', url('account.php?secao=favoritos'), !$bnUser) ?>
+    <?= $bnItem('sacola', 'Sacola', 'cart', url('cart.php'), false, $badge) ?>
+    <?= $bnItem('perfil', 'Perfil', 'user', url('account.php'), !$bnUser) ?>
+</nav>
+
 <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </body>
 </html>

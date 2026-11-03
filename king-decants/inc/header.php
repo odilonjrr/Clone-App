@@ -47,16 +47,24 @@ $navItems = [
     <script src="<?= e(asset('js/tailwind.config.js')) ?>"></script>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
 </head>
-<body class="min-h-screen bg-ink-950 font-sans text-ink-200 antialiased selection:bg-gold-400/30 selection:text-white">
+<body class="has-bottom-nav min-h-screen bg-ink-950 font-sans text-ink-200 antialiased selection:bg-gold-400/30 selection:text-white">
 
 <!-- ======================= CABEÇALHO ======================= -->
 <header id="site-header" class="sticky top-0 z-40 border-b border-gold-400/10 bg-ink-950/80 backdrop-blur-md transition-colors">
-    <div class="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
+    <div class="relative mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
 
-        <!-- Logo dourada à esquerda -->
-        <a href="<?= e(url('index.php')) ?>" class="group flex items-center gap-2.5" aria-label="King Decants — início">
-            <span class="text-gold-400 transition-transform duration-500 group-hover:-translate-y-0.5"><?= icon('crown', 'h-6 w-6') ?></span>
-            <span class="font-serif text-xl tracking-[0.28em] text-gold-gradient sm:text-2xl">KING<span class="ml-2 hidden font-light sm:inline">DECANTS</span></span>
+        <!-- Celular: botão de menu à esquerda -->
+        <button type="button" data-toggle="mobile-nav" class="icon-btn -ml-2 text-gold-400 lg:hidden" aria-label="Abrir menu"><?= icon('menu', 'h-6 w-6') ?></button>
+
+        <!-- Logo: centralizada no celular, à esquerda no desktop -->
+        <a href="<?= e(url('index.php')) ?>" class="group absolute left-1/2 flex -translate-x-1/2 items-center gap-2.5 lg:static lg:translate-x-0" aria-label="King Decants — início">
+            <span class="hidden text-gold-400 transition-transform duration-500 group-hover:-translate-y-0.5 lg:inline"><?= icon('crown', 'h-6 w-6') ?></span>
+            <!-- celular: KING grande + DECANTS pequeno embaixo -->
+            <span class="flex flex-col items-center leading-none lg:hidden">
+                <span class="font-serif text-[28px] tracking-[0.16em] text-gold-gradient">KING</span>
+                <span class="mt-1 text-[9px] tracking-[0.55em] text-gold-400">DECANTS</span>
+            </span>
+            <span class="hidden font-serif text-2xl tracking-[0.28em] text-gold-gradient lg:inline">KING<span class="ml-2 font-light">DECANTS</span></span>
         </a>
 
         <!-- Menu central (desktop) -->
@@ -70,28 +78,27 @@ $navItems = [
         </nav>
 
         <!-- Ações à direita: busca, sacola, conta -->
-        <div class="flex items-center gap-1 text-gold-400 sm:gap-2">
+        <div class="-mr-2 flex items-center gap-0 text-gold-400 sm:gap-1 lg:mr-0 lg:gap-2">
             <button type="button" data-toggle="search" class="icon-btn" aria-label="Buscar"><?= icon('search') ?></button>
 
             <a href="<?= e(url('cart.php')) ?>" class="icon-btn relative" aria-label="Sacola">
                 <?= icon('bag') ?>
-                <span id="cart-count"
+                <span id="cart-count" data-cart-count
                       class="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gold-400 px-1 text-[10px] font-semibold text-black transition-transform <?= $cartCount ? '' : 'scale-0' ?>">
                     <?= (int) $cartCount ?>
                 </span>
             </a>
 
+            <!-- Favoritos e conta: no celular ficam na barra inferior -->
             <?php if ($user): ?>
-                <a href="<?= e(url('account.php?secao=favoritos')) ?>" class="icon-btn hidden sm:inline-flex" aria-label="Favoritos"><?= icon('heart') ?></a>
-                <a href="<?= e(url('account.php')) ?>" class="ml-1 inline-flex items-center gap-1" aria-label="Minha conta" title="<?= e($user['name']) ?>">
+                <a href="<?= e(url('account.php?secao=favoritos')) ?>" class="icon-btn hidden lg:inline-flex" aria-label="Favoritos"><?= icon('heart') ?></a>
+                <a href="<?= e(url('account.php')) ?>" class="ml-1 hidden items-center gap-1 lg:inline-flex" aria-label="Minha conta" title="<?= e($user['name']) ?>">
                     <span class="avatar-ring h-9 w-9 text-xs"><?= e(user_initials($user['name'])) ?></span>
                 </a>
             <?php else: ?>
-                <button type="button" data-open-modal="login-modal" class="icon-btn hidden sm:inline-flex" aria-label="Favoritos"><?= icon('heart') ?></button>
-                <button type="button" data-open-modal="login-modal" class="icon-btn" aria-label="Entrar"><?= icon('user') ?></button>
+                <button type="button" data-open-modal="login-modal" class="icon-btn hidden lg:inline-flex" aria-label="Favoritos"><?= icon('heart') ?></button>
+                <button type="button" data-open-modal="login-modal" class="icon-btn hidden lg:inline-flex" aria-label="Entrar"><?= icon('user') ?></button>
             <?php endif; ?>
-
-            <button type="button" data-toggle="mobile-nav" class="icon-btn lg:hidden" aria-label="Abrir menu"><?= icon('menu') ?></button>
         </div>
     </div>
 

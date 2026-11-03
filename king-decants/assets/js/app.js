@@ -117,11 +117,12 @@
 
   // ---------------------------------------------------------------- 5. Adicionar à sacola
   function updateCartCount(n) {
-    const badge = document.getElementById('cart-count');
-    if (!badge) return;
-    badge.textContent = n;
-    badge.classList.toggle('scale-0', !n);
-    badge.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 350, easing: 'ease-out' });
+    // Cabeçalho e barra inferior do celular
+    $$('[data-cart-count]').forEach((badge) => {
+      badge.textContent = n;
+      badge.classList.toggle('scale-0', !n);
+      badge.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 350, easing: 'ease-out' });
+    });
   }
   $$('form[data-add-to-cart]').forEach((form) =>
     form.addEventListener('submit', async (ev) => {

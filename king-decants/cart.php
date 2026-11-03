@@ -115,7 +115,7 @@ require __DIR__ . '/inc/header.php';
                                     <span class="w-10 text-center text-sm text-white"><?= (int) $item['quantity'] ?></span>
                                     <button name="quantity" value="<?= (int) $item['quantity'] + 1 ?>" class="flex h-9 w-9 items-center justify-center text-gold-400 hover:bg-white/5 disabled:opacity-30" aria-label="Aumentar" <?= $item['quantity'] >= min(CART_MAX_QTY_PER_ITEM, (int) $item['stock']) ? 'disabled' : '' ?>><?= icon('plus', 'h-4 w-4') ?></button>
                                 </form>
-                                <p class="font-serif text-2xl text-gold-300"><?= money($item['line_total']) ?></p>
+                                <p class="whitespace-nowrap font-serif text-2xl text-gold-300"><?= money($item['line_total']) ?></p>
                             </div>
                         </div>
                     </div>

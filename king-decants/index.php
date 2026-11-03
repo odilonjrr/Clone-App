@@ -84,7 +84,7 @@ require __DIR__ . '/inc/header.php';
             ?>
             <?php if ($heroLink): ?><a href="<?= e(url($heroLink)) ?>" class="block" aria-label="<?= e($heroAlt) ?>"><?php endif; ?>
             <img src="<?= e($heroImage ? product_image_src($heroImage) : asset('img/hero-bottle.svg')) ?>" alt="<?= e($heroAlt) ?>"
-                 class="hero-bottle <?= $heroImage ? 'is-photo' : 'blend-edges' ?> relative mx-auto w-full animate-fade-up" width="600" height="720"
+                 class="hero-bottle <?= $heroImage ? 'is-photo' . (hero_image_opaque($heroImage) ? ' is-opaque' : '') : 'blend-edges' ?> relative mx-auto w-full animate-fade-up" width="600" height="720"
                  onerror="this.onerror=null;this.src='<?= e(asset('img/hero-bottle.svg')) ?>'">
             <?php if ($heroLink): ?></a><?php endif; ?>
         </div>
