@@ -32,7 +32,11 @@ $productUrl = url('product.php?slug=' . urlencode($product['slug']));
         <p class="text-[11px] tracking-wider text-ink-500">SKU <?= e($product['sku']) ?> · <?= $inStock ? (int) $product['stock'] . ' em estoque' : 'Sem estoque' ?></p>
 
         <div class="mt-auto flex items-center justify-between gap-3 pt-4">
-            <span class="whitespace-nowrap font-serif text-2xl text-gold-300"><?= money($product['price']) ?></span>
+            <span class="whitespace-nowrap font-serif text-2xl text-gold-300"><?= product_price_label($product) ?></span>
+            <?php if (product_variant_count((int) $product['id']) > 0): ?>
+                <!-- Produto com tamanhos: a escolha é feita na página do produto -->
+                <a href="<?= e($productUrl) ?>" class="btn-outline btn-sm" <?= $inStock ? '' : 'aria-disabled="true"' ?>>Escolher tamanho</a>
+            <?php else: ?>
             <form action="<?= e(url('cart.php')) ?>" method="post" data-add-to-cart>
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="add">
@@ -42,6 +46,7 @@ $productUrl = url('product.php?slug=' . urlencode($product['slug']));
                     <?= icon('bag', 'h-4 w-4') ?> <span class="hidden sm:inline">Adicionar</span>
                 </button>
             </form>
+            <?php endif; ?>
         </div>
     </div>
 </article>

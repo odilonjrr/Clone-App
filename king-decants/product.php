@@ -76,7 +76,26 @@ $canReview = $user ? user_can_review((int) $user['id'], $productId) : false;
 $myReview = ($user && $canReview) ? user_review((int) $user['id'], $productId) : null;
 
 // "Eau de Parfum – 10 ml" (cai no subtítulo se não houver concentração)
-$subtitleParts = array_filter([trim((string) $product['concentration']), $product['volume_ml'] ? (int) $product['volume_ml'] . ' ml' : '']);
+// Tamanhos (variações). O primeiro com estoque já vem selecionado.
+$variants = product_variants($productId);
+$selected = null;
+foreach ($variants as $v) {
+    if ((int) $v['stock'] > 0) {
+        $selected = $v;
+        break;
+    }
+}
+$selected = $selected ?? ($variants[0] ?? null);
+if ($variants) {
+    $inStock = $selected && (int) $selected['stock'] > 0;
+}
+$displayPrice = $selected ? (float) $selected['price'] : (float) $product['price'];
+$displaySku = $selected['sku'] ?? $product['sku'];
+$displayStock = $selected ? (int) $selected['stock'] : (int) $product['stock'];
+$stockText = fn(int $n) => $n > 0 ? ($n <= 10 ? 'Últimas ' . $n . ' unidades' : 'Em estoque') : 'Sem estoque no momento';
+
+// Com tamanhos, o volume aparece no seletor; o subtítulo mostra só a concentração.
+$subtitleParts = array_filter([trim((string) $product['concentration']), (!$variants && $product['volume_ml']) ? (int) $product['volume_ml'] . ' ml' : '']);
 $subtitle = $subtitleParts ? implode(' – ', $subtitleParts) : (string) $product['tagline'];
 
 $rel = db()->prepare('SELECT * FROM products WHERE is_active = 1 AND id <> ? ORDER BY sold_count DESC LIMIT 3');
@@ -143,7 +162,7 @@ require __DIR__ . '/inc/header.php';
                 <?php endif; ?>
             </a>
 
-            <p class="mt-5 font-serif text-5xl font-semibold text-gold-gradient"><?= money($product['price']) ?></p>
+            <p class="mt-5 font-serif text-5xl font-semibold text-gold-gradient" data-variant-price><?= money($displayPrice) ?></p>
             <p class="mt-1 text-xs text-ink-500">em até 12x no cartão ou à vista no PIX via <?= e(payment_provider_name()) ?></p>
 
             <p class="mt-6 max-w-md text-lg leading-relaxed text-ink-200"><?= e($product['short_description']) ?></p>
@@ -164,6 +183,26 @@ require __DIR__ . '/inc/header.php';
                 </ul>
             <?php endif; ?>
 
+            <!-- Escolha do tamanho (antes dos botões). Os rádios pertencem ao formulário
+                 da sacola pelo atributo form="", então funcionam até sem JavaScript. -->
+            <?php if ($variants): ?>
+                <fieldset class="mt-8">
+                    <legend class="text-sm uppercase tracking-[0.16em] text-white">Tamanho: <span class="text-gold-300" data-variant-label><?= e($selected['label']) ?></span></legend>
+                    <div class="mt-3 flex flex-wrap gap-3">
+                        <?php foreach ($variants as $v): $out = (int) $v['stock'] <= 0; ?>
+                            <label class="variant-pill <?= $out ? 'is-out' : '' ?>">
+                                <input type="radio" name="variant_id" value="<?= (int) $v['id'] ?>" form="add-to-cart-form"
+                                       data-price="<?= e(money($v['price'])) ?>" data-sku="<?= e($v['sku']) ?>" data-label="<?= e($v['label']) ?>"
+                                       data-stock="<?= (int) $v['stock'] ?>" data-stock-text="<?= e($stockText((int) $v['stock'])) ?>"
+                                       <?= $selected && (int) $selected['id'] === (int) $v['id'] ? 'checked' : '' ?> <?= $out ? 'disabled' : '' ?> required>
+                                <span class="variant-pill-label"><?= e($v['label']) ?></span>
+                                <span class="variant-pill-price"><?= $out ? 'Esgotado' : e(money($v['price'])) ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </fieldset>
+            <?php endif; ?>
+
             <!-- Ações -->
             <div class="mt-8 grid gap-3 sm:grid-cols-2">
                 <?php if ($user): ?>
@@ -182,19 +221,19 @@ require __DIR__ . '/inc/header.php';
                     </button>
                 <?php endif; ?>
 
-                <form action="<?= e(url('cart.php')) ?>" method="post" data-add-to-cart>
+                <form id="add-to-cart-form" action="<?= e(url('cart.php')) ?>" method="post" data-add-to-cart>
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="product_id" value="<?= $productId ?>">
                     <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="btn-gold btn-lg w-full" <?= $inStock ? '' : 'disabled' ?> data-loading-text="Adicionando…">
+                    <button type="submit" class="btn-gold btn-lg w-full" <?= $inStock ? '' : 'disabled' ?> data-loading-text="Adicionando…" data-add-button>
                         <?= $inStock ? 'Adicionar à sacola' : 'Esgotado' ?>
                     </button>
                 </form>
             </div>
             <p class="mt-4 text-xs tracking-wider text-ink-500">
-                SKU <?= e($product['sku']) ?> ·
-                <?= $inStock ? ((int) $product['stock'] <= 10 ? 'Últimas ' . (int) $product['stock'] . ' unidades' : 'Em estoque') : 'Sem estoque no momento' ?>
+                SKU <span data-variant-sku><?= e($displaySku) ?></span> ·
+                <span data-variant-stock><?= e($stockText($displayStock)) ?></span>
                 · Frete grátis acima de <?= money(FREE_SHIPPING_FROM) ?>
             </p>
         </div>

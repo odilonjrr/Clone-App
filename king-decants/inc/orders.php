@@ -76,14 +76,22 @@ function order_create(array $customer, array $cart, array $shipping, string $met
         // mesma transação. Assim dois clientes não conseguem gerar pagamento para a última
         // unidade. A reserva é devolvida se o pedido for cancelado (inclusive por expiração,
         // ver orders_expire_stale()).
-        $reserve = $pdo->prepare('UPDATE products SET stock = stock - ? WHERE id = ?');
+        // Com TAMANHOS: o estoque controlado é o do tamanho; o do produto (soma) acompanha.
         foreach ($cart['items'] as $item) {
-            $stmt = $pdo->prepare('SELECT stock FROM products WHERE id = ? FOR UPDATE');
-            $stmt->execute([$item['id']]);
-            if ((int) $stmt->fetchColumn() < (int) $item['quantity']) {
-                throw new RuntimeException('Estoque insuficiente para "' . $item['name'] . '".');
+            $qty = (int) $item['quantity'];
+            $vid = (int) ($item['variant_id'] ?? 0);
+            $label = $item['name'] . ($vid ? ' — ' . $item['variant_label'] : '');
+            if ($vid) {
+                $stmt = $pdo->prepare('SELECT stock FROM product_variants WHERE id = ? AND product_id = ? FOR UPDATE');
+                $stmt->execute([$vid, $item['id']]);
+            } else {
+                $stmt = $pdo->prepare('SELECT stock FROM products WHERE id = ? FOR UPDATE');
+                $stmt->execute([$item['id']]);
             }
-            $reserve->execute([(int) $item['quantity'], $item['id']]);
+            if ((int) $stmt->fetchColumn() < $qty) {
+                throw new RuntimeException('Estoque insuficiente para "' . $label . '".');
+            }
+            stock_adjust((int) $item['id'], $vid, -$qty);
         }
 
         $userId = $isGuest
@@ -111,15 +119,20 @@ function order_create(array $customer, array $cart, array $shipping, string $met
         $orderId = (int) $pdo->lastInsertId();
 
         $itemStmt = $pdo->prepare(
-            'INSERT INTO order_items (order_id, product_id, sku, name, unit_price, quantity, line_total)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO order_items (order_id, product_id, variant_id, sku, name, variant_label, unit_price, quantity, line_total)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         foreach ($cart['items'] as $item) {
-            $itemStmt->execute([$orderId, $item['id'], $item['sku'], $item['name'], $item['price'], $item['quantity'], $item['line_total']]);
+            $vid = (int) ($item['variant_id'] ?? 0);
+            // O nome gravado já inclui o tamanho ("Decants Básicos — 10 ml"): aparece assim
+            // no pedido, no e-mail, no admin e na página de pagamento.
+            $name = $item['name'] . ($vid ? ' — ' . $item['variant_label'] : '');
+            $itemStmt->execute([$orderId, $item['id'], $vid ?: null, $item['sku'], $name, $item['variant_label'] ?? null,
+                                $item['price'], $item['quantity'], $item['line_total']]);
         }
 
         $pdo->prepare('INSERT INTO order_status_history (order_id, from_status, to_status, source, note) VALUES (?, NULL, \'pending\', \'system\', ?)')
-            ->execute([$orderId, 'Pedido criado (' . ($method === 'pix' ? 'PIX' : 'Cartão / Checkout Pro') . ')']);
+            ->execute([$orderId, 'Pedido criado (' . ['pix' => 'PIX', 'card' => 'Cartão / Checkout Pro', 'infinitepay' => 'InfinitePay'][$method] ?? $method . ')']);
 
         $pdo->commit();
         return ['id' => $orderId, 'access_token' => $token, 'total' => $total];
@@ -127,6 +140,19 @@ function order_create(array $customer, array $cart, array $shipping, string $met
         $pdo->rollBack();
         throw $e;
     }
+}
+
+/**
+ * Ajusta estoque (delta negativo baixa, positivo devolve). Com tamanho, ajusta o
+ * tamanho e também o total do produto; nunca fica abaixo de zero.
+ */
+function stock_adjust(int $productId, int $variantId, int $delta): void
+{
+    $pdo = db();
+    if ($variantId) {
+        $pdo->prepare('UPDATE product_variants SET stock = GREATEST(stock + ?, 0) WHERE id = ?')->execute([$delta, $variantId]);
+    }
+    $pdo->prepare('UPDATE products SET stock = GREATEST(stock + ?, 0) WHERE id = ?')->execute([$delta, $productId]);
 }
 
 function order_find(int $id): ?array
@@ -195,13 +221,16 @@ function order_change_status(int $orderId, string $to, string $source, ?int $adm
                     continue;
                 }
                 if (!(int) $order['stock_applied']) {
-                    $s = $pdo->prepare('SELECT stock FROM products WHERE id = ? FOR UPDATE');
-                    $s->execute([$it['product_id']]);
+                    $vid = (int) ($it['variant_id'] ?? 0);
+                    $s = $vid
+                        ? $pdo->prepare('SELECT stock FROM product_variants WHERE id = ? FOR UPDATE')
+                        : $pdo->prepare('SELECT stock FROM products WHERE id = ? FOR UPDATE');
+                    $s->execute([$vid ?: $it['product_id']]);
                     if ((int) $s->fetchColumn() < (int) $it['quantity']) {
                         $note = trim(($note ?? '') . ' · ATENÇÃO: estoque insuficiente para ' . $it['sku'] . ', verificar.');
                         app_log('payments', 'Pedido pago sem estoque reservado', ['order' => $orderId, 'sku' => $it['sku']]);
                     }
-                    $pdo->prepare('UPDATE products SET stock = GREATEST(stock - ?, 0) WHERE id = ?')->execute([$it['quantity'], $it['product_id']]);
+                    stock_adjust((int) $it['product_id'], $vid, -(int) $it['quantity']);
                 }
                 $pdo->prepare('UPDATE products SET sold_count = sold_count + ? WHERE id = ?')->execute([$it['quantity'], $it['product_id']]);
             }
@@ -212,7 +241,7 @@ function order_change_status(int $orderId, string $to, string $source, ?int $adm
                     continue;
                 }
                 if ((int) $order['stock_applied']) {
-                    $pdo->prepare('UPDATE products SET stock = stock + ? WHERE id = ?')->execute([$it['quantity'], $it['product_id']]);
+                    stock_adjust((int) $it['product_id'], (int) ($it['variant_id'] ?? 0), (int) $it['quantity']);
                 }
                 if ($order['status'] === 'paid') {
                     $pdo->prepare('UPDATE products SET sold_count = GREATEST(CAST(sold_count AS SIGNED) - ?, 0) WHERE id = ?')->execute([$it['quantity'], $it['product_id']]);

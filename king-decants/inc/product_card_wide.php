@@ -28,10 +28,14 @@ $subtitle = trim((string) ($product['concentration'] ?? '')) ?: (string) $produc
             <a href="<?= e($productUrl) ?>" class="hover:text-gold-200"><?= e($product['name']) ?></a>
         </h3>
         <?php if ($subtitle !== ''): ?><p class="text-ink-200"><?= e($subtitle) ?></p><?php endif; ?>
-        <p class="mt-1 text-2xl font-medium text-gold-300"><?= money($product['price']) ?></p>
+        <p class="mt-1 text-2xl font-medium text-gold-300"><?= product_price_label($product) ?></p>
         <?php if ($ratingCount > 0): ?>
             <p class="flex items-center gap-2 text-ink-200"><?= stars_html((float) $product['rating_avg'], 'h-4 w-4') ?> <?= e(number_format((float) $product['rating_avg'], 1, ',', '')) ?></p>
         <?php endif; ?>
+        <?php if (product_variant_count((int) $product['id']) > 0): ?>
+            <!-- Produto com tamanhos: leva à página para escolher -->
+            <a href="<?= e($productUrl) ?>" class="btn-gold mt-4 w-full"><?= $inStock ? 'Escolher tamanho' : 'Esgotado' ?></a>
+        <?php else: ?>
         <form action="<?= e(url('cart.php')) ?>" method="post" class="mt-4" data-add-to-cart>
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="add">
@@ -41,5 +45,6 @@ $subtitle = trim((string) ($product['concentration'] ?? '')) ?: (string) $produc
                 <?= $inStock ? 'Adicionar à sacola' : 'Esgotado' ?>
             </button>
         </form>
+        <?php endif; ?>
     </div>
 </article>

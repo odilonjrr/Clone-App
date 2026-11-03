@@ -466,3 +466,26 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
    nas bordas da caixa da imagem, formando um retângulo claro. (Fotos opacas
    continuam com a máscara via .is-opaque.) */
 .hero-bottle.is-photo:not(.is-opaque) { -webkit-mask-image: none; mask-image: none; }
+
+/* =========================================================================
+   Seletor de tamanho (página de produto)
+   ========================================================================= */
+.variant-pill {
+  position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 96px; padding: .7rem 1.1rem; border-radius: 8px; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.14); background: #0f0f0f; transition: border-color .2s, background .2s, box-shadow .2s;
+}
+.variant-pill input { position: absolute; opacity: 0; pointer-events: none; }
+.variant-pill-label { font-size: 15px; color: #ece9e3; font-weight: 500; }
+.variant-pill-price { margin-top: .15rem; font-size: 12px; color: #8f8b83; }
+.variant-pill:hover { border-color: rgba(212,175,55,.5); }
+.variant-pill:has(input:checked) { border-color: var(--gold-2); background: rgba(212,175,55,.08); box-shadow: 0 0 0 1px var(--gold-2); }
+.variant-pill:has(input:checked) .variant-pill-price { color: #e6c76f; }
+.variant-pill:has(input:focus-visible) { outline: 2px solid var(--gold-2); outline-offset: 2px; }
+.variant-pill.is-out { cursor: not-allowed; opacity: .45; }
+.variant-pill.is-out .variant-pill-label { text-decoration: line-through; }
+
+/* Tabela de tamanhos no admin: compacta para caber sem rolagem */
+.variants-table th, .variants-table td { padding: .55rem .45rem; }
+.variants-table th:first-child, .variants-table td:first-child { padding-left: .9rem; }
+.variants-table th { letter-spacing: .08em; }

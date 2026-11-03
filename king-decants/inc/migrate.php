@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const KD_SCHEMA_VERSION = 4;
+const KD_SCHEMA_VERSION = 5;
 
 function kd_schema_marker(): string
 {
@@ -144,6 +144,33 @@ function kd_ensure_schema(): void
     }
     if (!$hasColumn('payments', 'external_slug')) {
         $pdo->exec("ALTER TABLE payments ADD COLUMN external_slug VARCHAR(80) NULL AFTER mp_payment_id");
+    }
+
+    // ---------------- Versão 5: variações de tamanho (5 ml, 10 ml...)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS product_variants (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        product_id INT UNSIGNED NOT NULL,
+        label VARCHAR(40) NOT NULL,
+        volume_ml SMALLINT UNSIGNED NULL,
+        sku VARCHAR(40) NOT NULL,
+        price DECIMAL(10,2) NOT NULL,
+        stock INT NOT NULL DEFAULT 0,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_variant_sku (sku),
+        KEY idx_variants_product (product_id, is_active, sort_order),
+        CONSTRAINT fk_variants_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    if (!$hasColumn('cart_items', 'variant_id')) {
+        // A sacola passa a identificar o item por produto + tamanho.
+        $pdo->exec('ALTER TABLE cart_items ADD COLUMN variant_id INT UNSIGNED NOT NULL DEFAULT 0 AFTER product_id,
+                    DROP PRIMARY KEY, ADD PRIMARY KEY (user_id, product_id, variant_id)');
+    }
+    if (!$hasColumn('order_items', 'variant_id')) {
+        $pdo->exec('ALTER TABLE order_items ADD COLUMN variant_id INT UNSIGNED NULL AFTER product_id,
+                    ADD COLUMN variant_label VARCHAR(40) NULL AFTER name');
     }
 
     @file_put_contents($marker, (string) KD_SCHEMA_VERSION, LOCK_EX);

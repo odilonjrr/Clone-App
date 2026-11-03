@@ -376,6 +376,25 @@
     })
   );
 
+  // ---------------------------------------------------------------- 8b2. Tamanhos (variações)
+  // Ao escolher um tamanho: atualiza preço, SKU, estoque e o botão da sacola.
+  $$('input[name="variant_id"][data-price]').forEach((radio) =>
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      const set = (sel, val) => $$(sel).forEach((el) => (el.textContent = val));
+      set('[data-variant-price]', radio.dataset.price);
+      set('[data-variant-label]', radio.dataset.label);
+      set('[data-variant-sku]', radio.dataset.sku);
+      set('[data-variant-stock]', radio.dataset.stockText);
+      const btn = document.querySelector('[data-add-button]');
+      if (btn) {
+        const out = Number(radio.dataset.stock) <= 0;
+        btn.disabled = out;
+        btn.textContent = out ? 'Esgotado' : 'Adicionar à sacola';
+      }
+    })
+  );
+
   // ---------------------------------------------------------------- 8c. Favoritos
   $$('form[data-wishlist]').forEach((form) =>
     form.addEventListener('submit', async (ev) => {

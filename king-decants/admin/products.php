@@ -85,7 +85,7 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                         <div class="h-14 w-11 shrink-0 overflow-hidden rounded-md bg-ink-900"><?= product_img($p, 'h-full w-full object-cover') ?></div>
                         <div>
                             <a class="text-white hover:text-gold-300" href="<?= e(url('admin/product_edit.php?id=' . $p['id'])) ?>"><?= e($p['name']) ?></a>
-                            <p class="text-xs text-ink-500">SKU <?= e($p['sku']) ?></p>
+                            <p class="text-xs text-ink-500">SKU <?= e($p['sku']) ?><?php $nv = product_variant_count((int) $p['id']); ?><?= $nv ? ' · ' . $nv . ' tamanho' . ($nv > 1 ? 's' : '') : '' ?></p>
                         </div>
                     </div>
                 </td>

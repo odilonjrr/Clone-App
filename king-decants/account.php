@@ -205,13 +205,17 @@ $firstName = explode(' ', trim($user['name']))[0];
                             <div class="flex min-w-0 flex-1 flex-col">
                                 <a href="<?= e(url('product.php?slug=' . urlencode($p['slug']))) ?>" class="truncate font-serif text-xl text-white hover:text-gold-300"><?= e($p['name']) ?></a>
                                 <span class="text-sm text-ink-400"><?= e($p['concentration'] ?: $p['tagline']) ?></span>
-                                <span class="mt-1 text-gold-300"><?= money($p['price']) ?></span>
+                                <span class="mt-1 text-gold-300"><?= product_price_label($p) ?></span>
                                 <div class="mt-auto flex items-center gap-4 pt-2">
+                                    <?php if (product_variant_count((int) $p['id']) > 0): ?>
+                                        <a href="<?= e(url('product.php?slug=' . urlencode($p['slug']))) ?>" class="btn-gold btn-sm">Escolher tamanho</a>
+                                    <?php else: ?>
                                     <form action="<?= e(url('cart.php')) ?>" method="post" data-add-to-cart>
                                         <?= csrf_field() ?>
                                         <input type="hidden" name="action" value="add"><input type="hidden" name="product_id" value="<?= (int) $p['id'] ?>"><input type="hidden" name="quantity" value="1">
                                         <button class="btn-gold btn-sm" <?= (int) $p['stock'] > 0 ? '' : 'disabled' ?>>Adicionar à sacola</button>
                                     </form>
+                                    <?php endif; ?>
                                     <form action="<?= e(url('wishlist.php')) ?>" method="post">
                                         <?= csrf_field() ?>
                                         <input type="hidden" name="product_id" value="<?= (int) $p['id'] ?>"><input type="hidden" name="back" value="account">

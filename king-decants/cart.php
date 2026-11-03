@@ -21,21 +21,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $action = $_POST['action'] ?? '';
     $productId = int_param($_POST, 'product_id');
+    $variantId = int_param($_POST, 'variant_id', 0); // tamanho escolhido (0 = produto sem tamanhos)
     $qty = int_param($_POST, 'quantity', 1);
     $result = ['ok' => true];
     $message = null;
 
     switch ($action) {
         case 'add':
-            $result = cart_add($productId, max(1, $qty));
+            $result = cart_add($productId, max(1, $qty), $variantId);
             $message = $result['ok'] ? ($result['notice'] ?? 'Adicionado à sacola.') : null;
             break;
         case 'update':
-            $result = cart_set($productId, max(0, $qty));
+            $result = cart_set($productId, max(0, $qty), $variantId);
             $message = $result['ok'] ? ($result['notice'] ?? 'Sacola atualizada.') : null;
             break;
         case 'remove':
-            cart_remove($productId);
+            cart_remove($productId, $variantId);
             $message = 'Item removido.';
             break;
         case 'clear':
@@ -95,12 +96,16 @@ require __DIR__ . '/inc/header.php';
                                 <div>
                                     <p class="text-[10px] uppercase tracking-[0.22em] text-gold-500"><?= e($item['tagline']) ?></p>
                                     <h2 class="mt-1 font-serif text-xl text-white sm:text-2xl"><?= e($item['name']) ?></h2>
+                                    <?php if ($item['variant_label']): ?>
+                                        <p class="mt-1 inline-flex rounded-full border border-gold-400/40 px-2.5 py-0.5 text-xs text-gold-300">Tamanho: <?= e($item['variant_label']) ?></p>
+                                    <?php endif; ?>
                                     <p class="mt-1 text-xs text-ink-500">SKU <?= e($item['sku']) ?> · <?= money($item['price']) ?> / unid.</p>
                                 </div>
                                 <form action="<?= e(url('cart.php')) ?>" method="post">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="remove">
                                     <input type="hidden" name="product_id" value="<?= (int) $item['id'] ?>">
+                                    <input type="hidden" name="variant_id" value="<?= (int) $item['variant_id'] ?>">
                                     <button class="icon-btn text-ink-400 hover:text-red-300" aria-label="Remover <?= e($item['name']) ?>"><?= icon('trash', 'h-5 w-5') ?></button>
                                 </form>
                             </div>
@@ -111,6 +116,7 @@ require __DIR__ . '/inc/header.php';
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="update">
                                     <input type="hidden" name="product_id" value="<?= (int) $item['id'] ?>">
+                                    <input type="hidden" name="variant_id" value="<?= (int) $item['variant_id'] ?>">
                                     <button name="quantity" value="<?= (int) $item['quantity'] - 1 ?>" class="flex h-9 w-9 items-center justify-center text-gold-400 hover:bg-white/5" aria-label="Diminuir"><?= icon('minus', 'h-4 w-4') ?></button>
                                     <span class="w-10 text-center text-sm text-white"><?= (int) $item['quantity'] ?></span>
                                     <button name="quantity" value="<?= (int) $item['quantity'] + 1 ?>" class="flex h-9 w-9 items-center justify-center text-gold-400 hover:bg-white/5 disabled:opacity-30" aria-label="Aumentar" <?= $item['quantity'] >= min(CART_MAX_QTY_PER_ITEM, (int) $item['stock']) ? 'disabled' : '' ?>><?= icon('plus', 'h-4 w-4') ?></button>

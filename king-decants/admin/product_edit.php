@@ -166,6 +166,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($imageUrlInput !== '' && (!filter_var($imageUrlInput, FILTER_VALIDATE_URL) || !preg_match('#^https://#i', $imageUrlInput))) {
         $errors['image_url_external'] = 'Use uma URL https:// válida.';
     }
+    // ------------------------------------------------ Tamanhos (variações)
+    // Linhas vêm como variants[i][id|label|volume_ml|price|stock|sku|is_active|delete].
+    // Linhas novas totalmente vazias são ignoradas. Ids que não pertencem a este
+    // produto são tratados como novos (proteção contra manipulação do formulário).
+    $variantInput = [];
+    $variantErrors = [];
+    $existingVariantIds = $product ? array_map('intval', array_column(product_variants($id, false), 'id')) : [];
+    $seenSkus = [];
+    $n = 0;
+    foreach ((array) ($_POST['variants'] ?? []) as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $n++;
+        $vid = (int) ($row['id'] ?? 0);
+        if ($vid && !in_array($vid, $existingVariantIds, true)) {
+            $vid = 0;
+        }
+        $vLabel = clean_string($row['label'] ?? '', 40);
+        $vPrice = str_replace(['R$', ' '], '', (string) ($row['price'] ?? ''));
+        if (str_contains($vPrice, ',')) {
+            $vPrice = str_replace(',', '.', str_replace('.', '', $vPrice));
+        }
+        $vStock = trim((string) ($row['stock'] ?? ''));
+        $vVol = trim((string) ($row['volume_ml'] ?? ''));
+        $vSku = strtoupper(preg_replace('/[^A-Za-z0-9\-_]/', '', (string) ($row['sku'] ?? '')) ?? '');
+        $vActive = isset($row['is_active']) ? 1 : 0;
+        if (!$vid && $vLabel === '' && $vPrice === '' && $vStock === '' && $vSku === '') {
+            continue; // linha nova vazia
+        }
+        if (isset($row['delete'])) {
+            if ($vid) {
+                $variantInput[] = ['id' => $vid, 'delete' => true];
+            }
+            continue;
+        }
+        $name = $vLabel !== '' ? "Tamanho \"{$vLabel}\"" : "Tamanho da linha {$n}";
+        if ($vLabel === '') {
+            $variantErrors[] = "{$name}: informe o nome (ex.: 5 ml).";
+        }
+        if (!is_numeric($vPrice) || (float) $vPrice <= 0 || (float) $vPrice > 99999) {
+            $variantErrors[] = "{$name}: preço inválido (ex.: 49,90).";
+        }
+        if (filter_var($vStock, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 100000]]) === false) {
+            $variantErrors[] = "{$name}: estoque deve ser um número inteiro (0 ou mais).";
+        }
+        if ($vVol !== '' && filter_var($vVol, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 1000]]) === false) {
+            $variantErrors[] = "{$name}: volume entre 1 e 1000 ml.";
+        }
+        if ($vSku === '') {
+            // SKU automático: SKU do produto + volume (ex.: KD-BAS-005-10ML)
+            $vSku = substr($old['sku'] . '-' . ($vVol !== '' ? (int) $vVol . 'ML' : 'T' . $n), 0, 40);
+        }
+        if (isset($seenSkus[$vSku])) {
+            $variantErrors[] = "{$name}: SKU {$vSku} repetido em outro tamanho.";
+        }
+        $seenSkus[$vSku] = true;
+        $dupV = db()->prepare('SELECT COUNT(*) FROM product_variants WHERE sku = ? AND id <> ?');
+        $dupV->execute([$vSku, $vid]);
+        if ((int) $dupV->fetchColumn() > 0) {
+            $variantErrors[] = "{$name}: SKU {$vSku} já usado em outro produto.";
+        }
+        $variantInput[] = [
+            'id' => $vid, 'label' => $vLabel, 'price' => $vPrice, 'stock' => $vStock,
+            'volume_ml' => $vVol, 'sku' => $vSku, 'is_active' => $vActive, 'sort_order' => $n,
+        ];
+    }
+    if ($variantErrors) {
+        $errors['variants'] = $variantErrors;
+    }
+    // Com tamanhos ativos, preço e estoque do produto são calculados pelos tamanhos.
+    $activeVariants = array_filter($variantInput, fn($v) => empty($v['delete']) && $v['is_active']);
+    if ($activeVariants && !$variantErrors) {
+        unset($errors['price'], $errors['stock']);
+        $old['price'] = (string) min(array_map(fn($v) => (float) $v['price'], $activeVariants));
+        $old['stock'] = (string) array_sum(array_map(fn($v) => (int) $v['stock'], $activeVariants));
+    }
+
     // SKU e slug únicos
     foreach (['sku' => 'SKU', 'slug' => 'Endereço (slug)'] as $col => $label) {
         if (!isset($errors[$col])) {
@@ -272,6 +350,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('success', 'Produto cadastrado.');
         }
 
+        // Tamanhos: atualiza, cria e exclui. Tamanho já vendido não é apagado
+        // (fica inativo) para preservar o histórico dos pedidos.
+        foreach ($variantInput as $vi) {
+            if (!empty($vi['delete'])) {
+                $used = db()->prepare('SELECT COUNT(*) FROM order_items WHERE variant_id = ?');
+                $used->execute([$vi['id']]);
+                if ((int) $used->fetchColumn() > 0) {
+                    db()->prepare('UPDATE product_variants SET is_active = 0 WHERE id = ? AND product_id = ?')->execute([$vi['id'], $id]);
+                } else {
+                    db()->prepare('DELETE FROM product_variants WHERE id = ? AND product_id = ?')->execute([$vi['id'], $id]);
+                }
+                db()->prepare('DELETE FROM cart_items WHERE variant_id = ?')->execute([$vi['id']]);
+                continue;
+            }
+            $vals = [$vi['label'], $vi['volume_ml'] !== '' ? (int) $vi['volume_ml'] : null, $vi['sku'],
+                     round((float) $vi['price'], 2), (int) $vi['stock'], $vi['is_active'], $vi['sort_order']];
+            if ($vi['id']) {
+                db()->prepare('UPDATE product_variants SET label = ?, volume_ml = ?, sku = ?, price = ?, stock = ?, is_active = ?, sort_order = ?
+                               WHERE id = ? AND product_id = ?')->execute([...$vals, $vi['id'], $id]);
+            } else {
+                db()->prepare('INSERT INTO product_variants (label, volume_ml, sku, price, stock, is_active, sort_order, product_id)
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?)')->execute([...$vals, $id]);
+            }
+        }
+        if ($variantInput) {
+            product_sync_from_variants($id);
+            admin_log('product_variants', 'product', $id, count($activeVariants) . ' tamanho(s) ativo(s)');
+        }
+
         // Galeria: remove marcadas e adiciona novas ao final
         foreach ($existingGallery as $img) {
             if (in_array((int) $img['id'], $removeIds, true)) {
@@ -305,6 +412,13 @@ $v = fn(string $k) => e($old[$k] ?? '');
 $priceDisplay = is_numeric($old['price']) ? number_format((float) $old['price'], 2, ',', '') : $old['price'];
 $isExternal = preg_match('#^https?://#i', (string) $old['image_url']);
 $extraImages = $product ? product_extra_images((int) $product['id']) : [];
+// Linhas de tamanho para o formulário: as enviadas (se houve erro) ou as do banco.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $errors && isset($_POST['variants'])) {
+    $variantRows = array_values(array_filter((array) $_POST['variants'], 'is_array'));
+} else {
+    $variantRows = $product ? product_variants((int) $product['id'], false) : [];
+}
+$hasVariants = (bool) array_filter($variantRows, fn($r) => !empty($r['is_active']));
 $productReviews = [];
 if ($product) {
     $rv = db()->prepare('SELECT r.id, r.rating, r.comment, r.is_visible, r.created_at, u.name, u.email
@@ -378,12 +492,14 @@ require dirname(__DIR__) . '/inc/admin_header.php';
         <div class="grid gap-5 sm:grid-cols-4">
             <div>
                 <label class="field-label" for="price">Preço (R$) *</label>
-                <input id="price" name="price" inputmode="decimal" class="field<?= $inv('price') ?>" required placeholder="49,90" value="<?= e($priceDisplay) ?>">
+                <input id="price" name="price" inputmode="decimal" class="field<?= $inv('price') ?>" required placeholder="49,90" value="<?= e($priceDisplay) ?>" <?= $hasVariants ? 'readonly title="Calculado pelos tamanhos (menor preço)"' : '' ?>>
+                <?php if ($hasVariants): ?><p class="mt-1 text-[11px] text-ink-500">Menor preço dos tamanhos</p><?php endif; ?>
                 <?= $err('price') ?>
             </div>
             <div>
                 <label class="field-label" for="stock">Estoque *</label>
-                <input id="stock" name="stock" type="number" min="0" class="field<?= $inv('stock') ?>" required value="<?= $v('stock') ?>">
+                <input id="stock" name="stock" type="number" min="0" class="field<?= $inv('stock') ?>" required value="<?= $v('stock') ?>" <?= $hasVariants ? 'readonly title="Soma do estoque dos tamanhos"' : '' ?>>
+                <?php if ($hasVariants): ?><p class="mt-1 text-[11px] text-ink-500">Soma dos tamanhos</p><?php endif; ?>
                 <?= $err('stock') ?>
             </div>
             <div>
@@ -408,6 +524,61 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 <input type="checkbox" name="is_active" value="1" class="accent-[#d4af37]" <?= (int) $old['is_active'] ? 'checked' : '' ?>>
                 Visível na loja
             </label>
+        </div>
+
+        <!-- Tamanhos e preços (variações) -->
+        <div class="gold-divider"></div>
+        <div id="tamanhos">
+            <h2 class="text-xs font-medium uppercase tracking-[0.22em] text-white">Tamanhos e preços</h2>
+            <p class="mt-1 text-xs text-ink-500">Cadastre cada tamanho (ex.: 5 ml e 10 ml) com preço e estoque próprios. O cliente escolhe o tamanho na página do produto.
+                Com tamanhos cadastrados, o preço e o estoque do produto passam a ser calculados automaticamente (menor preço e soma do estoque). Deixe vazio para vender sem tamanhos.</p>
+            <?php if (!empty($errors['variants'])): ?>
+                <div class="alert alert-error mt-3 text-sm"><?php foreach ($errors['variants'] as $ve): ?><p><?= e($ve) ?></p><?php endforeach; ?></div>
+            <?php endif; ?>
+            <div class="mt-4 overflow-x-auto rounded-lg border border-white/5">
+                <table class="table-lux variants-table">
+                    <thead><tr><th>Tamanho *</th><th>ml</th><th>Preço (R$) *</th><th>Estoque *</th><th>SKU</th><th class="text-center">Ativo</th><th class="text-center">Excluir</th></tr></thead>
+                    <tbody data-variant-rows>
+                        <?php foreach ($variantRows as $vi => $vr): ?>
+                        <tr>
+                            <td><input type="hidden" name="variants[<?= (int) $vi ?>][id]" value="<?= (int) ($vr['id'] ?? 0) ?>">
+                                <input name="variants[<?= (int) $vi ?>][label]" class="field !px-2.5 !py-2 !w-20" placeholder="5 ml" maxlength="40" value="<?= e($vr['label'] ?? '') ?>" aria-label="Tamanho"></td>
+                            <td><input name="variants[<?= (int) $vi ?>][volume_ml]" type="number" min="1" max="1000" class="field !px-2.5 !py-2 !w-14" placeholder="5" value="<?= e($vr['volume_ml'] ?? '') ?>" aria-label="Volume em ml"></td>
+                            <td><input name="variants[<?= (int) $vi ?>][price]" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset($vr['price']) && is_numeric($vr['price']) ? number_format((float) $vr['price'], 2, ',', '') : ($vr['price'] ?? '')) ?>" aria-label="Preço"></td>
+                            <td><input name="variants[<?= (int) $vi ?>][stock]" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e($vr['stock'] ?? '') ?>" aria-label="Estoque"></td>
+                            <td><input name="variants[<?= (int) $vi ?>][sku]" class="field !px-2 !py-2 !w-32 !text-xs uppercase" placeholder="automático" maxlength="40" value="<?= e($vr['sku'] ?? '') ?>" aria-label="SKU"></td>
+                            <td class="text-center"><input type="checkbox" name="variants[<?= (int) $vi ?>][is_active]" value="1" class="accent-[#d4af37]" <?= !isset($vr['label']) || !empty($vr['is_active']) ? 'checked' : '' ?> aria-label="Ativo"></td>
+                            <td class="text-center"><input type="checkbox" name="variants[<?= (int) $vi ?>][delete]" value="1" class="accent-red-400" aria-label="Excluir"></td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php if (!$variantRows): $vr = []; $vi = 0; ?>
+                        <tr>
+                            <td><input type="hidden" name="variants[0][id]" value="<?= (int) ($vr['id'] ?? 0) ?>">
+                                <input name="variants[0][label]" class="field !px-2.5 !py-2 !w-20" placeholder="5 ml" maxlength="40" value="<?= e($vr['label'] ?? '') ?>" aria-label="Tamanho"></td>
+                            <td><input name="variants[0][volume_ml]" type="number" min="1" max="1000" class="field !px-2.5 !py-2 !w-14" placeholder="5" value="<?= e($vr['volume_ml'] ?? '') ?>" aria-label="Volume em ml"></td>
+                            <td><input name="variants[0][price]" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset($vr['price']) && is_numeric($vr['price']) ? number_format((float) $vr['price'], 2, ',', '') : ($vr['price'] ?? '')) ?>" aria-label="Preço"></td>
+                            <td><input name="variants[0][stock]" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e($vr['stock'] ?? '') ?>" aria-label="Estoque"></td>
+                            <td><input name="variants[0][sku]" class="field !px-2 !py-2 !w-32 !text-xs uppercase" placeholder="automático" maxlength="40" value="<?= e($vr['sku'] ?? '') ?>" aria-label="SKU"></td>
+                            <td class="text-center"><input type="checkbox" name="variants[0][is_active]" value="1" class="accent-[#d4af37]" <?= !isset($vr['label']) || !empty($vr['is_active']) ? 'checked' : '' ?> aria-label="Ativo"></td>
+                            <td class="text-center"><input type="checkbox" name="variants[0][delete]" value="1" class="accent-red-400" aria-label="Excluir"></td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" class="btn-outline btn-sm mt-3" data-add-variant><?= icon('plus', 'h-4 w-4') ?> Adicionar tamanho</button>
+            <template id="variant-row-template">
+                        <tr>
+                            <td><input type="hidden" name="variants[__i__][id]" value="<?= (int) ([]['id'] ?? 0) ?>">
+                                <input name="variants[__i__][label]" class="field !px-2.5 !py-2 !w-20" placeholder="5 ml" maxlength="40" value="<?= e([]['label'] ?? '') ?>" aria-label="Tamanho"></td>
+                            <td><input name="variants[__i__][volume_ml]" type="number" min="1" max="1000" class="field !px-2.5 !py-2 !w-14" placeholder="5" value="<?= e([]['volume_ml'] ?? '') ?>" aria-label="Volume em ml"></td>
+                            <td><input name="variants[__i__][price]" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset([]['price']) && is_numeric([]['price']) ? number_format((float) []['price'], 2, ',', '') : ([]['price'] ?? '')) ?>" aria-label="Preço"></td>
+                            <td><input name="variants[__i__][stock]" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e([]['stock'] ?? '') ?>" aria-label="Estoque"></td>
+                            <td><input name="variants[__i__][sku]" class="field !px-2 !py-2 !w-32 !text-xs uppercase" placeholder="automático" maxlength="40" value="<?= e([]['sku'] ?? '') ?>" aria-label="SKU"></td>
+                            <td class="text-center"><input type="checkbox" name="variants[__i__][is_active]" value="1" class="accent-[#d4af37]" <?= !isset([]['label']) || !empty([]['is_active']) ? 'checked' : '' ?> aria-label="Ativo"></td>
+                            <td class="text-center"><input type="checkbox" name="variants[__i__][delete]" value="1" class="accent-red-400" aria-label="Excluir"></td>
+                        </tr>
+            </template>
         </div>
 
         <!-- Pirâmide olfativa -->
@@ -518,4 +689,13 @@ require dirname(__DIR__) . '/inc/admin_header.php';
     </form>
 <?php endif; ?>
 
+<script>
+// Adiciona uma nova linha de tamanho (índice único para não colidir com as existentes).
+document.querySelector('[data-add-variant]')?.addEventListener('click', function () {
+    var tpl = document.getElementById('variant-row-template');
+    var body = document.querySelector('[data-variant-rows]');
+    body.insertAdjacentHTML('beforeend', tpl.innerHTML.split('__i__').join('n' + Date.now()));
+    body.lastElementChild.querySelector('input[name$="[label]"]').focus();
+});
+</script>
 <?php require dirname(__DIR__) . '/inc/admin_footer.php'; ?>

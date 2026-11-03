@@ -402,7 +402,7 @@ require __DIR__ . '/inc/header.php';
                     <li class="flex items-center gap-3">
                         <div class="h-14 w-12 shrink-0 overflow-hidden rounded-md bg-ink-900"><?= product_img($item, 'h-full w-full object-cover') ?></div>
                         <div class="flex-1 text-sm">
-                            <p class="text-white"><?= e($item['name']) ?></p>
+                            <p class="text-white"><?= e($item['name']) ?><?= $item['variant_label'] ? ' <span class="text-gold-300">· ' . e($item['variant_label']) . '</span>' : '' ?></p>
                             <p class="text-xs text-ink-500"><?= (int) $item['quantity'] ?> × <?= money($item['price']) ?></p>
                         </div>
                         <span class="text-sm text-ink-200"><?= money($item['line_total']) ?></span>
