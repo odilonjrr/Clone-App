@@ -166,7 +166,7 @@ require __DIR__ . '/inc/header.php';
             <?php
             $benefits = [
                 ['shield', 'Originais e rastreáveis', 'Decants envasados a partir de frascos originais, com lote registrado.'],
-                ['truck', 'Envio para todo o Brasil', 'Embalagem protegida e frete grátis acima de ' . money(FREE_SHIPPING_FROM) . '.'],
+                ['truck', 'Envio para todo o Brasil', 'Embalagem protegida' . (free_shipping_text() ? ' e ' . mb_strtolower(free_shipping_text()) : '') . '.'],
                 ['gift', 'Pronto para presentear', 'Estojos elegantes e cartão personalizado sob encomenda.'],
             ];
             foreach ($benefits as $i => [$ic, $title, $text]): ?>

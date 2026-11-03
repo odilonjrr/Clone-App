@@ -107,6 +107,13 @@ function mp_build_preference_payload(array $order, array $items): array
             'unit_price'  => round((float) $it['unit_price'], 2),
         ];
     }
+    if ((float) ($order['discount'] ?? 0) > 0) {
+        // Com cupom: produtos numa única linha já com desconto (total exato).
+        $mpItems = [[
+            'id' => 'PEDIDO-' . (int) $order['id'], 'title' => 'Pedido #' . (int) $order['id'] . ' (cupom ' . $order['coupon_code'] . ')',
+            'quantity' => 1, 'currency_id' => 'BRL', 'unit_price' => round((float) $order['subtotal'] - (float) $order['discount'], 2),
+        ]];
+    }
     if ((float) $order['shipping'] > 0) {
         $mpItems[] = [
             'id' => 'FRETE', 'title' => 'Frete', 'quantity' => 1,

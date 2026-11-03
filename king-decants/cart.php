@@ -140,13 +140,14 @@ require __DIR__ . '/inc/header.php';
                 <dl class="mt-6 space-y-3 text-sm">
                     <div class="flex justify-between"><dt class="text-ink-400">Subtotal (<?= (int) $cart['count'] ?> <?= $cart['count'] > 1 ? 'itens' : 'item' ?>)</dt><dd class="text-white"><?= money($cart['subtotal']) ?></dd></div>
                     <div class="flex justify-between"><dt class="text-ink-400">Frete</dt>
-                        <dd class="text-white"><?= FREE_SHIPPING_FROM > 0 && $cart['subtotal'] >= FREE_SHIPPING_FROM ? 'Grátis' : 'Calculado no checkout' ?></dd></div>
+                        <dd class="text-white"><?= free_shipping_applies((float) $cart['subtotal']) ? 'Grátis' : 'Calculado no checkout' ?></dd></div>
                 </dl>
-                <?php if (FREE_SHIPPING_FROM > 0 && $cart['subtotal'] < FREE_SHIPPING_FROM): ?>
+                <?php if (($missing = free_shipping_missing((float) $cart['subtotal'])) !== null): ?>
                     <p class="mt-4 rounded-md border border-gold-400/20 bg-gold-400/5 px-3 py-2 text-xs text-gold-200">
-                        Faltam <?= money(FREE_SHIPPING_FROM - $cart['subtotal']) ?> para frete grátis.
+                        Faltam <?= money($missing) ?> para frete grátis.
                     </p>
                 <?php endif; ?>
+                <p class="mt-3 text-xs text-ink-500">Tem cupom de desconto? Aplique na finalização da compra.</p>
                 <div class="gold-divider my-6"></div>
                 <div class="flex items-baseline justify-between">
                     <span class="text-xs uppercase tracking-[0.2em] text-ink-400">Subtotal</span>

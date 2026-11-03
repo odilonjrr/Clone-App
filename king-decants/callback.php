@@ -199,6 +199,9 @@ require __DIR__ . '/inc/header.php';
             <div class="gold-divider my-5"></div>
             <dl class="space-y-2 text-sm">
                 <div class="flex justify-between"><dt class="text-ink-400">Subtotal</dt><dd><?= money($order['subtotal']) ?></dd></div>
+                <?php if ((float) ($order['discount'] ?? 0) > 0): ?>
+                    <div class="flex justify-between"><dt class="text-ink-400">Desconto <span class="text-xs text-gold-300"><?= e($order['coupon_code']) ?></span></dt><dd class="text-emerald-300">− <?= money($order['discount']) ?></dd></div>
+                <?php endif; ?>
                 <div class="flex justify-between"><dt class="text-ink-400">Frete</dt><dd><?= (float) $order['shipping'] > 0 ? money($order['shipping']) : 'Grátis' ?></dd></div>
                 <div class="flex justify-between text-base"><dt class="text-white">Total</dt><dd class="font-serif text-2xl text-gold-300"><?= money($order['total']) ?></dd></div>
             </dl>

@@ -234,7 +234,7 @@ require __DIR__ . '/inc/header.php';
             <p class="mt-4 text-xs tracking-wider text-ink-500">
                 SKU <span data-variant-sku><?= e($displaySku) ?></span> ·
                 <span data-variant-stock><?= e($stockText($displayStock)) ?></span>
-                · Frete grátis acima de <?= money(FREE_SHIPPING_FROM) ?>
+                <?php if ($fsText = free_shipping_text()): ?>· <?= e($fsText) ?><?php endif; ?>
             </p>
         </div>
     </div>

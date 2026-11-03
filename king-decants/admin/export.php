@@ -32,10 +32,10 @@ if ($type === 'orders') {
     [$whereSql, $params] = admin_orders_filter($_GET);
     $sql = "SELECT o.id, o.created_at, o.status, o.payment_method, o.customer_name, o.customer_email, o.customer_phone, o.customer_cpf,
                    o.cep, o.street, o.number, o.complement, o.district, o.city, o.state,
-                   o.subtotal, o.shipping, o.total, o.tracking_code, o.paid_at, o.shipped_at, o.delivered_at,
+                   o.subtotal, o.discount, o.coupon_code, o.shipping, o.total, o.tracking_code, o.paid_at, o.shipped_at, o.delivered_at,
                    (SELECT GROUP_CONCAT(CONCAT(quantity, 'x ', sku) SEPARATOR ', ') FROM order_items WHERE order_id = o.id) AS items
               FROM orders o WHERE $whereSql ORDER BY o.id DESC LIMIT " . EXPORT_LIMIT;
-    $header = ['Pedido', 'Data', 'Status', 'Pagamento', 'Cliente', 'E-mail', 'Telefone', 'CPF', 'CEP', 'Logradouro', 'Número', 'Complemento', 'Bairro', 'Cidade', 'UF', 'Subtotal', 'Frete', 'Total', 'Rastreio', 'Pago em', 'Enviado em', 'Entregue em', 'Itens'];
+    $header = ['Pedido', 'Data', 'Status', 'Pagamento', 'Cliente', 'E-mail', 'Telefone', 'CPF', 'CEP', 'Logradouro', 'Número', 'Complemento', 'Bairro', 'Cidade', 'UF', 'Subtotal', 'Desconto', 'Cupom', 'Frete', 'Total', 'Rastreio', 'Pago em', 'Enviado em', 'Entregue em', 'Itens'];
 } else {
     $filter = $_GET;
     $filter['type'] = $_GET['ctype'] ?? '';
@@ -61,7 +61,7 @@ $out = fopen('php://output', 'w');
 fwrite($out, "\xEF\xBB\xBF"); // BOM para o Excel reconhecer UTF-8
 fputcsv($out, $header, ';', '"', '');
 while ($row = $stmt->fetch()) {
-    foreach (['subtotal', 'shipping', 'total', 'total_pago'] as $moneyCol) {
+    foreach (['subtotal', 'discount', 'shipping', 'total', 'total_pago'] as $moneyCol) {
         if (isset($row[$moneyCol])) {
             $row[$moneyCol] = number_format((float) $row[$moneyCol], 2, ',', '');
         }

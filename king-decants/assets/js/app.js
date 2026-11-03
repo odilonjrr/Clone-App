@@ -247,13 +247,57 @@
         const url = base + (base.includes('?') ? '&' : '?') + 'cep=' + encodeURIComponent(ev.detail.cep);
         const res = await fetch(url, { headers: { Accept: 'application/json' } });
         const d = await res.json();
-        if (d.ok) {
-          $('[data-shipping]').textContent = d.shipping_label;
-          $('[data-total]').textContent = d.total_label;
-          const days = $('[data-shipping-days]');
-          if (days) days.textContent = d.days || '';
-        }
+        if (d.ok && window.kdApplyTotals) window.kdApplyTotals(d);
       } catch (e) { /* silencioso: o servidor recalcula no envio */ }
+    });
+
+    // Atualiza o resumo (subtotal, desconto, frete, total) com a resposta do servidor.
+    const applyTotals = (d) => {
+      if (d.shipping_label) $('[data-shipping]').textContent = d.shipping_label;
+      if (d.total_label) $('[data-total]').textContent = d.total_label;
+      const days = $('[data-shipping-days]');
+      if (days && d.days !== undefined) days.textContent = d.days || '';
+      const row = $('[data-discount-row]');
+      if (row) {
+        row.classList.toggle('hidden', !(d.discount > 0));
+        $('[data-discount]').textContent = d.discount_label || '';
+        $('[data-coupon-desc]').textContent = d.coupon_code ? d.coupon_code + ' · ' + d.coupon_desc : '';
+      }
+    };
+    window.kdApplyTotals = applyTotals;
+
+    // Cupom: aplicar/remover sem recarregar (sem JS, os botões enviam o formulário).
+    const couponAction = async (remove) => {
+      const input = checkoutForm.elements.coupon_code;
+      const fd = new FormData();
+      fd.append('_csrf', csrf);
+      fd.append('coupon_code', remove ? '' : input.value);
+      if (remove) fd.append('remove_coupon', '1');
+      fd.append('cep', checkoutForm.elements.cep ? checkoutForm.elements.cep.value : '');
+      const msg = $('[data-coupon-msg]');
+      try {
+        const res = await fetch(checkoutForm.dataset.couponUrl, { method: 'POST', body: fd, headers: { Accept: 'application/json', 'X-CSRF-Token': csrf }, credentials: 'same-origin' });
+        const d = await res.json();
+        applyTotals(d);
+        const applied = !!d.coupon_code;
+        input.readOnly = applied;
+        if (applied) input.value = d.coupon_code;
+        $('[data-apply-coupon]').classList.toggle('hidden', applied);
+        $('[data-remove-coupon]').classList.toggle('hidden', !applied);
+        msg.innerHTML = '';
+        const span = document.createElement('span');
+        span.className = d.error ? 'text-red-300' : 'text-emerald-300';
+        span.textContent = d.error || (applied ? 'Cupom aplicado: ' + d.coupon_desc : d.message || '');
+        msg.appendChild(span);
+        if (!applied && remove) input.value = '';
+      } catch (e) {
+        kdToast('error', 'Falha de conexão ao aplicar o cupom.');
+      }
+    };
+    $('[data-apply-coupon]')?.addEventListener('click', (ev) => { ev.preventDefault(); couponAction(false); });
+    $('[data-remove-coupon]')?.addEventListener('click', (ev) => { ev.preventDefault(); couponAction(true); });
+    checkoutForm.elements.coupon_code?.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); couponAction(false); }
     });
 
     // Envio AJAX: o servidor cria o pedido + preferência e devolve a URL.

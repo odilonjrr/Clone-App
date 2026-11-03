@@ -362,7 +362,8 @@ function viacep_lookup(string $cep): ?array
 function shipping_quote(string $cep, float $subtotal): array
 {
     $cep = only_digits($cep);
-    if (FREE_SHIPPING_FROM > 0 && $subtotal >= FREE_SHIPPING_FROM) {
+    // Frete grátis conforme Admin -> Frete (inc/promotions.php). $subtotal = valor dos produtos já com desconto.
+    if (free_shipping_applies($subtotal)) {
         return ['price' => 0.0, 'label' => 'Frete grátis', 'days' => '3 a 8 dias úteis'];
     }
     if (!validate_cep($cep)) {
@@ -659,6 +660,7 @@ function icon(string $name, string $class = 'h-5 w-5'): string
         'pin'     => '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.5"/>',
         'badge'   => '<path d="M12 2.5l2.4 1.8 3-.2.9 2.9 2.4 1.8-1 2.8 1 2.8-2.4 1.8-.9 2.9-3-.2L12 21.5l-2.4-1.8-3 .2-.9-2.9-2.4-1.8 1-2.8-1-2.8 2.4-1.8.9-2.9 3 .2Z"/><path d="m12 8 1.2 2.5 2.7.3-2 1.9.5 2.7L12 14.1l-2.4 1.3.5-2.7-2-1.9 2.7-.3Z"/>',
         'chevron' => '<path d="m9 6 6 6-6 6"/>',
+        'tag'     => '<path d="M3 12V4h8l10 10-8 8L3 12Z"/><circle cx="7.5" cy="8.5" r="1.5"/>',
         'home'    => '<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>',
         'cart'    => '<path d="M3 4h2.2l2.3 11h10.3l2-8H6.6"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="16.5" cy="19" r="1.4"/>',
         'edit'    => '<path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13 7 4 4"/>',

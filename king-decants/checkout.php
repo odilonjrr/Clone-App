@@ -24,14 +24,51 @@ $cart = cart_items_detailed();
 $user = current_user();
 
 // ------------------------------------------------------------------ Frete (AJAX)
-if (($_GET['action'] ?? '') === 'shipping') {
-    $quote = shipping_quote($_GET['cep'] ?? '', $cart['subtotal']);
-    json_response([
+/** Resposta JSON com os totais (usada pelo frete e pelo cupom). */
+function checkout_totals_json(array $t, array $extra = []): array
+{
+    return $extra + [
         'ok'             => true,
-        'shipping_label' => $quote['price'] > 0 ? money($quote['price']) : $quote['label'],
-        'total_label'    => money($cart['subtotal'] + $quote['price']),
-        'days'           => $quote['days'],
-    ]);
+        'subtotal_label' => money($t['subtotal']),
+        'discount'       => $t['discount'],
+        'discount_label' => '− ' . money($t['discount']),
+        'coupon_code'    => $t['coupon']['code'] ?? null,
+        'coupon_desc'    => $t['coupon'] ? coupon_label($t['coupon']) : null,
+        'shipping_label' => $t['shipping']['price'] > 0 ? money($t['shipping']['price']) : $t['shipping']['label'],
+        'total_label'    => money($t['total']),
+        'days'           => $t['shipping']['days'],
+    ];
+}
+
+if (($_GET['action'] ?? '') === 'shipping') {
+    json_response(checkout_totals_json(order_totals($cart, (string) ($_GET['cep'] ?? ''))));
+}
+
+// ------------------------------------------------------------------ Cupom (aplicar / remover)
+// POST checkout.php?action=coupon  com coupon_code (vazio ou remove_coupon=1 remove).
+if (($_GET['action'] ?? '') === 'coupon' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_require();
+    $code = coupon_normalize((string) ($_POST['coupon_code'] ?? ''));
+    $message = null;
+    $error = null;
+    if (isset($_POST['remove_coupon']) || $code === '') {
+        unset($_SESSION['coupon_code']);
+        $message = 'Cupom removido.';
+    } else {
+        $error = coupon_error(coupon_find($code), (float) $cart['subtotal']);
+        if ($error) {
+            unset($_SESSION['coupon_code']);
+        } else {
+            $_SESSION['coupon_code'] = $code;
+            $message = 'Cupom aplicado!';
+        }
+    }
+    $t = order_totals($cart, only_digits($_POST['cep'] ?? ''));
+    if (wants_json()) {
+        json_response(checkout_totals_json($t, ['ok' => $error === null, 'message' => $message, 'error' => $error]), $error ? 422 : 200);
+    }
+    flash($error ? 'error' : 'success', $error ?? $message);
+    redirect(url('checkout.php'));
 }
 
 if (!$cart['items']) {
@@ -122,13 +159,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
         $errors['_global'] = 'Pagamentos ainda não configurados: defina MP_ACCESS_TOKEN em inc/config.php (veja o README).';
     }
 
+    // Totais finais (cupom revalidado; frete grátis conforme o admin).
+    $totals = order_totals($cart, $old['cep']);
+    if ($totals['coupon_error']) {
+        $errors['_global'] = 'Cupom removido: ' . $totals['coupon_error'] . ' Confira o novo total e tente de novo.';
+    }
+
     if (!$errors) {
-        $shipping = shipping_quote($old['cep'], $cart['subtotal']);
+        $shipping = $totals['shipping'];
         $orderRef = null;
         orders_expire_stale(); // libera reservas de pedidos abandonados antes de reservar
         try {
             // 3) Pedido "pending"
-            $orderRef = order_create($old, $cart, $shipping, $old['payment_method'], $isGuest);
+            $orderRef = order_create($old, $cart, $shipping, $old['payment_method'], $isGuest, $totals['coupon']['code'] ?? null);
             $order = order_find($orderRef['id']);
             $orderUrl = url('callback.php?order=' . $order['id'] . '&token=' . $order['access_token']);
 
@@ -170,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
                 }
             }
             cart_clear();
-            unset($_SESSION['guest_checkout']);
+            unset($_SESSION['guest_checkout'], $_SESSION['coupon_code']);
             $_SESSION['last_order'] = ['id' => $order['id'], 'token' => $order['access_token']];
             mail_order_created($order);
 
@@ -212,7 +255,11 @@ $v = fn(string $k) => e($old[$k] ?? '');
 $err = fn(string $k) => isset($errors[$k]) ? '<p class="field-error">' . e($errors[$k]) . '</p>' : '';
 $inv = fn(string $k) => isset($errors[$k]) ? ' is-invalid' : '';
 
-$shippingPreview = shipping_quote($old['cep'] ?? '', $cart['subtotal']);
+$preview = order_totals($cart, (string) ($old['cep'] ?? ''));
+$shippingPreview = $preview['shipping'];
+if ($preview['coupon_error'] && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    flash('error', 'Cupom removido: ' . $preview['coupon_error']);
+}
 
 $pageTitle = 'Finalizar compra — King Decants';
 require __DIR__ . '/inc/header.php';
@@ -252,7 +299,7 @@ require __DIR__ . '/inc/header.php';
     <?php endif; ?>
 
     <form action="<?= e(url('checkout.php')) ?>" method="post" class="grid gap-10 lg:grid-cols-3" novalidate
-          data-checkout data-shipping-url="<?= e(url('checkout.php')) ?>?action=shipping">
+          data-checkout data-shipping-url="<?= e(url('checkout.php')) ?>?action=shipping" data-coupon-url="<?= e(url('checkout.php?action=coupon')) ?>">
         <?= csrf_field() ?>
 
         <div class="space-y-10 lg:col-span-2">
@@ -411,14 +458,32 @@ require __DIR__ . '/inc/header.php';
             </ul>
             <div class="gold-divider my-6"></div>
             <dl class="space-y-3 text-sm">
-                <div class="flex justify-between"><dt class="text-ink-400">Subtotal</dt><dd class="text-white"><?= money($cart['subtotal']) ?></dd></div>
+                <div class="flex justify-between"><dt class="text-ink-400">Subtotal</dt><dd class="text-white" data-subtotal><?= money($cart['subtotal']) ?></dd></div>
+                <div class="flex justify-between <?= $preview['discount'] > 0 ? '' : 'hidden' ?>" data-discount-row>
+                    <dt class="text-ink-400">Desconto <span class="text-[11px] text-gold-300" data-coupon-desc><?= $preview['coupon'] ? e($preview['coupon']['code'] . ' · ' . coupon_label($preview['coupon'])) : '' ?></span></dt>
+                    <dd class="text-emerald-300" data-discount>− <?= money($preview['discount']) ?></dd>
+                </div>
                 <div class="flex justify-between"><dt class="text-ink-400">Frete <span class="block text-[11px] text-ink-500" data-shipping-days><?= e($shippingPreview['days']) ?></span></dt>
                     <dd class="text-white" data-shipping><?= $shippingPreview['price'] > 0 ? money($shippingPreview['price']) : e($shippingPreview['label']) ?></dd></div>
             </dl>
             <div class="gold-divider my-6"></div>
             <div class="flex items-baseline justify-between">
                 <span class="text-xs uppercase tracking-[0.2em] text-ink-400">Total</span>
-                <span class="font-serif text-3xl text-white" data-total><?= money($cart['subtotal'] + $shippingPreview['price']) ?></span>
+                <span class="font-serif text-3xl text-white" data-total><?= money($preview['total']) ?></span>
+            </div>
+
+            <!-- Cupom de desconto: aplicado ANTES de ir para o pagamento -->
+            <div class="mt-6 rounded-lg border border-white/10 p-4" data-coupon-box>
+                <label class="field-label" for="coupon_code">Cupom de desconto</label>
+                <div class="flex gap-2">
+                    <input id="coupon_code" name="coupon_code" class="field !py-2.5 uppercase" maxlength="30" autocomplete="off"
+                           placeholder="Digite o código" value="<?= e($preview['coupon']['code'] ?? '') ?>" <?= $preview['coupon'] ? 'readonly' : '' ?>>
+                    <button type="submit" formaction="<?= e(url('checkout.php?action=coupon')) ?>" formnovalidate
+                            class="btn-outline btn-sm shrink-0 <?= $preview['coupon'] ? 'hidden' : '' ?>" data-apply-coupon>Aplicar</button>
+                    <button type="submit" name="remove_coupon" value="1" formaction="<?= e(url('checkout.php?action=coupon')) ?>" formnovalidate
+                            class="btn-outline btn-sm shrink-0 !border-red-400/40 !text-red-300 <?= $preview['coupon'] ? '' : 'hidden' ?>" data-remove-coupon>Remover</button>
+                </div>
+                <p class="mt-2 text-xs" data-coupon-msg><?= $preview['coupon'] ? '<span class="text-emerald-300">Cupom aplicado: ' . e(coupon_label($preview['coupon'])) . '</span>' : '' ?></p>
             </div>
             <button type="submit" class="btn-gold mt-6 w-full" data-loading-text="Gerando pagamento…">Pagar com <?= e(payment_provider_name()) ?></button>
             <p class="mt-4 flex items-center justify-center gap-2 text-xs text-ink-500"><span class="text-gold-400"><?= icon('shield', 'h-4 w-4') ?></span> Dados protegidos · ambiente seguro</p>

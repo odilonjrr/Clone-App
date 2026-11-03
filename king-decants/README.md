@@ -143,7 +143,7 @@ Todas as constantes estão em **`inc/config.php`**. Cada uma é resolvida nesta 
 | `APP_ENV` | `production` oculta erros detalhados |
 | `SESSION_LIFETIME` | Expiração por inatividade (segundos) |
 | `LOGIN_MAX_ATTEMPTS`, `LOGIN_WINDOW_MINUTES` | Rate limit de login |
-| `FREE_SHIPPING_FROM` | Frete grátis a partir deste subtotal (0 desativa) |
+| `FREE_SHIPPING_FROM` | Valor inicial do frete grátis, usado só até o admin salvar a tela **Frete** (depois vale o que estiver no painel) |
 | `MAIL_*`, `SMTP_*` | E-mail (ver seção 7) |
 
 **Exemplos de como definir as variáveis**
@@ -399,7 +399,9 @@ Dica: em hospedagem compartilhada, se o `session.save_path` for compartilhado, o
 
 **Convidados no CRM:** compras como convidado criam/atualizam um registro em `users` com `is_guest=1`. Se a pessoa se cadastrar depois com o mesmo e-mail, o registro vira conta. Por segurança (não há verificação de e-mail no MVP), a nova conta **não herda** telefone/CPF do convidado e **não vê** pedidos nem endereços de compras feitas como convidado; o cliente acessa esses pedidos pelo link do e-mail. Da mesma forma, um checkout como convidado com o e-mail de uma conta existente não altera os dados dessa conta.
 
-**Frete:** `shipping_quote()` em `inc/helpers.php` usa uma tabela fictícia pelo 1º dígito do CEP, com frete grátis acima de `FREE_SHIPPING_FROM`. Troque pela API dos Correios, Melhor Envio ou Frenet quando precisar.
+**Frete:** `shipping_quote()` em `inc/helpers.php` usa uma tabela fictícia pelo 1º dígito do CEP. O frete grátis é configurado em **Admin → Frete** (sem frete grátis / grátis em todos os pedidos / grátis acima de R$ X); a regra fica em `inc/promotions.php`. O limite "acima de" compara o valor dos produtos já com o desconto do cupom.
+
+**Cupons de desconto:** **Admin → Cupons** cria códigos de % ou valor fixo, com pedido mínimo, limite de usos e validade opcionais. O cliente aplica o código no resumo do checkout (campo "Cupom de desconto"), antes de ir para o pagamento. O desconto vale sobre os produtos (não sobre o frete), é revalidado com bloqueio de linha ao criar o pedido e o uso é devolvido se o pedido for cancelado. Com cupom, a InfinitePay/Mercado Pago recebe os produtos numa linha única ("Pedido KD-123 (cupom X)") com o valor já descontado, mais a linha de frete. Cupom já usado não é excluído, só desativado. Troque pela API dos Correios, Melhor Envio ou Frenet quando precisar.
 
 **ViaCEP:** o checkout preenche o endereço automaticamente ao sair do campo CEP (atributo `data-viacep`; remova-o para desativar). Há também a versão servidor `viacep_lookup()`, com um bloco comentado em `checkout.php` para ativá-la.
 

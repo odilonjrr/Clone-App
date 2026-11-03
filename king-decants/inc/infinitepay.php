@@ -115,6 +115,15 @@ function ip_create_checkout_link(array $order, array $items): array
             'description' => mb_substr($it['name'], 0, 120),
         ];
     }
+    // Com cupom: a InfinitePay não tem campo de desconto documentado, então os
+    // produtos vão numa única linha com o valor já descontado (total exato).
+    if ((float) ($order['discount'] ?? 0) > 0) {
+        $mpItems = [[
+            'quantity'    => 1,
+            'price'       => (int) round(((float) $order['subtotal'] - (float) $order['discount']) * 100),
+            'description' => 'Pedido KD-' . (int) $order['id'] . ' (cupom ' . $order['coupon_code'] . ')',
+        ]];
+    }
     if ((float) $order['shipping'] > 0) {
         $mpItems[] = ['quantity' => 1, 'price' => (int) round((float) $order['shipping'] * 100), 'description' => 'Frete'];
     }

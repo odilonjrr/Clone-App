@@ -176,6 +176,9 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                     <tr><td class="text-white"><?= e($it['name']) ?></td><td class="text-ink-400"><?= e($it['sku']) ?></td><td class="text-right"><?= (int) $it['quantity'] ?></td><td class="text-right"><?= money($it['unit_price']) ?></td><td class="text-right"><?= money($it['line_total']) ?></td></tr>
                 <?php endforeach; ?>
                 <tr><td colspan="4" class="text-right text-ink-400">Subtotal</td><td class="text-right"><?= money($order['subtotal']) ?></td></tr>
+                <?php if ((float) ($order['discount'] ?? 0) > 0): ?>
+                    <tr><td colspan="4" class="text-right text-ink-400">Desconto (cupom <span class="text-gold-300"><?= e($order['coupon_code']) ?></span>)</td><td class="text-right text-emerald-300">− <?= money($order['discount']) ?></td></tr>
+                <?php endif; ?>
                 <tr><td colspan="4" class="text-right text-ink-400">Frete</td><td class="text-right"><?= money($order['shipping']) ?></td></tr>
                 <tr><td colspan="4" class="text-right text-white">Total</td><td class="text-right font-serif text-xl text-gold-300"><?= money($order['total']) ?></td></tr>
                 </tbody>

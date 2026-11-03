@@ -67,7 +67,7 @@ function customer_upsert(string $name, string $email, string $phone, string $cpf
  * @param bool $isGuest    pedido feito sem login
  * @return array           ['id' => int, 'access_token' => string, 'total' => float]
  */
-function order_create(array $customer, array $cart, array $shipping, string $method, bool $isGuest): array
+function order_create(array $customer, array $cart, array $shipping, string $method, bool $isGuest, ?string $couponCode = null): array
 {
     $pdo = db();
     $pdo->beginTransaction();
@@ -100,21 +100,37 @@ function order_create(array $customer, array $cart, array $shipping, string $met
 
         $subtotal = (float) $cart['subtotal'];
         $shippingPrice = (float) $shipping['price'];
-        $total = round($subtotal + $shippingPrice, 2);
+
+        // Cupom: revalida com a linha travada (limite de usos não estoura em pedidos
+        // simultâneos) e já conta o uso; o uso é devolvido se o pedido for cancelado.
+        $discount = 0.0;
+        $appliedCode = null;
+        if ($couponCode) {
+            $cs = $pdo->prepare('SELECT * FROM coupons WHERE code = ? FOR UPDATE');
+            $cs->execute([coupon_normalize($couponCode)]);
+            $coupon = $cs->fetch() ?: null;
+            if ($err = coupon_error($coupon, $subtotal)) {
+                throw new RuntimeException('Cupom: ' . $err);
+            }
+            $discount = coupon_discount($coupon, $subtotal);
+            $appliedCode = $coupon['code'];
+            $pdo->prepare('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?')->execute([$coupon['id']]);
+        }
+        $total = round($subtotal - $discount + $shippingPrice, 2);
         $token = random_token(20);
 
         $pdo->prepare(
             'INSERT INTO orders (user_id, is_guest_order, access_token, status, payment_method,
                 customer_name, customer_email, customer_phone, customer_cpf,
                 cep, street, number, complement, district, city, state,
-                subtotal, shipping, total, stock_applied)
-             VALUES (?, ?, ?, \'pending\', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)'
+                subtotal, discount, coupon_code, shipping, total, stock_applied)
+             VALUES (?, ?, ?, \'pending\', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)'
         )->execute([
             $userId, $isGuest ? 1 : 0, $token, $method,
             $customer['name'], $customer['email'], $customer['phone'], $customer['cpf'],
             $customer['cep'], $customer['street'], $customer['number'], $customer['complement'] ?: null,
             $customer['district'], $customer['city'], $customer['state'],
-            $subtotal, $shippingPrice, $total,
+            $subtotal, $discount, $appliedCode, $shippingPrice, $total,
         ]);
         $orderId = (int) $pdo->lastInsertId();
 
@@ -193,7 +209,7 @@ function order_change_status(int $orderId, string $to, string $source, ?int $adm
         $pdo->beginTransaction();
     }
     try {
-        $stmt = $pdo->prepare('SELECT id, status, stock_applied FROM orders WHERE id = ? FOR UPDATE');
+        $stmt = $pdo->prepare('SELECT id, status, stock_applied, coupon_code FROM orders WHERE id = ? FOR UPDATE');
         $stmt->execute([$orderId]);
         $order = $stmt->fetch();
         if (!$order || $order['status'] === $to || !order_can_transition($order['status'], $to)) {
@@ -248,6 +264,15 @@ function order_change_status(int $orderId, string $to, string $source, ?int $adm
                 }
             }
             $pdo->prepare('UPDATE orders SET stock_applied = 0 WHERE id = ?')->execute([$orderId]);
+        }
+
+        // Uso do cupom: devolvido ao cancelar; contado de novo se um cancelado for pago.
+        if (!empty($order['coupon_code'])) {
+            if ($to === 'cancelled') {
+                $pdo->prepare('UPDATE coupons SET used_count = GREATEST(CAST(used_count AS SIGNED) - 1, 0) WHERE code = ?')->execute([$order['coupon_code']]);
+            } elseif ($to === 'paid' && $order['status'] === 'cancelled') {
+                $pdo->prepare('UPDATE coupons SET used_count = used_count + 1 WHERE code = ?')->execute([$order['coupon_code']]);
+            }
         }
 
         $pdo->prepare('INSERT INTO order_status_history (order_id, from_status, to_status, source, admin_id, note) VALUES (?, ?, ?, ?, ?, ?)')

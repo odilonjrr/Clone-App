@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const KD_SCHEMA_VERSION = 5;
+const KD_SCHEMA_VERSION = 6;
 
 function kd_schema_marker(): string
 {
@@ -171,6 +171,27 @@ function kd_ensure_schema(): void
     if (!$hasColumn('order_items', 'variant_id')) {
         $pdo->exec('ALTER TABLE order_items ADD COLUMN variant_id INT UNSIGNED NULL AFTER product_id,
                     ADD COLUMN variant_label VARCHAR(40) NULL AFTER name');
+    }
+
+    // ---------------- Versão 6: cupons de desconto + desconto no pedido
+    $pdo->exec("CREATE TABLE IF NOT EXISTS coupons (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        code VARCHAR(30) NOT NULL,
+        type ENUM('percent','fixed') NOT NULL DEFAULT 'percent',
+        value DECIMAL(10,2) NOT NULL,
+        min_subtotal DECIMAL(10,2) NULL,
+        max_uses INT UNSIGNED NULL,
+        used_count INT UNSIGNED NOT NULL DEFAULT 0,
+        starts_at DATETIME NULL,
+        expires_at DATETIME NULL,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_coupons_code (code)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    if (!$hasColumn('orders', 'discount')) {
+        $pdo->exec('ALTER TABLE orders ADD COLUMN discount DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER subtotal,
+                    ADD COLUMN coupon_code VARCHAR(30) NULL AFTER discount');
     }
 
     @file_put_contents($marker, (string) KD_SCHEMA_VERSION, LOCK_EX);
