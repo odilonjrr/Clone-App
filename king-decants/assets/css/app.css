@@ -374,13 +374,21 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
 /* Celular/tablet: o frasco fica no topo do banner — a área das luzes acompanha
    o frasco para os raios nascerem atrás dele. */
 @media (max-width: 1023px) {
+  /* O ponto de onde saem os raios no SVG é (560, 470) num quadro 1000×560.
+     Com 760px de largura (escala .76) ele fica em (425.6px, 357px): posicionamos
+     o SVG para esse ponto cair no CENTRO horizontal e na base do frasco (~316px). */
   .hero-rays {
-    top: 0; bottom: auto; height: 560px;
-    -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%) !important;
-    mask-image: linear-gradient(to bottom, #000 62%, transparent 100%) !important;
+    inset: 0 !important; width: 100% !important; height: auto;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 360px, transparent 600px) !important;
+    mask-image: linear-gradient(to bottom, #000 0, #000 360px, transparent 600px) !important;
   }
-  .hero-rays svg.hero-lights { transform: translateX(-56px) scale(1.4); transform-origin: 50% 80%; }
-  .hero-rays::after { top: 62%; width: 90%; }
+  .hero-rays svg.hero-lights {
+    position: absolute; inset: auto; width: 760px; height: 425.6px;
+    left: calc(50% - 425.6px); top: -41px; transform: none;
+  }
+  .hero-rays::after { top: 300px; width: 120%; }
+  /* Frasco menor no celular para o título aparecer na primeira tela */
+  .hero-bottle { max-height: 300px; width: auto; max-width: 100%; object-fit: contain; }
 }
 
 /* Foto enviada no admin para o banner: integra ao fundo (bordas suavizadas e
@@ -419,7 +427,17 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
    com desfoque faz alguns aparelhos redesenharem com cintilação.
    ========================================================================= */
 @media (max-width: 1023px) {
-  .hero-lights *, .hero-rays, .hero-rays::after { animation: none !important; }
+  /* Raios, brilho e feixe ficam parados; SÓ os pontos flutuantes se movem
+     (sobem devagar e desaparecem — sem piscar). */
+  /* Celular: raios BALANÇAM devagar e os pontos flutuam. Para não cintilar:
+     sem desfoque nos grupos animados (o desfoque era recalculado a cada quadro),
+     sem pulsos de opacidade, sem feixe de varredura e sem cintilar. */
+  .hero-lights g[filter] { filter: none; }
+  .hero-lights .hl-rays-a { animation: hl-sway 16s ease-in-out infinite !important; will-change: transform; }
+  .hero-lights .hl-rays-b { animation: hl-sway-rev 22s ease-in-out infinite !important; will-change: transform; opacity: .8; }
+  .hero-lights .hl-arcs   { animation: hl-sway 26s ease-in-out infinite reverse !important; will-change: transform; opacity: .7; }
+  .hero-lights .hl-core, .hero-lights .hl-beam, .hero-lights .hl-twinkle,
+  .hero-rays, .hero-rays::after { animation: none !important; }
   .hero-lights .hl-beam { opacity: 0; }
 }
 
@@ -435,3 +453,16 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
 /* .icon-btn define display; garante que hidden / lg:inline-flex funcionem */
 .icon-btn.hidden { display: none; }
 @media (min-width: 1024px) { .icon-btn.lg\:inline-flex { display: inline-flex; } .bottom-nav { display: none; } }
+@media (max-width: 1023px) { .hero-bottle.is-photo { max-height: 300px; } }
+@media (max-width: 1023px) {
+  /* sem o "piso" de luz e com a borda inferior das luzes suavizada (evita faixa reta) */
+  .hero-lights rect[fill="url(#hl-floor)"] { display: none; }
+  .hero-rays svg.hero-lights {
+    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+  }
+}
+/* PNG/WebP transparente não precisa de máscara: ela cortava o brilho dourado
+   nas bordas da caixa da imagem, formando um retângulo claro. (Fotos opacas
+   continuam com a máscara via .is-opaque.) */
+.hero-bottle.is-photo:not(.is-opaque) { -webkit-mask-image: none; mask-image: none; }

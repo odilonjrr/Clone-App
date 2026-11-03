@@ -59,23 +59,25 @@ require __DIR__ . '/inc/header.php';
     <div class="hero-rays pointer-events-none absolute inset-y-0 right-0 w-full lg:w-[68%]">
         <?= file_get_contents(__DIR__ . '/assets/img/hero-lights.svg') ?>
     </div>
-    <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/70 to-transparent lg:via-ink-950/40"></div>
+    <!-- Sombra para legibilidade do texto: de cima para baixo no celular (raios simétricos),
+         da esquerda para a direita no desktop (texto à esquerda). -->
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950/90 lg:bg-gradient-to-r lg:from-ink-950 lg:via-ink-950/40 lg:to-transparent"></div>
 
-    <div class="relative mx-auto grid min-h-[520px] max-w-7xl items-center gap-4 px-5 py-12 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:py-16">
+    <div class="relative mx-auto grid max-w-7xl items-center gap-2 px-5 pb-10 pt-4 lg:min-h-[520px] lg:grid-cols-[1.1fr_1fr] lg:gap-4 lg:px-8 lg:py-16">
         <div class="relative z-10 order-2 text-center lg:order-1 lg:text-left">
             <p class="eyebrow animate-fade-up">Decants de alta perfumaria</p>
-            <h1 class="mt-6 font-serif text-5xl font-normal leading-[1.02] text-white animate-fade-up sm:text-6xl xl:text-7xl" style="animation-delay:.1s">
+            <h1 class="mt-3 font-serif text-5xl lg:mt-6 font-normal leading-[1.02] text-white animate-fade-up sm:text-6xl xl:text-7xl" style="animation-delay:.1s">
                 Criado para<br>
                 <em class="font-light text-gold-gradient">marcar presença.</em>
             </h1>
-            <div class="mx-auto mt-8 h-px w-16 bg-gold-400/60 lg:mx-0"></div>
-            <p class="mt-8 text-lg font-light tracking-wide text-ink-300 animate-fade-up" style="animation-delay:.2s">Luxo em cada gota.</p>
-            <div class="mt-10 flex flex-col items-center gap-4 animate-fade-up sm:flex-row sm:justify-center lg:justify-start" style="animation-delay:.3s">
+            <div class="mx-auto mt-5 h-px w-16 bg-gold-400/60 lg:mx-0 lg:mt-8"></div>
+            <p class="mt-5 text-lg lg:mt-8 font-light tracking-wide text-ink-300 animate-fade-up" style="animation-delay:.2s">Luxo em cada gota.</p>
+            <div class="mt-7 flex flex-col items-center gap-4 animate-fade-up lg:mt-10 sm:flex-row sm:justify-center lg:justify-start" style="animation-delay:.3s">
                 <a href="#mais-vendidos" class="btn-gold">Comprar agora <?= icon('arrow', 'h-4 w-4') ?></a>
                 <a href="#colecoes" class="text-xs uppercase tracking-[0.22em] text-ink-400 transition-colors hover:text-gold-300">Explorar coleções</a>
             </div>
         </div>
-        <div class="relative order-1 mx-auto w-full max-w-[320px] lg:order-2 lg:max-w-[400px]">
+        <div class="hero-bottle-wrap relative order-1 mx-auto w-full max-w-[210px] sm:max-w-[250px] lg:order-2 lg:max-w-[400px]">
             <?php
             // Imagem do banner: a enviada em Admin -> Aparência, ou o frasco ilustrado padrão.
             $heroImage = setting('hero_image');
