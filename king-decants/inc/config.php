@@ -26,6 +26,8 @@ $kdExternalConfig = getenv('KD_CONFIG_FILE') ?: dirname(__DIR__, 2) . '/kingdeca
 if (is_file($kdExternalConfig)) {
     require_once $kdExternalConfig;
 }
+// Para diagnóstico (inc/db.php): qual arquivo de configuração foi usado.
+define('KD_CONFIG_SOURCE', is_file($kdExternalConfig) ? $kdExternalConfig : 'inc/config.php (arquivo externo NÃO encontrado)');
 
 /** Helper local: define a constante só se ainda não existir (env > arquivo externo > placeholder). */
 function kd_define(string $name, $default): void
