@@ -110,6 +110,15 @@ kd_define('LOGIN_WINDOW_MINUTES', 15);
 kd_define('FREE_SHIPPING_FROM', 299.00);
 
 // ---------------------------------------------------------------------------
+// SuperFrete (cotação real de frete + etiquetas). Token gerado em
+// web.superfrete.com -> Integrações -> Desenvolvedores (ou no sandbox, para testes).
+// O restante (CEP de origem, medidas, transportadoras) fica em Admin -> Frete.
+// ---------------------------------------------------------------------------
+kd_define('SUPERFRETE_TOKEN', '');
+kd_define('SUPERFRETE_SANDBOX', false);       // true = sandbox.superfrete.com (etiquetas sem validade)
+kd_define('SUPERFRETE_API_BASE', '');         // vazio = automático (produção ou sandbox)
+
+// ---------------------------------------------------------------------------
 // E-mail (veja inc/mailer.php e Admin > E-mails). MAIL_DRIVER: 'smtp' (recomendado, sem Composer), 'mail'
 // (função mail()) ou 'log' (apenas grava em storage/logs/mail.log). Hostinger: smtp.hostinger.com, 465, 'ssl'.
 // ---------------------------------------------------------------------------

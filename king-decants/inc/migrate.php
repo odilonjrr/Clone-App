@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const KD_SCHEMA_VERSION = 6;
+const KD_SCHEMA_VERSION = 7;
 
 function kd_schema_marker(): string
 {
@@ -192,6 +192,19 @@ function kd_ensure_schema(): void
     if (!$hasColumn('orders', 'discount')) {
         $pdo->exec('ALTER TABLE orders ADD COLUMN discount DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER subtotal,
                     ADD COLUMN coupon_code VARCHAR(30) NULL AFTER discount');
+    }
+
+    // ---------------- Versão 7: SuperFrete (serviço de entrega escolhido + etiqueta)
+    if (!$hasColumn('orders', 'shipping_service_id')) {
+        $pdo->exec('ALTER TABLE orders
+            ADD COLUMN shipping_service_id INT NULL AFTER shipping,
+            ADD COLUMN shipping_service VARCHAR(60) NULL AFTER shipping_service_id,
+            ADD COLUMN shipping_package VARCHAR(255) NULL AFTER shipping_service,
+            ADD COLUMN sf_order_id VARCHAR(40) NULL,
+            ADD COLUMN sf_status VARCHAR(20) NULL,
+            ADD COLUMN sf_price DECIMAL(10,2) NULL,
+            ADD COLUMN sf_label_url VARCHAR(500) NULL,
+            ADD INDEX idx_orders_sf (sf_order_id)');
     }
 
     @file_put_contents($marker, (string) KD_SCHEMA_VERSION, LOCK_EX);

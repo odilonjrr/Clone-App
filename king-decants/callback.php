@@ -202,7 +202,7 @@ require __DIR__ . '/inc/header.php';
                 <?php if ((float) ($order['discount'] ?? 0) > 0): ?>
                     <div class="flex justify-between"><dt class="text-ink-400">Desconto <span class="text-xs text-gold-300"><?= e($order['coupon_code']) ?></span></dt><dd class="text-emerald-300">− <?= money($order['discount']) ?></dd></div>
                 <?php endif; ?>
-                <div class="flex justify-between"><dt class="text-ink-400">Frete</dt><dd><?= (float) $order['shipping'] > 0 ? money($order['shipping']) : 'Grátis' ?></dd></div>
+                <div class="flex justify-between"><dt class="text-ink-400">Frete<?= !empty($order['shipping_service']) ? ' · ' . e($order['shipping_service']) : '' ?></dt><dd><?= (float) $order['shipping'] > 0 ? money($order['shipping']) : 'Grátis' ?></dd></div>
                 <div class="flex justify-between text-base"><dt class="text-white">Total</dt><dd class="font-serif text-2xl text-gold-300"><?= money($order['total']) ?></dd></div>
             </dl>
         </div>

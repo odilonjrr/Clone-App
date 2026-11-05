@@ -415,6 +415,13 @@ Dica: em hospedagem compartilhada, se o `session.save_path` for compartilhado, o
 
 **Frete:** `shipping_quote()` em `inc/helpers.php` usa uma tabela fictícia pelo 1º dígito do CEP. O frete grátis é configurado em **Admin → Frete** (sem frete grátis / grátis em todos os pedidos / grátis acima de R$ X); a regra fica em `inc/promotions.php`. O limite "acima de" compara o valor dos produtos já com o desconto do cupom.
 
+**SuperFrete (cotação real e etiquetas):** `inc/superfrete.php`, conforme a documentação oficial (superfrete.readme.io).
+- Token em `SUPERFRETE_TOKEN` (gerado em web.superfrete.com → Integrações → Desenvolvedores); `SUPERFRETE_SANDBOX` = true usa o ambiente de testes.
+- **Admin → Frete → Cálculo do frete:** escolha "SuperFrete" e preencha as medidas de 1 decant embalado, as transportadoras, a margem, os dias de preparo e o endereço de postagem. Há um teste de cotação e o saldo da conta.
+- **Checkout:** depois do CEP, o cliente escolhe PAC, SEDEX, Mini Envios… O preço é recalculado no servidor (cotação guardada na sessão por 20 min). Se a SuperFrete não responder, vale a tabela por CEP. Com frete grátis, a opção mais barata sai grátis e as outras cobram a diferença.
+- **Pedido (admin):** "Gerar e pagar etiqueta" cria a etiqueta e paga com o saldo SuperFrete (`api/v0/cart` + `api/v0/checkout`); o rastreio é gravado no pedido. Também há imprimir (PDF), atualizar situação e cancelar (antes da postagem; o valor volta ao saldo).
+- **Avisos automáticos:** em Admin → Frete, "Ativar avisos automáticos" cadastra `webhook-superfrete.php` (precisa de https). Ao receber um aviso, o site consulta a SuperFrete (`order/info`) e nunca confia no conteúdo do aviso. Postado → pedido "Enviado" (e-mail com rastreio); entregue → "Entregue".
+
 **Cupons de desconto:** **Admin → Cupons** cria códigos de % ou valor fixo, com pedido mínimo, limite de usos e validade opcionais. O cliente aplica o código no resumo do checkout (campo "Cupom de desconto"), antes de ir para o pagamento. O desconto vale sobre os produtos (não sobre o frete), é revalidado com bloqueio de linha ao criar o pedido e o uso é devolvido se o pedido for cancelado. Com cupom, a InfinitePay/Mercado Pago recebe os produtos numa linha única ("Pedido KD-123 (cupom X)") com o valor já descontado, mais a linha de frete. Cupom já usado não é excluído, só desativado. Troque pela API dos Correios, Melhor Envio ou Frenet quando precisar.
 
 **ViaCEP:** o checkout preenche o endereço automaticamente ao sair do campo CEP (atributo `data-viacep`; remova-o para desativar). Há também a versão servidor `viacep_lookup()`, com um bloco comentado em `checkout.php` para ativá-la.

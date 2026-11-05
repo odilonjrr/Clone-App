@@ -123,14 +123,16 @@ function order_create(array $customer, array $cart, array $shipping, string $met
             'INSERT INTO orders (user_id, is_guest_order, access_token, status, payment_method,
                 customer_name, customer_email, customer_phone, customer_cpf,
                 cep, street, number, complement, district, city, state,
-                subtotal, discount, coupon_code, shipping, total, stock_applied)
-             VALUES (?, ?, ?, \'pending\', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)'
+                subtotal, discount, coupon_code, shipping, shipping_service_id, shipping_service, shipping_package, total, stock_applied)
+             VALUES (?, ?, ?, \'pending\', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)'
         )->execute([
             $userId, $isGuest ? 1 : 0, $token, $method,
             $customer['name'], $customer['email'], $customer['phone'], $customer['cpf'],
             $customer['cep'], $customer['street'], $customer['number'], $customer['complement'] ?: null,
             $customer['district'], $customer['city'], $customer['state'],
-            $subtotal, $discount, $appliedCode, $shippingPrice, $total,
+            $subtotal, $discount, $appliedCode, $shippingPrice,
+            $shipping['service_id'] ?? null, isset($shipping['service_name']) ? mb_substr($shipping['service_name'], 0, 60) : null,
+            isset($shipping['package']) ? json_encode($shipping['package']) : null, $total,
         ]);
         $orderId = (int) $pdo->lastInsertId();
 

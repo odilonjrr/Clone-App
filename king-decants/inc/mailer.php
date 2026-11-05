@@ -226,7 +226,7 @@ function mail_order_summary(array $order): string
     if ((float) ($order['discount'] ?? 0) > 0) {
         $rows .= $line('Desconto' . (!empty($order['coupon_code']) ? ' (' . e($order['coupon_code']) . ')' : ''), '− ' . money($order['discount']), '#6ee7b7');
     }
-    $rows .= $line('Frete', (float) $order['shipping'] > 0 ? money($order['shipping']) : 'Grátis');
+    $rows .= $line('Frete' . (!empty($order['shipping_service']) ? ' (' . e($order['shipping_service']) . ')' : ''), (float) $order['shipping'] > 0 ? money($order['shipping']) : 'Grátis');
     $rows .= '<tr><td style="padding:10px 0 0;font-size:15px;color:#ffffff"><strong>Total</strong></td><td align="right" style="padding:10px 0 0;font-size:18px;color:#e6c76f"><strong>' . money($order['total']) . '</strong></td></tr>';
 
     $addr = e($order['street'] . ', ' . $order['number'] . ($order['complement'] ? ' — ' . $order['complement'] : ''))

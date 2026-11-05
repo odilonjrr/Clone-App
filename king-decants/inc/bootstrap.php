@@ -69,6 +69,7 @@ require_once __DIR__ . '/cart.php';
 require_once __DIR__ . '/catalog.php';
 require_once __DIR__ . '/account.php';
 require_once __DIR__ . '/promotions.php';
+require_once __DIR__ . '/superfrete.php';
 require_once __DIR__ . '/orders.php';
 require_once __DIR__ . '/mercadopago.php';
 require_once __DIR__ . '/infinitepay.php';

@@ -241,19 +241,57 @@
   // Atualiza o resumo de frete quando o CEP muda (consulta o servidor).
   const checkoutForm = $('form[data-checkout]');
   if (checkoutForm) {
-    checkoutForm.addEventListener('kd:cep', async (ev) => {
+    // Recalcula frete/total no servidor (CEP digitado ou opção de entrega trocada).
+    const refreshShipping = async (cep, service) => {
       try {
         const base = checkoutForm.dataset.shippingUrl;
-        const url = base + (base.includes('?') ? '&' : '?') + 'cep=' + encodeURIComponent(ev.detail.cep);
-        const res = await fetch(url, { headers: { Accept: 'application/json' } });
+        let url = base + (base.includes('?') ? '&' : '?') + 'cep=' + encodeURIComponent(cep);
+        if (service) url += '&service=' + encodeURIComponent(service);
+        const shipEl = $('[data-shipping]');
+        if (shipEl && !service) shipEl.textContent = 'Calculando…';
+        const res = await fetch(url, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
         const d = await res.json();
         if (d.ok && window.kdApplyTotals) window.kdApplyTotals(d);
       } catch (e) { /* silencioso: o servidor recalcula no envio */ }
+    };
+    checkoutForm.addEventListener('kd:cep', (ev) => refreshShipping(ev.detail.cep));
+    checkoutForm.addEventListener('change', (ev) => {
+      if (ev.target.name === 'shipping_service') {
+        refreshShipping(checkoutForm.elements.cep ? checkoutForm.elements.cep.value : '', ev.target.value);
+      }
     });
+
+    // Lista de opções de entrega (SuperFrete) montada com a resposta do servidor.
+    const renderShippingOptions = (opts) => {
+      const box = $('[data-shipping-options]');
+      const list = $('[data-shipping-options-list]');
+      if (!box || !list || !Array.isArray(opts)) return;
+      list.innerHTML = '';
+      opts.forEach((o) => {
+        const label = document.createElement('label');
+        label.className = 'flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors ' +
+          (o.selected ? 'border-gold-400/60 bg-gold-400/5' : 'border-white/10 hover:border-white/20');
+        const input = document.createElement('input');
+        input.type = 'radio'; input.name = 'shipping_service'; input.value = o.id; input.checked = !!o.selected;
+        input.className = 'accent-[#d4af37]';
+        const info = document.createElement('span');
+        info.className = 'flex-1';
+        const n = document.createElement('span'); n.className = 'block text-white'; n.textContent = o.name;
+        const dd = document.createElement('span'); dd.className = 'block text-[11px] text-ink-500'; dd.textContent = o.days || '';
+        info.append(n, dd);
+        const price = document.createElement('span');
+        price.className = o.price_label === 'Grátis' ? 'text-emerald-300' : 'text-white';
+        price.textContent = o.price_label;
+        label.append(input, info, price);
+        list.appendChild(label);
+      });
+      box.classList.toggle('hidden', opts.length === 0);
+    };
 
     // Atualiza o resumo (subtotal, desconto, frete, total) com a resposta do servidor.
     const applyTotals = (d) => {
       if (d.shipping_label) $('[data-shipping]').textContent = d.shipping_label;
+      if (d.shipping_options) renderShippingOptions(d.shipping_options);
       if (d.total_label) $('[data-total]').textContent = d.total_label;
       const days = $('[data-shipping-days]');
       if (days && d.days !== undefined) days.textContent = d.days || '';

@@ -134,7 +134,7 @@ function coupon_label(array $coupon): string
  * Se o cupom da sessão deixou de valer, ele é removido e o motivo retornado.
  * @return array subtotal, discount, coupon (array|null), coupon_error, products_total, shipping (quote), total
  */
-function order_totals(array $cart, string $cep = ''): array
+function order_totals(array $cart, string $cep = '', ?int $serviceId = null): array
 {
     $subtotal = (float) $cart['subtotal'];
     $coupon = null;
@@ -151,7 +151,8 @@ function order_totals(array $cart, string $cep = ''): array
     }
     $discount = $coupon ? coupon_discount($coupon, $subtotal) : 0.0;
     $productsTotal = round($subtotal - $discount, 2);
-    $shipping = shipping_quote($cep, $productsTotal);
+    // SuperFrete (cotação real, com opções) quando ativa; senão, tabela por CEP.
+    $shipping = sf_shipping($cep, $cart, $productsTotal, $serviceId) ?? shipping_quote($cep, $productsTotal);
     return [
         'subtotal'       => $subtotal,
         'discount'       => $discount,

@@ -25,6 +25,33 @@ $user = current_user();
 
 // ------------------------------------------------------------------ Frete (AJAX)
 /** Resposta JSON com os totais (usada pelo frete e pelo cupom). */
+/** Serviço de entrega escolhido (SuperFrete): vem do formulário e fica na sessão. */
+function checkout_service(): ?int
+{
+    $v = $_POST['shipping_service'] ?? $_GET['service'] ?? null;
+    if ($v !== null && $v !== '') {
+        $_SESSION['shipping_service'] = (int) $v;
+    }
+    return isset($_SESSION['shipping_service']) ? (int) $_SESSION['shipping_service'] : null;
+}
+
+/** Opções de frete para exibir (preço já com frete grátis aplicado). */
+function checkout_shipping_options(array $shipping): array
+{
+    $out = [];
+    foreach ($shipping['options'] ?? [] as $o) {
+        $out[] = [
+            'id'          => $o['id'],
+            'name'        => $o['name'],
+            'company'     => $o['company'],
+            'price_label' => $o['charge'] > 0 ? money($o['charge']) : 'Grátis',
+            'days'        => $o['days'],
+            'selected'    => $o['id'] === ($shipping['service_id'] ?? null),
+        ];
+    }
+    return $out;
+}
+
 function checkout_totals_json(array $t, array $extra = []): array
 {
     return $extra + [
@@ -37,11 +64,12 @@ function checkout_totals_json(array $t, array $extra = []): array
         'shipping_label' => $t['shipping']['price'] > 0 ? money($t['shipping']['price']) : $t['shipping']['label'],
         'total_label'    => money($t['total']),
         'days'           => $t['shipping']['days'],
+        'shipping_options' => checkout_shipping_options($t['shipping']),
     ];
 }
 
 if (($_GET['action'] ?? '') === 'shipping') {
-    json_response(checkout_totals_json(order_totals($cart, (string) ($_GET['cep'] ?? ''))));
+    json_response(checkout_totals_json(order_totals($cart, (string) ($_GET['cep'] ?? ''), checkout_service())));
 }
 
 // ------------------------------------------------------------------ Cupom (aplicar / remover)
@@ -63,7 +91,7 @@ if (($_GET['action'] ?? '') === 'coupon' && $_SERVER['REQUEST_METHOD'] === 'POST
             $message = 'Cupom aplicado!';
         }
     }
-    $t = order_totals($cart, only_digits($_POST['cep'] ?? ''));
+    $t = order_totals($cart, only_digits($_POST['cep'] ?? ''), checkout_service());
     if (wants_json()) {
         json_response(checkout_totals_json($t, ['ok' => $error === null, 'message' => $message, 'error' => $error]), $error ? 422 : 200);
     }
@@ -160,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
     }
 
     // Totais finais (cupom revalidado; frete grátis conforme o admin).
-    $totals = order_totals($cart, $old['cep']);
+    $totals = order_totals($cart, $old['cep'], checkout_service());
     if ($totals['coupon_error']) {
         $errors['_global'] = 'Cupom removido: ' . $totals['coupon_error'] . ' Confira o novo total e tente de novo.';
     }
@@ -213,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
                 }
             }
             cart_clear();
-            unset($_SESSION['guest_checkout'], $_SESSION['coupon_code']);
+            unset($_SESSION['guest_checkout'], $_SESSION['coupon_code'], $_SESSION['shipping_service']);
             $_SESSION['last_order'] = ['id' => $order['id'], 'token' => $order['access_token']];
             mail_order_created($order);
 
@@ -255,7 +283,7 @@ $v = fn(string $k) => e($old[$k] ?? '');
 $err = fn(string $k) => isset($errors[$k]) ? '<p class="field-error">' . e($errors[$k]) . '</p>' : '';
 $inv = fn(string $k) => isset($errors[$k]) ? ' is-invalid' : '';
 
-$preview = order_totals($cart, (string) ($old['cep'] ?? ''));
+$preview = order_totals($cart, (string) ($old['cep'] ?? ''), checkout_service());
 $shippingPreview = $preview['shipping'];
 if ($preview['coupon_error'] && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     flash('error', 'Cupom removido: ' . $preview['coupon_error']);
@@ -466,6 +494,19 @@ require __DIR__ . '/inc/header.php';
                 <div class="flex justify-between"><dt class="text-ink-400">Frete <span class="block text-[11px] text-ink-500" data-shipping-days><?= e($shippingPreview['days']) ?></span></dt>
                     <dd class="text-white" data-shipping><?= $shippingPreview['price'] > 0 ? money($shippingPreview['price']) : e($shippingPreview['label']) ?></dd></div>
             </dl>
+            <!-- Opções de entrega (SuperFrete): aparecem depois do CEP -->
+            <fieldset class="mt-4 space-y-2 <?= empty($shippingPreview['options']) ? 'hidden' : '' ?>" data-shipping-options>
+                <legend class="mb-2 text-[11px] uppercase tracking-[0.2em] text-ink-400">Escolha a entrega</legend>
+                <div class="space-y-2" data-shipping-options-list>
+                <?php foreach (checkout_shipping_options($shippingPreview) as $so): ?>
+                    <label class="flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 text-sm transition-colors <?= $so['selected'] ? 'border-gold-400/60 bg-gold-400/5' : 'border-white/10 hover:border-white/20' ?>">
+                        <input type="radio" name="shipping_service" value="<?= (int) $so['id'] ?>" class="accent-[#d4af37]" <?= $so['selected'] ? 'checked' : '' ?>>
+                        <span class="flex-1"><span class="block text-white"><?= e($so['name']) ?></span><span class="block text-[11px] text-ink-500"><?= e($so['days']) ?></span></span>
+                        <span class="<?= $so['price_label'] === 'Grátis' ? 'text-emerald-300' : 'text-white' ?>"><?= e($so['price_label']) ?></span>
+                    </label>
+                <?php endforeach; ?>
+                </div>
+            </fieldset>
             <div class="gold-divider my-6"></div>
             <div class="flex items-baseline justify-between">
                 <span class="text-xs uppercase tracking-[0.2em] text-ink-400">Total</span>

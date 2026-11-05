@@ -70,6 +70,7 @@
 .btn-outline:hover { background: rgba(212, 175, 55, 0.08); color: #f1dfa6; border-color: var(--gold-2); }
 
 .btn-sm { padding: 0.55rem 0.95rem; font-size: 11px; letter-spacing: 0.14em; }
+.btn-gold.hidden, .btn-outline.hidden { display: none; }
 
 .icon-btn {
   display: inline-flex;

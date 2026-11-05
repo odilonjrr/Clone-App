@@ -61,6 +61,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect($selfUrl . '#notas');
     }
 
+    // ---------------- SuperFrete: etiqueta
+    if (str_starts_with($action, 'sf_')) {
+        try {
+            if ($action === 'sf_label') {
+                if (!in_array($order['status'], ['paid', 'shipped'], true)) {
+                    throw new RuntimeException('Gere a etiqueta só depois do pagamento aprovado.');
+                }
+                $svc = int_param($_POST, 'sf_service') ?: null;
+                $fresh = sf_create_and_pay_label($order, $svc);
+                admin_log('sf_label', 'order', $id, (string) $fresh['sf_order_id']);
+                flash('success', 'Etiqueta gerada e paga' . ($fresh['tracking_code'] ? ' · rastreio ' . $fresh['tracking_code'] : '') . '. Imprima e poste o pacote.');
+            } elseif ($action === 'sf_print') {
+                $url = sf_print_url($order);
+                admin_log('sf_print', 'order', $id);
+                redirect($url);
+            } elseif ($action === 'sf_sync') {
+                $fresh = sf_sync($order, 'admin');
+                flash('success', 'Etiqueta: ' . sf_status_label($fresh['sf_status']) . '.');
+            } elseif ($action === 'sf_cancel') {
+                sf_cancel_label($order, clean_string($_POST['reason'] ?? '', 120) ?: 'Cancelado pela loja');
+                admin_log('sf_cancel', 'order', $id, (string) $order['sf_order_id']);
+                flash('success', 'Etiqueta cancelada; o valor volta para o saldo da SuperFrete.');
+            }
+        } catch (Throwable $e) {
+            flash('error', 'SuperFrete: ' . $e->getMessage());
+        }
+        redirect($selfUrl . '#etiqueta');
+    }
+
     if ($action === 'sync' && ($order['payment_provider'] ?? '') === 'infinitepay') {
         $last = db()->prepare("SELECT mp_payment_id, external_slug FROM payments WHERE order_id = ? AND provider = 'infinitepay' ORDER BY id DESC LIMIT 1");
         $last->execute([$id]);
@@ -179,7 +208,7 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 <?php if ((float) ($order['discount'] ?? 0) > 0): ?>
                     <tr><td colspan="4" class="text-right text-ink-400">Desconto (cupom <span class="text-gold-300"><?= e($order['coupon_code']) ?></span>)</td><td class="text-right text-emerald-300">− <?= money($order['discount']) ?></td></tr>
                 <?php endif; ?>
-                <tr><td colspan="4" class="text-right text-ink-400">Frete</td><td class="text-right"><?= money($order['shipping']) ?></td></tr>
+                <tr><td colspan="4" class="text-right text-ink-400">Frete<?= !empty($order['shipping_service']) ? ' (' . e($order['shipping_service']) . ')' : '' ?></td><td class="text-right"><?= money($order['shipping']) ?></td></tr>
                 <tr><td colspan="4" class="text-right text-white">Total</td><td class="text-right font-serif text-xl text-gold-300"><?= money($order['total']) ?></td></tr>
                 </tbody>
             </table>
@@ -251,8 +280,54 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 <p><?= e($order['city']) ?>/<?= e($order['state']) ?></p>
                 <p>CEP <?= e(format_cep($order['cep'])) ?></p>
             </address>
-            <?php if ($order['tracking_code']): ?><p class="mt-4 text-sm">Rastreio: <span class="text-gold-300"><?= e($order['tracking_code']) ?></span></p><?php endif; ?>
+            <?php if (!empty($order['shipping_service'])): ?><p class="mt-4 text-sm">Entrega escolhida: <span class="text-white"><?= e($order['shipping_service']) ?></span></p><?php endif; ?>
+            <?php if ($order['tracking_code']): ?><p class="mt-2 text-sm">Rastreio: <span class="text-gold-300"><?= e($order['tracking_code']) ?></span></p><?php endif; ?>
         </section>
+
+        <!-- Etiqueta SuperFrete -->
+        <?php if (sf_token_ok()): $sfs = sf_settings(); ?>
+        <section class="panel p-6" id="etiqueta">
+            <h2 class="text-xs font-medium uppercase tracking-[0.22em] text-white">Etiqueta SuperFrete</h2>
+            <?php if (!empty($order['sf_order_id'])): ?>
+                <dl class="mt-4 space-y-1 text-sm">
+                    <div class="flex justify-between"><dt class="text-ink-400">Situação</dt><dd class="text-white"><?= e(sf_status_label($order['sf_status'])) ?></dd></div>
+                    <?php if ($order['sf_price'] !== null): ?><div class="flex justify-between"><dt class="text-ink-400">Custo da etiqueta</dt><dd class="text-white"><?= money($order['sf_price']) ?></dd></div><?php endif; ?>
+                    <div class="flex justify-between"><dt class="text-ink-400">ID</dt><dd class="font-mono text-xs text-ink-300"><?= e($order['sf_order_id']) ?></dd></div>
+                </dl>
+            <?php else: ?>
+                <p class="mt-3 text-sm text-ink-400">Nenhuma etiqueta gerada.</p>
+            <?php endif; ?>
+
+            <div class="mt-5 space-y-2">
+                <?php $canLabel = in_array($order['status'], ['paid', 'shipped'], true) && (empty($order['sf_order_id']) || in_array($order['sf_status'], ['pending', 'canceled', 'cancelled'], true)); ?>
+                <?php if ($canLabel): ?>
+                    <form method="post" class="space-y-2" onsubmit="return confirm('Gerar a etiqueta e pagar com o saldo da SuperFrete?')">
+                        <?= csrf_field() ?><input type="hidden" name="action" value="sf_label">
+                        <select name="sf_service" class="field !py-2 !pr-9 text-sm">
+                            <?php foreach ($sfs['services'] ?: array_keys(SF_SERVICES) as $sid): ?>
+                                <option value="<?= $sid ?>" <?= (int) ($order['shipping_service_id'] ?? 0) === $sid ? 'selected' : '' ?>><?= e(SF_SERVICES[$sid]) ?><?= (int) ($order['shipping_service_id'] ?? 0) === $sid ? ' (escolhido pelo cliente)' : '' ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button class="btn-gold btn-sm w-full"><?= icon('truck', 'h-4 w-4') ?> Gerar e pagar etiqueta</button>
+                    </form>
+                <?php endif; ?>
+                <?php if (!empty($order['sf_order_id']) && !in_array($order['sf_status'], ['canceled', 'cancelled', 'pending'], true)): ?>
+                    <form method="post" target="_blank"><?= csrf_field() ?><input type="hidden" name="action" value="sf_print">
+                        <button class="btn-outline btn-sm w-full">Imprimir etiqueta (PDF)</button></form>
+                <?php endif; ?>
+                <?php if (!empty($order['sf_order_id'])): ?>
+                    <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="sf_sync">
+                        <button class="btn-outline btn-sm w-full">Atualizar situação</button></form>
+                <?php endif; ?>
+                <?php if (!empty($order['sf_order_id']) && in_array($order['sf_status'], ['pending', 'released'], true)): ?>
+                    <form method="post" onsubmit="return confirm('Cancelar a etiqueta? O valor volta para o saldo da SuperFrete.')">
+                        <?= csrf_field() ?><input type="hidden" name="action" value="sf_cancel">
+                        <button class="btn-outline btn-sm w-full !border-red-400/40 !text-red-300">Cancelar etiqueta</button></form>
+                <?php endif; ?>
+            </div>
+            <p class="mt-4 text-xs text-ink-500">Depois de postar, o pedido vira "Enviado" sozinho (com os avisos automáticos ativos) ou ao clicar em Atualizar situação.</p>
+        </section>
+        <?php endif; ?>
 
         <!-- Histórico -->
         <section class="panel p-6">
