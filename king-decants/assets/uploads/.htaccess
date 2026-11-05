@@ -1,0 +1,14 @@
+# =============================================================================
+# King Decants — assets/uploads/.htaccess
+# Pasta de imagens enviadas pelo admin. Defesa em profundidade: mesmo que algum
+# arquivo malicioso chegasse aqui, NADA além de imagens pode ser servido, e
+# nenhum script é executado.
+# =============================================================================
+Options -Indexes -ExecCGI
+Require all denied
+<FilesMatch "(?i)^[a-z0-9_\-]+\.(jpe?g|png|webp)$">
+    Require all granted
+</FilesMatch>
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
