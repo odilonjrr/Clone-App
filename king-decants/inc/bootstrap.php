@@ -16,12 +16,15 @@
  * ---------------------------------------------------------------------------
  */
 
-require_once __DIR__ . '/config.php';
+// Até a configuração carregar, nunca mostre erros brutos na tela (podem conter trechos de senhas/tokens).
+ini_set('display_errors', '0');
 
 /**
  * Erros FATAIS (ex.: arquivo do sistema faltando após uma atualização incompleta)
  * não passam pelo set_exception_handler. Esta função mostra uma página clara em
- * vez da tela branca e indica qual arquivo está faltando.
+ * vez da tela branca e indica qual arquivo está faltando (ou a linha com erro
+ * de digitação no kingdecants-config.php). Registrada ANTES de carregar a
+ * configuração, para pegar também erros nela.
  */
 register_shutdown_function(function (): void {
     $err = error_get_last();
@@ -35,6 +38,12 @@ register_shutdown_function(function (): void {
         $missing = ltrim(str_replace($root, '', $m[1]), '/\\');
         $hint = '<p style="color:#e6c76f">Arquivo do sistema não encontrado: <strong>public_html/' . htmlspecialchars($missing) . '</strong>.<br>Envie novamente o .zip mais recente e extraia em public_html, substituindo os arquivos.</p>';
     }
+    // Erro de digitação no arquivo de configuração (ex.: aspas ou ; faltando)
+    if ($hint === '' && str_ends_with((string) $err['file'], 'kingdecants-config.php')) {
+        $hint = '<p style="color:#e6c76f">Erro de digitação no arquivo <strong>kingdecants-config.php</strong>, perto da <strong>linha ' . (int) $err['line'] . '</strong>.</p>'
+            . '<p style="color:#b8b4ab;font-size:14px;line-height:1.6">Confira nessa linha (e na anterior): cada valor entre aspas simples, sem aspas faltando, e cada linha terminando com <code>);</code><br>'
+            . 'Exemplo correto: <code style="color:#e6c76f">define(\'SUPERFRETE_TOKEN\', \'seu-token\');</code></p>';
+    }
     @file_put_contents($root . '/storage/logs/php-errors.log', '[' . date('Y-m-d H:i:s') . '] FATAL ' . $err['message'] . ' em ' . $err['file'] . ':' . $err['line'] . "\n", FILE_APPEND);
     if (!headers_sent()) {
         http_response_code(500);
@@ -46,6 +55,9 @@ register_shutdown_function(function (): void {
         . '<h1 style="font-family:Georgia,serif;font-weight:400">Site em manutenção</h1>' . $hint
         . '<p style="color:#8f8b83;font-size:13px">Detalhes em storage/logs/php-errors.log.</p></div></body></html>';
 });
+
+require_once __DIR__ . '/config.php';
+
 
 date_default_timezone_set(APP_TIMEZONE);
 
