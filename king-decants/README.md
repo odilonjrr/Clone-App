@@ -16,7 +16,7 @@ Loja de decants de perfumes com estética de perfumaria de luxo (preto, dourado,
 4. [Configuração (`inc/config.php`) e proteção das chaves](#4-configuração-e-proteção-das-chaves)
 5. [Mercado Pago: sandbox, webhook e produção](#5-mercado-pago)
 6. [Painel admin](#6-painel-admin)
-7. [E-mail (mail() ou SMTP com PHPMailer)](#7-e-mail)
+7. [E-mail (SMTP, mail() ou log)](#7-e-mail)
 8. [Deploy (cPanel/Plesk, VPS, Netlify)](#8-deploy)
 9. [Segurança: o que já está implementado e o que fazer em produção](#9-segurança)
 10. [Sessões PHP](#10-sessões-php)
@@ -292,13 +292,27 @@ Os CSVs usam separador `;` e BOM UTF-8 (abrem direto no Excel em português), t�
 
 ## 7. E-mail
 
-`MAIL_DRIVER` em `inc/config.php`:
+`MAIL_DRIVER` (no `kingdecants-config.php` ou `inc/config.php`):
 
-- `log` (padrão): grava os e-mails em `storage/logs/mail.log` — ideal para desenvolvimento.
-- `mail`: usa a função `mail()` do PHP. Configure **SPF/DKIM** no domínio para não cair no spam.
-- `smtp`: `composer require phpmailer/phpmailer` e preencha `SMTP_HOST`, `SMTP_PORT` (587 com `tls` ou 465 com `ssl`), `SMTP_USER`, `SMTP_PASS` e `MAIL_FROM`. Serve para Gmail Workspace, Zoho, Amazon SES, SendGrid, Brevo etc.
+- `smtp` (**recomendado**): envia pela caixa de e-mail do domínio. Cliente SMTP próprio em `inc/mailer.php`, **sem Composer** (se o PHPMailer estiver instalado, ele é usado). Hostinger: `SMTP_HOST` `smtp.hostinger.com`, `SMTP_PORT` 465, `SMTP_SECURE` `ssl` (ou 587 + `tls`), `SMTP_USER` = `MAIL_FROM` = a caixa criada no hPanel, `SMTP_PASS` = senha dela. Serve também para Zoho, Gmail Workspace, Brevo, SES etc.
+- `mail`: função `mail()` do PHP (mais chance de cair no spam).
+- `log` (padrão de desenvolvimento): não envia, só grava em `storage/logs/mail.log`.
 
-E-mails enviados: pedido recebido, pagamento confirmado, pedido enviado (com rastreio), entregue e cancelado.
+**Admin → E-mails** mostra a configuração, envia e-mail de teste (com o erro exato do servidor, se falhar) e pré-visualiza os modelos.
+
+E-mails para o cliente (com itens, desconto, frete, total e endereço):
+
+| Quando | E-mail |
+|---|---|
+| Pedido criado no checkout | Pedido recebido (aguardando pagamento) |
+| Pagamento confirmado (webhook/retorno ou admin) | Pagamento aprovado |
+| Operadora recusou (webhook/retorno) | Pagamento não aprovado |
+| 24 h sem pagamento (cancelamento automático) | Pagamento não identificado |
+| Admin marca **Enviado** (preencha o rastreio no mesmo formulário) | Pedido enviado + código de rastreio |
+| Admin marca **Entregue** | Pedido entregue |
+| Admin cancela / estorno | Pedido cancelado |
+
+Falha ao gerar o link de pagamento não envia e-mail (o cliente vê o erro na tela). Falha de e-mail nunca interrompe a compra; fica registrada em `storage/logs/mail.log`.
 
 ---
 

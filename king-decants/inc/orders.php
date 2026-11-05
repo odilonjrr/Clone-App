@@ -292,7 +292,7 @@ function order_change_status(int $orderId, string $to, string $source, ?int $adm
     try {
         $fresh = order_find($orderId);
         if ($fresh) {
-            mail_order_status($fresh);
+            mail_order_status($fresh, $source, $note);
         }
     } catch (Throwable $e) {
         app_log('mail', 'Falha ao enviar e-mail de status', ['order' => $orderId, 'error' => $e->getMessage()]);

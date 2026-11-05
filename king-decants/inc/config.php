@@ -110,8 +110,8 @@ kd_define('LOGIN_WINDOW_MINUTES', 15);
 kd_define('FREE_SHIPPING_FROM', 299.00);
 
 // ---------------------------------------------------------------------------
-// E-mail (veja inc/mailer.php). MAIL_DRIVER: 'mail' (função mail()), 'smtp'
-// (PHPMailer via Composer) ou 'log' (apenas grava em storage/logs/mail.log).
+// E-mail (veja inc/mailer.php e Admin > E-mails). MAIL_DRIVER: 'smtp' (recomendado, sem Composer), 'mail'
+// (função mail()) ou 'log' (apenas grava em storage/logs/mail.log). Hostinger: smtp.hostinger.com, 465, 'ssl'.
 // ---------------------------------------------------------------------------
 kd_define('MAIL_DRIVER', 'log');
 kd_define('MAIL_FROM', 'nao-responda@seudominio.com.br');
