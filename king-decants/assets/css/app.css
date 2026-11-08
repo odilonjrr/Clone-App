@@ -491,3 +491,37 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
 .variants-table th, .variants-table td { padding: .55rem .45rem; }
 .variants-table th:first-child, .variants-table td:first-child { padding-left: .9rem; }
 .variants-table th { letter-spacing: .08em; }
+
+/* =========================================================================
+   Botão flutuante do WhatsApp (canto inferior direito; acima da barra do celular)
+   ========================================================================= */
+.wa-float {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 44;
+  display: flex; align-items: center; gap: .6rem;
+}
+.wa-float-btn {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 58px; height: 58px; border-radius: 9999px; color: #fff;
+  background: #25d366; box-shadow: 0 10px 30px -8px rgba(37,211,102,.55), 0 0 0 1px rgba(255,255,255,.08) inset;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.wa-float-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; }
+.wa-float-btn svg path:last-child { fill: currentColor; stroke: none; }
+.wa-float-btn::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  border: 2px solid rgba(37,211,102,.55); animation: wa-ring 2.6s ease-out infinite;
+}
+.wa-float:hover .wa-float-btn { transform: translateY(-2px) scale(1.04); box-shadow: 0 14px 34px -8px rgba(37,211,102,.7); }
+.wa-float-label {
+  padding: .5rem .85rem; border-radius: 9999px; font-size: 12px; letter-spacing: .04em;
+  color: #ece9e3; background: rgba(12,12,12,.92); border: 1px solid rgba(212,175,55,.25);
+  opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.wa-float:hover .wa-float-label, .wa-float:focus-visible .wa-float-label { opacity: 1; transform: none; }
+@keyframes wa-ring { 0% { transform: scale(1); opacity: .8; } 70%, 100% { transform: scale(1.45); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .wa-float-btn::before { animation: none; display: none; } }
+@media (max-width: 1023px) {
+  .wa-float { right: 1rem; bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .wa-float-btn { width: 52px; height: 52px; }
+  .wa-float-label { display: none; }
+}

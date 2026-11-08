@@ -120,6 +120,19 @@ $badge = '<span data-cart-count class="absolute -right-2 -top-1.5 flex h-[17px] 
     <?= $bnItem('perfil', 'Perfil', 'user', url('account.php'), !$bnUser) ?>
 </nav>
 
+<?php
+// Botão flutuante do WhatsApp (Admin -> Aparência). Na página do produto, a
+// mensagem já menciona o perfume.
+$waText = isset($product['name']) && basename($_SERVER['SCRIPT_NAME'] ?? '') === 'product.php'
+    ? 'Olá! Tenho interesse no ' . $product['name'] . '.'
+    : null;
+if ($waLink = whatsapp_link($waText)): ?>
+<a href="<?= e($waLink) ?>" target="_blank" rel="noopener" class="wa-float" aria-label="Fale conosco pelo WhatsApp">
+    <span class="wa-float-label">Fale conosco</span>
+    <span class="wa-float-btn"><?= icon('whatsapp', 'h-7 w-7') ?></span>
+</a>
+<?php endif; ?>
+
 <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </body>
 </html>

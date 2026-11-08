@@ -28,6 +28,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_require();
     $current = setting('hero_image');
 
+    // ---------------- Botão flutuante do WhatsApp
+    if (($_POST['action'] ?? '') === 'whatsapp') {
+        $waNumber = whatsapp_normalize((string) ($_POST['whatsapp_number'] ?? ''));
+        $waOn = isset($_POST['whatsapp_enabled']);
+        $waMsg = clean_string($_POST['whatsapp_message'] ?? '', 300);
+        if ($waOn && (strlen($waNumber) < 12 || strlen($waNumber) > 15)) {
+            $errors['whatsapp_number'] = 'Número inválido. Use DDD + número, ex.: (11) 91234-5678.';
+        } else {
+            setting_set('whatsapp_enabled', $waOn ? '1' : '0');
+            setting_set('whatsapp_number', $waNumber !== '' ? $waNumber : null);
+            setting_set('whatsapp_message', $waMsg !== '' ? $waMsg : null);
+            admin_log('appearance_whatsapp', 'settings', null, ($waOn ? 'ativado ' : 'desativado ') . $waNumber);
+            flash('success', $waOn ? 'Botão do WhatsApp ativado.' : 'Botão do WhatsApp desativado.');
+            redirect(url('admin/appearance.php#whatsapp'));
+        }
+    }
+
     if (($_POST['action'] ?? '') === 'reset') {
         setting_set('hero_image', null);
         product_image_delete($current);
@@ -36,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect(url('admin/appearance.php'));
     }
 
+    if (($_POST['action'] ?? '') !== 'whatsapp') {
     $alt = clean_string($_POST['hero_image_alt'] ?? '', 150);
     $productId = int_param($_POST, 'hero_product');
     $link = null;
@@ -57,7 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (RuntimeException $e) {
         $errors['hero_image'] = $e->getMessage();
     }
+    }
 }
+$waNumberShow = (string) ($_POST['whatsapp_number'] ?? setting('whatsapp_number', ''));
+if (!isset($_POST['whatsapp_number']) && preg_match('/^55(\d{2})(\d{4,5})(\d{4})$/', $waNumberShow, $wm)) {
+    $waNumberShow = "({$wm[1]}) {$wm[2]}-{$wm[3]}";
+}
+$waOnShow = isset($_POST['action']) && $_POST['action'] === 'whatsapp' ? isset($_POST['whatsapp_enabled']) : setting('whatsapp_enabled', '0') === '1';
 
 $heroImage = setting('hero_image');
 $products = db()->query('SELECT id, name FROM products WHERE is_active = 1 ORDER BY sort_order, name')->fetchAll();
@@ -118,5 +142,38 @@ require dirname(__DIR__) . '/inc/admin_header.php';
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Botão do WhatsApp -->
+<form method="post" action="<?= e(url('admin/appearance.php#whatsapp')) ?>" id="whatsapp" class="panel mt-6 max-w-3xl space-y-5 p-6" data-loading novalidate>
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="whatsapp">
+    <div class="flex items-center gap-3">
+        <span class="flex h-9 w-9 items-center justify-center rounded-full bg-[#25d366] text-white"><?= icon('whatsapp', 'h-5 w-5') ?></span>
+        <h2 class="text-xs font-medium uppercase tracking-[0.22em] text-white">Botão do WhatsApp</h2>
+    </div>
+    <p class="text-sm text-ink-400">Ícone flutuante no canto inferior direito de todas as páginas da loja. Ao tocar, abre uma conversa com o seu WhatsApp (no celular abre o app; no computador, o WhatsApp Web).</p>
+    <label class="flex items-center gap-3 text-sm text-ink-200">
+        <input type="checkbox" name="whatsapp_enabled" value="1" class="accent-[#d4af37]" <?= $waOnShow ? 'checked' : '' ?>> Mostrar o botão na loja
+    </label>
+    <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+            <label class="field-label" for="whatsapp_number">Número do WhatsApp (com DDD)</label>
+            <input id="whatsapp_number" name="whatsapp_number" inputmode="tel" class="field<?= isset($errors['whatsapp_number']) ? ' is-invalid' : '' ?>" placeholder="(11) 91234-5678" value="<?= e($waNumberShow) ?>">
+            <?php if (isset($errors['whatsapp_number'])): ?><p class="field-error"><?= e($errors['whatsapp_number']) ?></p><?php endif; ?>
+            <p class="mt-1 text-xs text-ink-500">Número do Brasil: só DDD + número. De outro país: comece pelo código do país.</p>
+        </div>
+        <div>
+            <label class="field-label" for="whatsapp_message">Mensagem inicial (opcional)</label>
+            <input id="whatsapp_message" name="whatsapp_message" maxlength="300" class="field" placeholder="Olá! Vim pelo site da King Decants." value="<?= e((string) ($_POST['whatsapp_message'] ?? setting('whatsapp_message', 'Olá! Vim pelo site da King Decants.'))) ?>">
+            <p class="mt-1 text-xs text-ink-500">Na página de um perfume, a mensagem já cita o produto.</p>
+        </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+        <button class="btn-gold btn-sm" data-loading-text="Salvando…">Salvar</button>
+        <?php if ($waTest = whatsapp_link()): ?>
+            <a href="<?= e($waTest) ?>" target="_blank" rel="noopener" class="btn-outline btn-sm">Testar o link</a>
+        <?php endif; ?>
+    </div>
+</form>
 
 <?php require dirname(__DIR__) . '/inc/admin_footer.php'; ?>

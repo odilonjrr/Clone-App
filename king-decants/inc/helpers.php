@@ -661,6 +661,7 @@ function icon(string $name, string $class = 'h-5 w-5'): string
         'badge'   => '<path d="M12 2.5l2.4 1.8 3-.2.9 2.9 2.4 1.8-1 2.8 1 2.8-2.4 1.8-.9 2.9-3-.2L12 21.5l-2.4-1.8-3 .2-.9-2.9-2.4-1.8 1-2.8-1-2.8 2.4-1.8.9-2.9 3 .2Z"/><path d="m12 8 1.2 2.5 2.7.3-2 1.9.5 2.7L12 14.1l-2.4 1.3.5-2.7-2-1.9 2.7-.3Z"/>',
         'chevron' => '<path d="m9 6 6 6-6 6"/>',
         'mail'    => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+        'whatsapp'=> '<path d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5Z"/><path d="M8.6 7.6c.2-.4.5-.4.8-.4h.6c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.5.7c-.1.2-.1.4 0 .6.6 1 1.4 1.8 2.4 2.4.2.1.4.1.6 0l.7-.5c.2-.1.4-.1.6 0l1.9.8c.4.2.5.4.5.6v.6c0 .3 0 .6-.4.8-.6.4-1.4.6-2.2.5-3-.5-6-3.5-6.5-6.5-.1-.8.1-1.6.6-2.1Z"/>',
         'tag'     => '<path d="M3 12V4h8l10 10-8 8L3 12Z"/><circle cx="7.5" cy="8.5" r="1.5"/>',
         'home'    => '<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>',
         'cart'    => '<path d="M3 4h2.2l2.3 11h10.3l2-8H6.6"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="16.5" cy="19" r="1.4"/>',
@@ -695,6 +696,30 @@ function setting(string $key, ?string $default = null): ?string
         }
     }
     return array_key_exists($key, $cache) && $cache[$key] !== null && $cache[$key] !== '' ? $cache[$key] : $default;
+}
+
+/**
+ * Link do WhatsApp da loja (Admin -> Aparência) ou null se desativado.
+ * Número salvo só com dígitos, com DDI (55...). $text = mensagem já preenchida.
+ */
+function whatsapp_link(?string $text = null): ?string
+{
+    $number = only_digits((string) setting('whatsapp_number', ''));
+    if (setting('whatsapp_enabled', '0') !== '1' || strlen($number) < 12) {
+        return null;
+    }
+    $text = trim((string) ($text ?? setting('whatsapp_message', '')));
+    return 'https://wa.me/' . $number . ($text !== '' ? '?text=' . rawurlencode($text) : '');
+}
+
+/** Normaliza o número digitado no admin: (11) 91234-5678 -> 5511912345678. */
+function whatsapp_normalize(string $raw): string
+{
+    $d = only_digits($raw);
+    if (strlen($d) === 10 || strlen($d) === 11) {
+        $d = '55' . $d; // número brasileiro sem DDI
+    }
+    return $d;
 }
 
 function setting_set(string $key, ?string $value): void
