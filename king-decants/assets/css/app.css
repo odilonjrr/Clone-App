@@ -1,0 +1,537 @@
+/**
+ * King Decants — assets/css/app.css
+ * ---------------------------------------------------------------------------
+ * Componentes da identidade visual que se repetem (botão dourado, campos,
+ * divisórias, toasts, modal...). Escrito em CSS puro porque o Tailwind CDN não
+ * processa @apply em arquivos externos. Utilitários pontuais ficam no HTML.
+ * ---------------------------------------------------------------------------
+ */
+
+:root {
+  --gold-1: #f1dfa6;
+  --gold-2: #d4af37;
+  --gold-3: #a8841f;
+  --ink: #070707;
+  --line: rgba(212, 175, 55, 0.18);
+}
+
+/* Texto com degradê dourado (logo e destaques em itálico) */
+.text-gold-gradient {
+  background: linear-gradient(100deg, var(--gold-3) 0%, var(--gold-2) 30%, var(--gold-1) 55%, var(--gold-2) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Pequeno rótulo em maiúsculas acima dos títulos */
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+}
+
+/* ---------- Botões ---------- */
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.95rem 1.9rem;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #f1dfa6 0%, #d4af37 45%, #b8952a 100%);
+  color: #000;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 30px -12px rgba(212, 175, 55, 0.55);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease, opacity 0.2s;
+}
+.btn-gold:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 16px 36px -12px rgba(212, 175, 55, 0.7); }
+.btn-gold:active { transform: translateY(0); }
+.btn-gold:disabled, .btn-gold[aria-busy="true"] { opacity: 0.7; cursor: wait; transform: none; }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  color: var(--gold-2);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+.btn-outline:hover { background: rgba(212, 175, 55, 0.08); color: #f1dfa6; border-color: var(--gold-2); }
+
+.btn-sm { padding: 0.55rem 0.95rem; font-size: 11px; letter-spacing: 0.14em; }
+.btn-gold.hidden, .btn-outline.hidden { display: none; }
+
+.icon-btn {
+  display: inline-flex;
+  height: 40px;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: background 0.25s, color 0.25s;
+}
+.icon-btn:hover { background: rgba(212, 175, 55, 0.08); color: #f1dfa6; }
+
+/* Spinner de loading (inserido via JS nos botões) */
+.spinner {
+  width: 14px; height: 14px;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: kd-spin 0.7s linear infinite;
+}
+@keyframes kd-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Navegação: sublinhado dourado da página ativa ---------- */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  height: 1px;
+  width: 0;
+  background: var(--gold-2);
+  transform: translateX(-50%);
+  transition: width 0.35s ease;
+}
+.nav-link:hover::after { width: 40%; }
+.nav-link.is-active::after { width: 22px; height: 2px; }
+
+/* ---------- Divisórias douradas ---------- */
+.gold-divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.45), transparent);
+}
+
+/* ---------- Cards ---------- */
+.card-lux {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #121212 0%, #0b0b0b 100%);
+  box-shadow: 0 20px 50px -30px rgba(0, 0, 0, 0.9);
+  transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
+}
+.card-lux:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px -30px rgba(212, 175, 55, 0.25);
+}
+.panel {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  background: #0e0e0e;
+}
+
+/* ---------- Formulários ---------- */
+.field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8f8b83;
+}
+.field {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0f0f0f;
+  padding: 0.8rem 0.95rem;
+  color: #fff;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field::placeholder { color: #5f5c56; }
+.field:focus { outline: none; border-color: rgba(212, 175, 55, 0.7); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12); }
+.field.is-invalid { border-color: rgba(248, 113, 113, 0.7); }
+select.field { appearance: none; background-image: linear-gradient(45deg, transparent 50%, #d4af37 50%), linear-gradient(135deg, #d4af37 50%, transparent 50%); background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+.field-error { margin-top: 0.35rem; font-size: 12px; color: #fca5a5; }
+
+/* Radio cards (método de pagamento) */
+.choice { cursor: pointer; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 1rem; transition: border-color .2s, background .2s; }
+.choice:has(input:checked) { border-color: var(--gold-2); background: rgba(212,175,55,.06); }
+
+/* ---------- Toasts (notificações visuais) ---------- */
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: rgba(14, 14, 14, 0.96);
+  padding: 0.9rem 1rem;
+  font-size: 14px;
+  color: #ece9e3;
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.9);
+  animation: kd-toast-in 0.45s cubic-bezier(.2,.7,.2,1) both;
+}
+.toast[data-type="error"] { border-color: rgba(248, 113, 113, 0.45); }
+.toast[data-type="error"] .toast-icon { color: #fca5a5; }
+.toast .toast-icon { color: var(--gold-2); flex-shrink: 0; }
+.toast.is-leaving { animation: kd-toast-out 0.35s ease forwards; }
+@keyframes kd-toast-in { from { opacity: 0; transform: translateY(-8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes kd-toast-out { to { opacity: 0; transform: translateX(16px); } }
+
+/* Alertas inline (mesma linguagem dos toasts) */
+.alert { border-radius: 10px; border: 1px solid rgba(212,175,55,.3); background: rgba(212,175,55,.06); padding: .9rem 1rem; font-size: 14px; }
+.alert-error { border-color: rgba(248,113,113,.4); background: rgba(248,113,113,.07); color: #fecaca; }
+.alert-success { border-color: rgba(110,231,183,.4); background: rgba(110,231,183,.07); color: #a7f3d0; }
+
+/* ---------- Modal ---------- */
+.modal { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.modal.hidden { display: none; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); animation: kd-fade .3s ease both; }
+.modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  background: radial-gradient(120% 80% at 50% 0%, #17140c 0%, #0b0b0b 60%);
+  padding: 2.25rem 2rem;
+  animation: kd-toast-in .4s cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes kd-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Hero ---------- */
+.hero-glow {
+  position: absolute;
+  inset: 8% 4% 8% 4%;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgba(212, 175, 55, 0.42), rgba(212, 175, 55, 0.12) 45%, transparent 75%);
+  filter: blur(18px);
+}
+/* Máscara que "derrete" a imagem no fundo preto, sem aparência de bloco */
+.blend-edges {
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 55%, transparent 100%);
+}
+
+/* Círculos das coleções */
+.collection-ring {
+  display: flex; align-items: center; justify-content: center;
+  height: 76px; width: 76px; border-radius: 9999px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: var(--gold-2);
+  transition: border-color .35s, background .35s, transform .35s, box-shadow .35s;
+}
+a:hover > .collection-ring, .collection-ring.is-active {
+  border-color: var(--gold-2);
+  background: rgba(212, 175, 55, 0.07);
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px -6px rgba(212, 175, 55, 0.45);
+}
+
+/* Coleções com ilustração (assets/img/collections/<slug>.svg) */
+.collection-ring.has-art { height: 96px; width: 96px; overflow: hidden; padding: 0; border-color: rgba(212, 175, 55, 0.45); }
+.collection-ring.has-art img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+a:hover > .collection-ring.has-art img, .collection-ring.has-art.is-active img { transform: scale(1.08); }
+@media (min-width: 640px) { .collection-ring.has-art { height: 120px; width: 120px; } }
+
+/* Revelação suave ao rolar (classe adicionada via IntersectionObserver) */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+/* Skeleton (loading state de imagens) */
+.skeleton { position: relative; overflow: hidden; background: #121212; }
+.skeleton::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,.06), transparent);
+  animation: kd-shimmer 1.6s infinite;
+}
+@keyframes kd-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+/* Tabelas do admin */
+.table-lux { width: 100%; font-size: 14px; }
+.table-lux th { text-align: left; font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: #8f8b83; padding: .85rem 1rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.table-lux td { padding: .85rem 1rem; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: middle; }
+.table-lux tbody tr { transition: background .2s; }
+.table-lux tbody tr:hover { background: rgba(212,175,55,.035); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+
+/* .icon-btn define display; garante que utilitários responsivos de visibilidade prevaleçam */
+@media (min-width: 1024px) { .icon-btn.lg\:hidden { display: none; } }
+
+/* =========================================================================
+   Página de produto
+   ========================================================================= */
+.btn-lg { padding-top: 1.1rem; padding-bottom: 1.1rem; font-size: 13px; white-space: nowrap; letter-spacing: .14em; }
+
+/* Palco da foto principal: brilho dourado + borda discreta */
+.product-stage { background: radial-gradient(ellipse at 50% 60%, #1c1608 0%, #0a0a0a 70%); box-shadow: 0 40px 80px -40px rgba(212,175,55,.35); }
+
+/* Miniaturas da galeria */
+.gallery-thumb { border-color: rgba(255,255,255,.1); opacity: .75; }
+.gallery-thumb:hover { opacity: 1; border-color: rgba(212,175,55,.5); }
+.gallery-thumb.is-active { opacity: 1; border-color: var(--gold-2); box-shadow: 0 0 0 1px var(--gold-2), 0 0 24px -6px rgba(212,175,55,.6); }
+
+/* Pirâmide olfativa: etiqueta dourada em trapézio + faixa escura com notas e imagem */
+.note-row { display: flex; align-items: stretch; min-height: 64px; }
+.note-label {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  width: 118px; flex-shrink: 0; margin-right: -14px;
+  padding: 0 18px 0 14px;
+  clip-path: polygon(14% 0, 100% 0, 86% 100%, 0 100%);
+  background: linear-gradient(135deg, #e6c76f 0%, #8f7220 38%, #3a2e10 100%);
+  color: #f8efd2; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0,0,0,.6);
+}
+.note-body {
+  flex: 1; display: flex; align-items: center; gap: .75rem;
+  padding: .5rem .9rem .5rem 1.75rem;
+  border: 1px solid rgba(255,255,255,.1); border-radius: 0 10px 10px 0;
+  background: linear-gradient(90deg, #121212 0%, #0c0c0c 100%);
+}
+@media (max-width: 420px) { .note-label { width: 96px; font-size: 12px; } .note-body img { width: 64px; } }
+
+/* Botão Favoritos (contorno dourado, coração preenchido quando ativo) */
+.btn-wishlist {
+  display: inline-flex; align-items: center; justify-content: center; gap: .6rem;
+  padding: 1.1rem 1rem; border-radius: 6px; white-space: nowrap;
+  border: 1px solid rgba(230,199,111,.7); color: #f8efd2;
+  font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+  transition: background .3s, border-color .3s;
+}
+.btn-wishlist:hover { background: rgba(212,175,55,.08); border-color: var(--gold-2); }
+.btn-wishlist.is-active svg { fill: currentColor; color: #e6c76f; }
+
+/* Seleção de estrelas (avaliação) — radios em ordem reversa para o hover funcionar */
+.star-input { display: inline-flex; flex-direction: row-reverse; gap: .15rem; border: 0; padding: 0; }
+.star-input input { position: absolute; opacity: 0; pointer-events: none; }
+.star-input label { cursor: pointer; font-size: 28px; line-height: 1; color: rgba(255,255,255,.15); transition: color .15s; }
+.star-input input:checked ~ label, .star-input label:hover, .star-input label:hover ~ label { color: #d4af37; }
+.star-input input:focus-visible + label { outline: 1px solid #d4af37; outline-offset: 2px; }
+
+/* =========================================================================
+   Minha conta
+   ========================================================================= */
+.account-aside { border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: linear-gradient(180deg, #111 0%, #0a0a0a 100%); }
+.avatar-ring {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border-radius: 9999px; border: 2px solid var(--gold-2);
+  background: radial-gradient(circle at 35% 30%, #3a2e10 0%, #121008 70%);
+  color: #f1dfa6; font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; letter-spacing: .04em;
+  box-shadow: 0 0 0 4px rgba(212,175,55,.08), 0 10px 30px -10px rgba(212,175,55,.45);
+}
+.account-nav { display: flex; align-items: center; gap: .9rem; padding: .75rem .9rem; border-radius: 10px; color: #ece9e3; transition: background .25s, color .25s; }
+.account-nav:hover { background: rgba(255,255,255,.04); }
+.account-nav.is-active { background: linear-gradient(90deg, rgba(212,175,55,.32), rgba(212,175,55,.12)); color: #f1dfa6; }
+.account-card {
+  display: flex; align-items: center; gap: 1.25rem; padding: 1.4rem 1.4rem;
+  border: 1px solid rgba(212,175,55,.28); border-radius: 12px;
+  background: linear-gradient(135deg, #121212 0%, #0b0b0b 100%);
+  transition: border-color .3s, transform .3s, box-shadow .3s;
+}
+a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(-2px); box-shadow: 0 20px 40px -24px rgba(212,175,55,.35); }
+.icon-ring { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; height: 72px; width: 72px; border-radius: 9999px; border: 1.5px solid rgba(212,175,55,.65); color: #e6c76f; }
+.count-ring { display: inline-flex; align-items: center; justify-content: center; height: 40px; min-width: 40px; padding: 0 .5rem; border-radius: 9999px; border: 1.5px solid rgba(212,175,55,.7); color: #f1dfa6; font-size: 1.05rem; }
+@media (max-width: 480px) { .account-card { gap: 1rem; padding: 1.1rem; } .icon-ring { height: 60px; width: 60px; } .icon-ring svg { height: 1.6rem; width: 1.6rem; } }
+
+/* =========================================================================
+   Home: banner com raios dourados e cards horizontais
+   ========================================================================= */
+.hero-rays svg.hero-lights { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* Brilho suave que "respira" sobre as luzes (complementa a animação do SVG) */
+.hero-rays::after {
+  content: ""; position: absolute; left: 50%; top: 58%; width: 60%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255,231,163,.22), transparent 70%);
+  animation: kd-halo 5s ease-in-out infinite;
+}
+@keyframes kd-halo { 0%, 100% { opacity: .5; transform: translate(-50%, -50%) scale(.92); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .hero-rays::after { animation: none; } }
+.hero-rays {
+  background-size: cover; background-position: center;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 100%);
+  animation: kd-rays 9s ease-in-out infinite;
+}
+@keyframes kd-rays { 0%, 100% { opacity: .9; } 50% { opacity: 1; filter: brightness(1.12); } }
+@media (max-width: 1023px) { .hero-rays { -webkit-mask-image: none; mask-image: none; opacity: .75; } }
+.btn-hero { padding: 1.05rem 3.6rem; font-size: 15px; letter-spacing: .08em; }
+
+.wide-card {
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+  background: linear-gradient(135deg, #111 0%, #090909 100%);
+  transition: border-color .4s, box-shadow .4s;
+}
+.wide-card:hover { border-color: rgba(212,175,55,.45); box-shadow: 0 30px 60px -36px rgba(212,175,55,.4); }
+.wide-card-media { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: #0b0b0b; }
+@media (min-width: 640px) {
+  .wide-card { flex-direction: row; min-height: 230px; }
+  .wide-card-media { width: 48%; flex-shrink: 0; aspect-ratio: auto; }
+}
+
+/* Celular/tablet: o frasco fica no topo do banner — a área das luzes acompanha
+   o frasco para os raios nascerem atrás dele. */
+@media (max-width: 1023px) {
+  /* O ponto de onde saem os raios no SVG é (560, 470) num quadro 1000×560.
+     Com 760px de largura (escala .76) ele fica em (425.6px, 357px): posicionamos
+     o SVG para esse ponto cair no CENTRO horizontal e na base do frasco (~316px). */
+  .hero-rays {
+    inset: 0 !important; width: 100% !important; height: auto;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 360px, transparent 600px) !important;
+    mask-image: linear-gradient(to bottom, #000 0, #000 360px, transparent 600px) !important;
+  }
+  .hero-rays svg.hero-lights {
+    position: absolute; inset: auto; width: 760px; height: 425.6px;
+    left: calc(50% - 425.6px); top: -41px; transform: none;
+  }
+  .hero-rays::after { top: 300px; width: 120%; }
+  /* Frasco menor no celular para o título aparecer na primeira tela */
+  .hero-bottle { max-height: 300px; width: auto; max-width: 100%; object-fit: contain; }
+}
+
+/* Foto enviada no admin para o banner: integra ao fundo (bordas suavizadas e
+   reflexo dourado). Funciona melhor com PNG/WebP de fundo transparente. */
+.hero-bottle.is-photo {
+  max-height: 560px; object-fit: contain;
+  filter: drop-shadow(0 30px 40px rgba(0,0,0,.6)) drop-shadow(0 0 40px rgba(212,175,55,.25));
+  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 70%, transparent 100%);
+  mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 70%, transparent 100%);
+}
+
+/* =========================================================================
+   Celular: barra de navegação inferior (Início, Descobrir, Favoritos, Sacola, Perfil)
+   ========================================================================= */
+.bottom-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  padding: .55rem .25rem calc(.55rem + env(safe-area-inset-bottom));
+  background: rgba(7,7,7,.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(212,175,55,.18);
+}
+.bottom-nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: .25rem;
+  font-size: 12px; color: #8f8b83; transition: color .2s;
+}
+.bottom-nav-item:hover { color: #ece9e3; }
+.bottom-nav-item.is-active { color: #e6c76f; }
+.bottom-nav-item.is-active svg { fill: rgba(230,199,111,.18); }
+@media (max-width: 1023px) {
+  .has-bottom-nav { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  #toast-stack { top: 5.5rem; }
+}
+
+/* =========================================================================
+   Celular: luzes do banner FIXAS (sem piscar). Em telas pequenas, animar SVG
+   com desfoque faz alguns aparelhos redesenharem com cintilação.
+   ========================================================================= */
+@media (max-width: 1023px) {
+  /* Raios, brilho e feixe ficam parados; SÓ os pontos flutuantes se movem
+     (sobem devagar e desaparecem — sem piscar). */
+  /* Celular: raios BALANÇAM devagar e os pontos flutuam. Para não cintilar:
+     sem desfoque nos grupos animados (o desfoque era recalculado a cada quadro),
+     sem pulsos de opacidade, sem feixe de varredura e sem cintilar. */
+  .hero-lights g[filter] { filter: none; }
+  .hero-lights .hl-rays-a { animation: hl-sway 16s ease-in-out infinite !important; will-change: transform; }
+  .hero-lights .hl-rays-b { animation: hl-sway-rev 22s ease-in-out infinite !important; will-change: transform; opacity: .8; }
+  .hero-lights .hl-arcs   { animation: hl-sway 26s ease-in-out infinite reverse !important; will-change: transform; opacity: .7; }
+  .hero-lights .hl-core, .hero-lights .hl-beam, .hero-lights .hl-twinkle,
+  .hero-rays, .hero-rays::after { animation: none !important; }
+  .hero-lights .hl-beam { opacity: 0; }
+}
+
+/* Foto do banner SEM fundo transparente: o fundo escuro da foto "some" e
+   deixa aparecer as luzes (mistura "lighten") — evita o quadrado escuro. */
+.hero-bottle.is-opaque {
+  /* contraste leva o fundo quase preto da foto a preto puro; "lighten" deixa as luzes aparecerem */
+  mix-blend-mode: lighten; filter: contrast(1.25) saturate(1.05);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 62%, transparent 100%);
+}
+
+/* .icon-btn define display; garante que hidden / lg:inline-flex funcionem */
+.icon-btn.hidden { display: none; }
+@media (min-width: 1024px) { .icon-btn.lg\:inline-flex { display: inline-flex; } .bottom-nav { display: none; } }
+@media (max-width: 1023px) { .hero-bottle.is-photo { max-height: 300px; } }
+@media (max-width: 1023px) {
+  /* sem o "piso" de luz e com a borda inferior das luzes suavizada (evita faixa reta) */
+  .hero-lights rect[fill="url(#hl-floor)"] { display: none; }
+  .hero-rays svg.hero-lights {
+    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+  }
+}
+/* PNG/WebP transparente não precisa de máscara: ela cortava o brilho dourado
+   nas bordas da caixa da imagem, formando um retângulo claro. (Fotos opacas
+   continuam com a máscara via .is-opaque.) */
+.hero-bottle.is-photo:not(.is-opaque) { -webkit-mask-image: none; mask-image: none; }
+
+/* =========================================================================
+   Seletor de tamanho (página de produto)
+   ========================================================================= */
+.variant-pill {
+  position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 96px; padding: .7rem 1.1rem; border-radius: 8px; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.14); background: #0f0f0f; transition: border-color .2s, background .2s, box-shadow .2s;
+}
+.variant-pill input { position: absolute; opacity: 0; pointer-events: none; }
+.variant-pill-label { font-size: 15px; color: #ece9e3; font-weight: 500; }
+.variant-pill-price { margin-top: .15rem; font-size: 12px; color: #8f8b83; }
+.variant-pill:hover { border-color: rgba(212,175,55,.5); }
+.variant-pill:has(input:checked) { border-color: var(--gold-2); background: rgba(212,175,55,.08); box-shadow: 0 0 0 1px var(--gold-2); }
+.variant-pill:has(input:checked) .variant-pill-price { color: #e6c76f; }
+.variant-pill:has(input:focus-visible) { outline: 2px solid var(--gold-2); outline-offset: 2px; }
+.variant-pill.is-out { cursor: not-allowed; opacity: .45; }
+.variant-pill.is-out .variant-pill-label { text-decoration: line-through; }
+
+/* Tabela de tamanhos no admin: compacta para caber sem rolagem */
+.variants-table th, .variants-table td { padding: .55rem .45rem; }
+.variants-table th:first-child, .variants-table td:first-child { padding-left: .9rem; }
+.variants-table th { letter-spacing: .08em; }
+
+/* =========================================================================
+   Botão flutuante do WhatsApp (canto inferior direito; acima da barra do celular)
+   ========================================================================= */
+.wa-float {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 44;
+  display: flex; align-items: center; gap: .6rem;
+}
+.wa-float-btn {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 58px; height: 58px; border-radius: 9999px; color: #fff;
+  background: #25d366; box-shadow: 0 10px 30px -8px rgba(37,211,102,.55), 0 0 0 1px rgba(255,255,255,.08) inset;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.wa-float-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; }
+.wa-float-btn svg path:last-child { fill: currentColor; stroke: none; }
+.wa-float-btn::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  border: 2px solid rgba(37,211,102,.55); animation: wa-ring 2.6s ease-out infinite;
+}
+.wa-float:hover .wa-float-btn { transform: translateY(-2px) scale(1.04); box-shadow: 0 14px 34px -8px rgba(37,211,102,.7); }
+.wa-float-label {
+  padding: .5rem .85rem; border-radius: 9999px; font-size: 12px; letter-spacing: .04em;
+  color: #ece9e3; background: rgba(12,12,12,.92); border: 1px solid rgba(212,175,55,.25);
+  opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.wa-float:hover .wa-float-label, .wa-float:focus-visible .wa-float-label { opacity: 1; transform: none; }
+@keyframes wa-ring { 0% { transform: scale(1); opacity: .8; } 70%, 100% { transform: scale(1.45); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .wa-float-btn::before { animation: none; display: none; } }
+@media (max-width: 1023px) {
+  .wa-float { right: 1rem; bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .wa-float-btn { width: 52px; height: 52px; }
+  .wa-float-label { display: none; }
+}
+
+/* Logo (imagem): menor no celular para caber entre o menu e os ícones */
+.site-logo { display: block; width: min(168px, calc(100vw - 200px)); height: auto; }
+@media (min-width: 1024px) { .site-logo { width: auto; height: 42px; } }

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720" role="img" aria-label="Frasco de perfume preto com tampa dourada cercado por luz dourada">
+  <!--
+    King Decants — ilustração vetorial do banner principal.
+    Frasco preto com reflexos e tampa dourada, sobre luz dourada difusa.
+    O fundo é transparente para se integrar ao preto da página.
+    Substitua por uma fotografia publicitária real (PNG/WebP com fundo preto)
+    mantendo o nome do arquivo ou alterando o <img> em index.php.
+  -->
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="52%" r="50%">
+      <stop offset="0" stop-color="#f1dfa6" stop-opacity=".55"/>
+      <stop offset=".35" stop-color="#d4af37" stop-opacity=".28"/>
+      <stop offset=".7" stop-color="#8f7220" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#050505"/>
+      <stop offset=".18" stop-color="#1c1a16"/>
+      <stop offset=".32" stop-color="#0a0a0a"/>
+      <stop offset=".7" stop-color="#050505"/>
+      <stop offset=".9" stop-color="#2a2620"/>
+      <stop offset="1" stop-color="#3a3226"/>
+    </linearGradient>
+    <linearGradient id="glassV" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset=".85" stop-color="#000" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".7"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#6e5615"/>
+      <stop offset=".25" stop-color="#d4af37"/>
+      <stop offset=".45" stop-color="#f8efd2"/>
+      <stop offset=".65" stop-color="#d4af37"/>
+      <stop offset="1" stop-color="#5e4b16"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" x2="1">
+      <stop offset="0" stop-color="#d4af37" stop-opacity=".0"/>
+      <stop offset=".5" stop-color="#f1dfa6" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#d4af37" stop-opacity=".0"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#d4af37" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#d4af37" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="blur4"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+
+  <!-- Luz dourada difusa -->
+  <ellipse cx="300" cy="380" rx="290" ry="320" fill="url(#halo)"/>
+  <ellipse cx="300" cy="420" rx="150" ry="220" fill="#d4af37" opacity=".16" filter="url(#soft)"/>
+
+  <!-- Partículas de luz -->
+  <g fill="#f1dfa6">
+    <circle cx="120" cy="210" r="1.6" opacity=".7"/><circle cx="470" cy="180" r="1.2" opacity=".6"/>
+    <circle cx="505" cy="420" r="1.8" opacity=".5"/><circle cx="95" cy="470" r="1.3" opacity=".5"/>
+    <circle cx="160" cy="120" r="1" opacity=".5"/><circle cx="430" cy="560" r="1.4" opacity=".45"/>
+    <circle cx="210" cy="600" r="1" opacity=".4"/><circle cx="380" cy="110" r="1.1" opacity=".55"/>
+  </g>
+
+  <!-- Reflexo no "piso" -->
+  <ellipse cx="300" cy="640" rx="170" ry="16" fill="#d4af37" opacity=".22" filter="url(#blur4)"/>
+  <path d="M175 636 h250 l-30 70 h-190z" fill="url(#floor)" opacity=".25"/>
+
+  <!-- Tampa dourada -->
+  <rect x="245" y="96" width="110" height="118" rx="10" fill="url(#gold)"/>
+  <rect x="245" y="96" width="110" height="10" rx="5" fill="#f8efd2" opacity=".55"/>
+  <g stroke="#5e4b16" stroke-opacity=".35" stroke-width="1">
+    <line x1="262" y1="112" x2="262" y2="206"/><line x1="280" y1="112" x2="280" y2="206"/>
+    <line x1="320" y1="112" x2="320" y2="206"/><line x1="338" y1="112" x2="338" y2="206"/>
+  </g>
+  <!-- Gargalo -->
+  <rect x="268" y="214" width="64" height="30" fill="#0d0c0a"/>
+  <rect x="262" y="236" width="76" height="10" rx="2" fill="url(#gold)"/>
+
+  <!-- Frasco -->
+  <path d="M170 262 Q170 246 186 246 H414 Q430 246 430 262 V618 Q430 640 408 640 H192 Q170 640 170 618 Z" fill="url(#glass)"/>
+  <path d="M170 262 Q170 246 186 246 H414 Q430 246 430 262 V618 Q430 640 408 640 H192 Q170 640 170 618 Z" fill="url(#glassV)"/>
+  <!-- Contorno dourado sutil (luz de recorte) -->
+  <path d="M170 262 Q170 246 186 246 H414 Q430 246 430 262 V618 Q430 640 408 640 H192 Q170 640 170 618 Z" fill="none" stroke="url(#rim)" stroke-width="1.4"/>
+  <path d="M428 270 V612" stroke="#f1dfa6" stroke-opacity=".55" stroke-width="2"/>
+  <!-- Reflexos verticais no vidro -->
+  <rect x="196" y="270" width="10" height="340" rx="5" fill="#fff" opacity=".07"/>
+  <rect x="214" y="270" width="3" height="340" rx="1.5" fill="#fff" opacity=".1"/>
+  <rect x="392" y="280" width="6" height="320" rx="3" fill="#d4af37" opacity=".18"/>
+
+  <!-- Placa / rótulo -->
+  <rect x="222" y="388" width="156" height="108" rx="4" fill="none" stroke="#d4af37" stroke-opacity=".75" stroke-width="1.2"/>
+  <path d="M276 420 l9 8 l15 -16 l15 16 l9 -8 l-4 22 h-40z" fill="none" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round"/>
+  <text x="300" y="468" text-anchor="middle" font-family="Georgia, 'Cormorant Garamond', serif" font-size="17" letter-spacing="6" fill="#d4af37">KING</text>
+  <text x="300" y="485" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.5" letter-spacing="4" fill="#b8952a">EAU DE PARFUM</text>
+</svg>
