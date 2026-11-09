@@ -234,6 +234,12 @@ a:hover > .collection-ring, .collection-ring.is-active {
   box-shadow: 0 0 30px -6px rgba(212, 175, 55, 0.45);
 }
 
+/* Coleções com ilustração (assets/img/collections/<slug>.svg) */
+.collection-ring.has-art { height: 96px; width: 96px; overflow: hidden; padding: 0; border-color: rgba(212, 175, 55, 0.45); }
+.collection-ring.has-art img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+a:hover > .collection-ring.has-art img, .collection-ring.has-art.is-active img { transform: scale(1.08); }
+@media (min-width: 640px) { .collection-ring.has-art { height: 120px; width: 120px; } }
+
 /* Revelação suave ao rolar (classe adicionada via IntersectionObserver) */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
 .reveal.is-visible { opacity: 1; transform: none; }

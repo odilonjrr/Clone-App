@@ -105,7 +105,11 @@ require __DIR__ . '/inc/header.php';
         <div class="grid grid-cols-3 gap-y-8 sm:grid-cols-5">
             <?php foreach ($allCollections as $slug => $c): ?>
                 <a href="<?= e(url('index.php?colecao=' . $slug . '#mais-vendidos')) ?>" class="group flex flex-col items-center gap-3 text-center">
-                    <span class="collection-ring <?= $collection === $slug ? 'is-active' : '' ?>"><?= icon($c['icon'], 'h-9 w-9') ?></span>
+                    <span class="collection-ring has-art <?= $collection === $slug ? 'is-active' : '' ?>">
+                        <?php if (is_file(__DIR__ . '/assets/img/collections/' . $slug . '.svg')): ?>
+                            <img src="<?= e(asset('img/collections/' . $slug . '.svg')) ?>" alt="" width="120" height="120" loading="lazy">
+                        <?php else: ?><?= icon($c['icon'], 'h-9 w-9') ?><?php endif; ?>
+                    </span>
                     <span class="text-[15px] <?= $collection === $slug ? 'text-gold-300' : 'text-ink-100 group-hover:text-white' ?>"><?= e($c['label']) ?></span>
                 </a>
             <?php endforeach; ?>
