@@ -533,5 +533,5 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
 }
 
 /* Logo (imagem): menor no celular para caber entre o menu e os ícones */
-.site-logo { display: block; width: min(134px, calc(100vw - 200px)); height: auto; }
+.site-logo { display: block; width: min(168px, calc(100vw - 200px)); height: auto; }
 @media (min-width: 1024px) { .site-logo { width: auto; height: 42px; } }
