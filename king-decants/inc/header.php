@@ -57,14 +57,11 @@ $navItems = [
         <button type="button" data-toggle="mobile-nav" class="icon-btn -ml-2 text-gold-400 lg:hidden" aria-label="Abrir menu"><?= icon('menu', 'h-6 w-6') ?></button>
 
         <!-- Logo: centralizada no celular, à esquerda no desktop -->
-        <a href="<?= e(url('index.php')) ?>" class="group absolute left-1/2 flex -translate-x-1/2 items-center gap-2.5 lg:static lg:translate-x-0" aria-label="King Decants — início">
-            <span class="hidden text-gold-400 transition-transform duration-500 group-hover:-translate-y-0.5 lg:inline"><?= icon('crown', 'h-6 w-6') ?></span>
-            <!-- celular: KING grande + DECANTS pequeno embaixo -->
-            <span class="flex flex-col items-center leading-none lg:hidden">
-                <span class="font-serif text-[28px] tracking-[0.16em] text-gold-gradient">KING</span>
-                <span class="mt-1 text-[9px] tracking-[0.55em] text-gold-400">DECANTS</span>
-            </span>
-            <span class="hidden font-serif text-2xl tracking-[0.28em] text-gold-gradient lg:inline">KING<span class="ml-2 font-light">DECANTS</span></span>
+        <a href="<?= e(url('index.php')) ?>" class="absolute left-1/2 flex -translate-x-1/2 items-center lg:static lg:translate-x-0" aria-label="King Decants e Perfumaria — início">
+            <picture>
+                <source srcset="<?= e(asset('img/logo-king-decants.webp')) ?>" type="image/webp">
+                <img src="<?= e(asset('img/logo-king-decants.png')) ?>" alt="King Decants e Perfumaria" class="site-logo" width="640" height="129">
+            </picture>
         </a>
 
         <!-- Menu central (desktop) -->
