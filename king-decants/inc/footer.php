@@ -25,7 +25,7 @@ if (strlen($currentPath) > 300) {
             <a href="<?= e(url('index.php')) ?>" class="inline-block" aria-label="King Decants e Perfumaria — início">
                 <picture>
                     <source srcset="<?= e(asset('img/logo-king-decants.webp')) ?>" type="image/webp">
-                    <img src="<?= e(asset('img/logo-king-decants.png')) ?>" alt="King Decants e Perfumaria" class="h-[46px] w-auto" width="640" height="129" loading="lazy">
+                    <img src="<?= e(asset('img/logo-king-decants.png')) ?>" alt="King Decants e Perfumaria" class="h-[37px] w-auto" width="640" height="129" loading="lazy">
                 </picture>
             </a>
             <p class="max-w-xs text-sm leading-relaxed text-ink-400">Fragrâncias icônicas em decants envasados com precisão. Luxo em cada gota.</p>
