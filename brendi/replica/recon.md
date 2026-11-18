@@ -6,8 +6,7 @@ online, ou na entrega) e o restaurante recebe, aceita, prepara, despacha e
 finaliza no gestor de pedidos. Em volta: editor de cardápio, áreas e taxas de
 entrega, horários, cupons, cashback, recuperador de clientes e o atendente de
 IA no WhatsApp.
-Para: **a confirmar**. Assumido como produto SaaS próprio para vender a
-restaurantes.
+Para: produto SaaS próprio para vender a restaurantes (confirmado em 2026-11-18).
 Data: 2026-11-18 (revisão 2, com acesso direto)
 
 > **Como este mapa foi feito.**
