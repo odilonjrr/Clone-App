@@ -1,260 +1,316 @@
 # Mapa de recon: Brendi (web, cardápio do cliente + painel do restaurante)
 
-Escopo: o loop central — o cliente final abre o cardápio digital da loja (link
-ou WhatsApp), monta o pedido, paga (Pix, cartão ou na entrega) e o restaurante
-recebe, aceita, despacha e conclui no gestor de pedidos. Em volta: editor de
-cardápio, áreas e taxas de entrega, horários, cupons, fidelidade, recuperador
-de clientes e o atendente de IA no WhatsApp.
-Para: **a confirmar** — assumido como produto SaaS próprio para vender a
-restaurantes (como o projeto anterior deste repositório).
-Data: 2026-11-18
+Escopo: o loop central. O cliente final abre o cardápio digital da loja (link
+ou WhatsApp), monta o pedido, escolhe entrega ou retirada, paga (Pix e cartão
+online, ou na entrega) e o restaurante recebe, aceita, prepara, despacha e
+finaliza no gestor de pedidos. Em volta: editor de cardápio, áreas e taxas de
+entrega, horários, cupons, cashback, recuperador de clientes e o atendente de
+IA no WhatsApp.
+Para: **a confirmar**. Assumido como produto SaaS próprio para vender a
+restaurantes.
+Data: 2026-11-18 (revisão 2, com acesso direto)
 
-> **Como este mapa foi feito.** A política de rede deste ambiente bloqueou o
-> acesso direto a `brendi.com.br`, `pedido.brendi.com.br` e a sites de
-> terceiros (proxy respondeu 403 / DNS não resolveu). Tudo abaixo vem de
-> **trechos indexados por busca na web** de páginas públicas: o site e o blog
-> da própria Brendi, títulos de páginas de lojas em `pedido.brendi.com.br` e
-> notícias. Nenhum login, nenhum código, nenhuma chamada de API privada.
-> Não há capturas de tela em `replica/screens/`. O blog é material de marketing
-> do fornecedor: descreve o que o produto faz, raramente como a tela é.
-> Confiança: **alta** (página da Brendi descreve diretamente), **média**
-> (marketing vago ou fonte única indireta), **palpite** (inferido do padrão de
-> mercado, sem fonte).
+> **Como este mapa foi feito.**
+> - **Revisão 1:** só trechos de busca na web.
+> - **Revisão 2 (esta):** a rede foi liberada para `brendi.com.br`,
+>   `pedido.brendi.com.br`, `menu.brendi.com.br`, `assets.brendi.com.br` e
+>   `images.brendi.com.br`. Abri num navegador, uma página por vez:
+>   - a home e a página de planos;
+>   - duas lojas públicas: uma fechada (Pizzaria Saborella) e uma aberta
+>     (Restaurante do Val).
+>
+>   Na loja aberta, percorri cardápio → item → sacola → entrega/retirada →
+>   pagamento → resumo, e **parei antes de "Ir para Pagamento"**, para não
+>   criar pedido real. Não fiz login, não li código JavaScript e não registrei
+>   chamadas de API. Só anotei os domínios que falharam ao carregar, para
+>   liberar estilos e imagens.
+> - **Painel do restaurante:** não foi acessado. O que está abaixo vem da
+>   réplica do painel exibida na própria home (`app.brendi.com.br`, imagem de
+>   marketing) e da página de planos.
+>
+> Confiança:
+> - **vista**: vi a tela funcionando;
+> - **alta**: página oficial descreve;
+> - **média**: marketing vago ou réplica de marketing;
+> - **palpite**: sem fonte.
 
 ## Fontes
 
 | # | fonte | URL | o que deu |
 | --- | --- | --- | --- |
-| 1 | site: home | https://brendi.com.br/ | "Sistema de delivery para vender mais, sem comissão"; +8.500/9.500 restaurantes (varia por página) |
-| 2 | site: planos | https://brendi.com.br/planos , https://brendi.com.br/nossos-planos | mínimo R$ 120/mês, todos os recursos; taxa de operação R$ 60/semana; Pix online R$ 0,40 + 0,5%/pedido; dinheiro/maquininha sem taxa |
-| 3 | site: recuperador de vendas | https://brendi.com.br/recuperador-de-vendas | clientes sumidos + carrinho abandonado → WhatsApp com cupom |
-| 4 | blog: preço | https://brendi.com.br/blog/quanto-custa-sistema-restaurantes-2026/ | mensalidade varia com faturamento, 15 dias grátis sem cartão, sem multa |
-| 5 | blog: gestão de pedidos | https://brendi.com.br/blog/sistema-para-restaurantes-gestao-pedidos/ | gestor kanban, status ao vivo, aceitar/despachar/finalizar, módulo de motoboys |
-| 6 | blog: cardápio integrado | https://brendi.com.br/blog/cardapio-digital-com-delivery-integrado/ | cardápio por link/WhatsApp sem app, checkout Pix+cartão, cross-sell 90 dias |
-| 7 | blog: IA no WhatsApp | https://brendi.com.br/blog/ia-atendimento-whatsapp-restaurantes/ | Brenda: texto, áudio, imagem; sugere promoções; guia ao pedido |
-| 8 | blog: atendimento automatizado | https://brendi.com.br/blog/atendimento-automatizado-whatsapp-delivery/ | comanda na cozinha, status ao cliente, feedback 1h–1h30 após entrega |
-| 9 | blog: área por bairro | https://brendi.com.br/blog/melhores-sistemas-delivery-por-bairro/ | taxa e prazo por área, validação de endereço via Google Geocoding |
-| 10 | blog: pizzaria | https://brendi.com.br/blog/como-criar-cardapio-digital-pizzaria/ , https://brendi.com.br/blog/ia-para-pizzaria-delivery-2026/ | meio a meio com preço automático, bordas por tamanho, regras de combo |
-| 11 | blog: integração iFood | https://brendi.com.br/blog/sistema-delivery-integracao-ifood/ | importa cardápio, horários, áreas, perfil em até 24 h; integra iFood, 99Food, Saipos, Colibri, Meta Pixel, GA, GTM |
-| 12 | blog: promoções automáticas | https://brendi.com.br/blog/cardapio-digital-promocoes-automaticas/ | galeria de cupons com limite semanal; IA escolhe o cupom |
-| 13 | blog: fidelidade/recuperação | https://brendi.com.br/blog/como-implementar-sistema-para-restaurantes/ | pontos e cashback; cashback válido até 40 dias; inativo após ~21 dias, risco em ~7 |
-| 14 | blog: pagamento online | https://brendi.com.br/blog/sistema-delivery-com-pagamento-online/ | Pix/cartão no cardápio; dinheiro e maquininha na entrega continuam |
-| 15 | lojas reais (títulos/trechos) | https://pedido.brendi.com.br/pizzaria-saborella , https://pedido.brendi.com.br/pizzaria-familia , https://pedido.brendi.com.br/pizzaria-firenze-vila-passarelli/ | rota `/{slug}`, "Entrega 1 - 55min", "Pedido mínimo R$ 30,00" / "Sem pedido mínimo", categorias (combos, pizzas doces...) |
-| 16 | checkout real (título/trecho) | https://pedido.brendi.com.br/ricotarella-esfiharia-diadema/checkout , https://menu.brendi.com.br/bulldogs-dogueria-tatuquara/checkout | rota `/{slug}/checkout`, título "Finalizar Pedido", sacola vazia "Sua sacola"; existe também o host `menu.brendi.com.br` |
-| 17 | notícia: captação | https://www.startupz.com.br/artigo/brendi-capta-us-6-6-milhoes-com-a-propel-ventures-e-aposta-no-whatsapp-para-brigar-com-ifood-e-rappi | US$ 6,6 mi (Propel Ventures); produto aíChef (pedido por conversa com IA) |
-| 18 | notícia: canais próprios | https://gironews.com/food-service/restaurantes-ampliam-canais-proprios-para-reduzir-dependencia-de-marketplaces/ | ~90% dos pedidos fecham no cardápio, ~10% inteiramente na conversa (autodeclarado) |
-| 19 | parceiro | https://saipos.com/integracoes/brendi | integração com PDV Saipos (conteúdo não lido, só título/trecho) |
+| 1 | home (lida no navegador) | https://brendi.com.br/ | menu de funcionalidades; **réplica do painel** (menu lateral, barra de ações, kanban de 5 colunas, cards de pedido); "11 agentes" com nomes; +9.500 restaurantes, +R$ 2 bi, +70 mi atendimentos |
+| 2 | planos (lida no navegador) | https://brendi.com.br/planos | plano único com preço por faixa de faturamento (R$ 120/mês até R$ 3.000); lista do que está incluído; taxas de pagamento online; tráfego pago à parte; FAQ |
+| 3 | loja fechada (navegada) | https://pedido.brendi.com.br/pizzaria-saborella | cabeçalho, estado "Abrimos hoje (quarta) às 18:00", cupom 5% no topo, "Mais Pedidos", pizza por tamanho → nº de sabores → sabores, "Estamos fechados :(" |
+| 4 | loja aberta (navegada até o resumo) | https://pedido.brendi.com.br/restaurantedoval | "Aberto até 18:00", "2% de Cashback", grupos de opção, sacola, entrega/retirada, endereço Google, formas de pagamento, resumo com cashback a receber, login por celular |
+| 5 | recuperador | https://brendi.com.br/recuperador-de-vendas | clientes sumidos + carrinho abandonado → WhatsApp com cupom (via busca) |
+| 6 | blog: gestão de pedidos | https://brendi.com.br/blog/sistema-para-restaurantes-gestao-pedidos/ | kanban, ações, módulo de motoboys (via busca) |
+| 7 | blog: área por bairro | https://brendi.com.br/blog/melhores-sistemas-delivery-por-bairro/ | taxa e prazo por área, geocodificação Google (via busca) |
+| 8 | blog: integração iFood | https://brendi.com.br/blog/sistema-delivery-integracao-ifood/ | importa cardápio, horários, áreas e perfil (via busca) |
+| 9 | blog: promoções | https://brendi.com.br/blog/cardapio-digital-promocoes-automaticas/ | galeria de cupons com limite semanal; IA escolhe o cupom (via busca) |
+| 10 | blog: fidelidade | https://brendi.com.br/blog/como-implementar-sistema-para-restaurantes/ | pontos e cashback; validade de até 40 dias; inativo após ~21 dias (via busca) |
+| 11 | blog: atendimento | https://brendi.com.br/blog/atendimento-automatizado-whatsapp-delivery/ | status por WhatsApp; feedback 1h–1h30 após a entrega (via busca) |
+| 12 | notícia | https://www.startupz.com.br/artigo/brendi-capta-us-6-6-milhoes-com-a-propel-ventures-e-aposta-no-whatsapp-para-brigar-com-ifood-e-rappi | captação de US$ 6,6 mi; produto aíChef (via busca) |
 
-Fontes que faltam (e o que destravariam): a central de ajuda (se existir), uma
-loja real navegada ao vivo (estados de item, checkout preenchido), o painel do
-restaurante (só com conta própria e sob os termos da Brendi), avaliações
-públicas (nada achado no Reclame Aqui / Play).
+**Ainda não lidos:**
+- Central de ajuda e Termos de uso: há link no rodapé, mas não abri.
+- O painel real: exige conta e leitura dos termos antes.
+- A tela de Pix e a de acompanhamento do pedido: exigem fazer um pedido real.
+
+**Capturas de referência** (nunca entram no clone): `brendi/replica/screens/`.
 
 ## Core loop
 
-O cliente pede no canal próprio do restaurante (cardápio por link/WhatsApp, sem
-app e sem comissão por pedido) e o restaurante opera tudo num gestor de pedidos
-em tempo real.
+O cliente pede no canal próprio do restaurante, sem app e sem comissão por
+pedido. O restaurante opera tudo num quadro de pedidos em tempo real, e o
+WhatsApp (com IA) avisa o cliente a cada etapa.
 
 ## Telas
 
-### Lado do cliente (`pedido.brendi.com.br/{slug}`)
+### Lado do cliente (`pedido.brendi.com.br/{slug}`, também `menu.brendi.com.br/{slug}`)
 
-| ID | tela | rota / como chegar | propósito | componentes-chave | estados vistos / esperados | conf. |
-| --- | --- | --- | --- | --- | --- | --- |
-| S01 | Cardápio da loja | `/{slug}` (link, QR, WhatsApp) | vitrine + entrada do pedido | cabeçalho da loja (logo, nome, cidade), selo aberto/fechado, tempo de entrega, pedido mínimo, abas de categoria fixas, busca, cards de produto, botão flutuante da sacola | aberto, **fechado**, sem pedido mínimo, categoria vazia, mobile | alta (título/trechos) |
-| S02 | Detalhe do produto | toque num produto em S01 (modal/bottom sheet) | personalizar o item | foto, descrição, preço, seletor de tamanho, seletor de sabores (meio a meio), grupos de complementos com mín/máx, observação, quantidade, "Adicionar" com total | obrigatório não preenchido, máx atingido, item esgotado | média (meio a meio, bordas por tamanho no blog); tela = palpite |
-| S03 | Sacola | botão da sacola | revisar o pedido | lista de itens com opções, +/- , remover, subtotal, cross-sell ("peça também"), aviso de pedido mínimo | **vazia ("Sua sacola")**, abaixo do mínimo, cheia | alta (vazio visto), resto palpite |
-| S04 | Finalizar pedido | `/{slug}/checkout` | dados + entrega + pagamento | nome e telefone (WhatsApp), entrega × retirada, endereço com validação, taxa/prazo da área, cupom, cashback disponível, forma de pagamento (Pix, cartão online, dinheiro com troco, maquininha), resumo, "Fazer pedido" | fora da área, loja fechou, cupom inválido, mobile | alta (rota/título), campos = média |
-| S05 | Pagamento Pix | após S04 com Pix | pagar online | QR code, copia-e-cola, contagem regressiva, "já paguei" | aguardando, pago, expirado | palpite (Pix online confirmado, tela não) |
-| S06 | Pedido confirmado / acompanhamento | após S04/S05 | mostrar status | número do pedido, linha do tempo (recebido → em preparo → saiu → entregue), resumo, botão WhatsApp da loja | cada status, cancelado | média (atualizações de status confirmadas, via WhatsApp) |
+| ID | tela | rota | propósito | componentes-chave (vistos) | estados | conf. | print |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| S01 | Cardápio da loja | `/{slug}` | vitrine e entrada | ver lista abaixo | aberto ("Aberto até 18:00"), **fechado** ("Abrimos hoje (quarta) às 18:00"), sem mínimo / mínimo R$ 30 | **vista** | `loja-cardapio-mobile.png`, `val-cardapio.png` |
+| S02 | Produto | `/{slug}/produto/{produto-slug}` (página cheia) | personalizar o item | ver lista abaixo | obrigatório pendente (botão em R$ 0,00), **loja fechada** ("Estamos fechados :(" no lugar do botão) | **vista** | `val-item.png`, `val-opcoes-1.png`, `lanche-1.png` |
+| S03 | Pizza: nº de sabores | toque no tamanho (bottom sheet) | escolher 1, 2 ou 3 sabores | título "Escolha o número de sabores"; cards com ícone de pizza dividida; o máximo varia por tamanho | — | **vista** | `item-pizza-1.png` |
+| S04 | Pizza: sabores | `/{slug}/pizza/{categoria}/{tamanho}/{n}` | escolher os sabores | ver lista abaixo | — | **vista** | `pizza2-2.png` |
+| S05 | Login do cliente | "Fazer login" no topo (modal) | identificar o cliente | Nome, Celular com seletor de país, "Receber código" (código por SMS/WhatsApp: palpite), Cancelar | — | **vista** | `val-login-1.png` |
+| S06 | Sacola | `/{slug}/checkout` (passo 1) | revisar | ver lista abaixo | vazia ("Sua sacola"), com itens | **vista** | `val-sacola.png` |
+| S07 | Entrega e agendamento | checkout (passo 2) | entrega × retirada | ver lista abaixo | sem endereço, retirada | **vista** (o agendamento só aparece no título: palpite) | `val-endereco.png`, `val-novo-endereco.png`, `val-retirada.png` |
+| S08 | Forma de pagamento | checkout (passo 3) | escolher como pagar | ver lista abaixo | — | **vista** | `val-pagamento.png` |
+| S09 | Resumo do pedido | checkout (passo 4) | conferir | ver lista abaixo | — | **vista** | `val-revisar.png` |
+| S10 | Pagamento online (Pix/cartão) | após "Ir para Pagamento" | pagar | QR / copia-e-cola, cartão, Apple Pay e Google Pay (citados nas taxas) | aguardando, pago, expirado | palpite | — |
+| S11 | Pedido feito / acompanhamento | após pagar | status | linha do tempo com as 5 etapas do painel; aviso pelo WhatsApp | por status, recusado | média | — |
 
-### Lado do restaurante (painel)
+Componentes vistos em cada tela do cliente:
 
-| ID | tela | rota / como chegar | propósito | componentes-chave | estados | conf. |
-| --- | --- | --- | --- | --- | --- | --- |
-| S10 | Cadastro / onboarding | site → teste grátis 15 dias | criar a loja | formulário, importar do iFood, conectar WhatsApp, conectar impressora | importando, falhou | média |
-| S11 | Gestor de pedidos | home do painel | operar pedidos ao vivo | colunas kanban por status, card do pedido (nº, cliente, total, tempo), ações aceitar/despachar/finalizar, alerta sonoro, toggle loja aberta | sem pedidos, pedido novo, atrasado | alta (kanban + ações no blog) |
-| S12 | Detalhe do pedido | clique num card | ver e agir | itens e opções, cliente, endereço, pagamento, imprimir, atribuir motoboy, cancelar | pago/não pago, cancelado | média |
-| S13 | Cardápio: lista | menu "Cardápio" | organizar o cardápio | categorias reordenáveis, produtos, pausar/esgotar, busca | vazio, importado do iFood | média |
-| S14 | Cardápio: editor de produto | S13 → produto | criar/editar item | nome, descrição, foto, preço, tamanhos, grupos de complemento (mín/máx), regras de sabores e bordas | validação | média (regras no blog) / tela palpite |
-| S15 | Áreas de entrega | Configurações | taxa e prazo por região | lista de bairros/áreas, taxa, prazo, (mapa/raio palpite) | sem áreas | alta |
-| S16 | Horários | Configurações | abrir/fechar | grade por dia da semana, pausa manual | fechado agora | alta (importa do iFood) |
-| S17 | Configurações da loja | Configurações | perfil e regras | logo, nome, slug, pedido mínimo, formas de pagamento, retirada on/off | — | média |
-| S18 | Motoboys | menu "Entregadores" | equipe de entrega | lista de entregadores, pedidos atribuídos, (acerto palpite) | vazio | média |
-| S19 | Clientes (CRM) | menu "Clientes" | base própria | lista, último pedido, total gasto, status ativo/em risco/inativo | vazio | média |
-| S20 | Cupons | menu "Marketing" | descontos | galeria de cupons, valor, limite semanal, validade | — | alta (limite semanal) |
-| S21 | Fidelidade | menu "Marketing" | reter | modo pontos × cashback, % e validade (até 40 dias) | desligado | alta |
-| S22 | Recuperador / disparos | menu "Marketing" | trazer cliente de volta | ativar recuperador, regras (7/21 dias, carrinho abandonado), campanhas de disparo, resultados | desligado | alta |
-| S23 | Relatórios | menu "Relatórios" | acompanhar | pedidos, faturamento, ticket médio, lucro, origem | sem dados | média |
-| S24 | Atendente IA (WhatsApp) | menu "Atendimento" | configurar e ver conversas | conexão do número, liga/desliga IA, conversas, assumir manualmente, feedback pós-entrega | IA off, desconectado | média |
-| S25 | Integrações | Configurações | conectar terceiros | iFood, 99Food, Saipos, Colibri, Meta Pixel, GA, GTM | conectado/não | alta (lista) |
-| S26 | Plano e cobrança | Configurações | assinatura | plano, faturas, taxas de Pix | teste, ativo, atrasado | média |
+- **S01 Cardápio da loja**
+  - Topo: foto de capa, botões de busca e perfil, logo, nome, bairro e cidade, link de informações da loja.
+  - Faixas de informação: tempo de entrega ("20min - 1h"), pedido mínimo, selo "2% de Cashback", card de cupom ("Desconto 5% / Sem mínimo").
+  - Convite: "Fazer login · Aproveite benefícios!".
+  - Carrossel "Mais Pedidos" com selo "🔥 O favorito!".
+  - Categorias em chips, incluindo "Em falta".
+  - Cards de produto com descrição, "A partir de", "De R$ X por R$ Y", "Recomendado", "Serve N pessoas", "3un" e foto.
+  - Fixos na tela: botão "Ver sacola R$ 25,00" e a barra "Tirar dúvidas no WhatsApp".
+- **S02 Produto**
+  - Foto, nome, descrição, preço ou "A partir de".
+  - Grupos de opção com contador "0 / 1", selo "Obrigatório", "Escolha até 10 opções" e preços "+R$ 3,00".
+  - Campo "Observações?", seletor de quantidade e botão "Adicionar R$ 25,00".
+- **S04 Pizza: sabores**
+  - Título "Tamanho Família - 2 sabores", "Escolha 2 opções", contador "0 / 2", "Obrigatório".
+  - Regra **"Preço com base no maior valor"**.
+  - Opções "Meia Pizza X", cada uma com o preço da pizza inteira.
+- **S06 Sacola**
+  - "Sua sacola", botão "Limpar", itens com quantidade, "Adicionar mais itens".
+  - **"Peça também"** (cross-sell).
+  - "Aplicar benefício": Cashback / Cupom.
+  - Subtotal, taxa de entrega "(a ser calculado)", total, "Observações?", "Continuar para Endereço".
+- **S07 Entrega e agendamento**
+  - Pergunta "Como deseja receber seu pedido?" com as opções Entrega / Retirada.
+  - Lista de endereços salvos e "Adicionar novo endereço".
+  - Modal de endereço: "Usar minha localização" ou digitar em "Para onde?" (autocompletar do Google).
+  - Retirada: endereço da loja, CEP, "Ver no mapa".
+  - Botão "Continuar para Pagamento".
+- **S08 Forma de pagamento**
+  - **Pagar online:** PIX, Cartão de Crédito.
+  - **Pagar na entrega:** Dinheiro, Cartão de Crédito, Cartão de Débito, Vale Refeição.
+  - Botão "Revisar Pedido".
+- **S09 Resumo do pedido**
+  - Recebimento, Pagamento ("PIX (Online)").
+  - **"Cashback a receber +R$ 0,50"**, com a nota "Calculados no fechamento".
+  - Itens, subtotal, total, botão "Ir para Pagamento".
 
-Total: 6 telas do cliente + 17 do painel = **23 telas**.
+### Lado do restaurante (`app.brendi.com.br`). Não acessado
+
+Fonte de todas as linhas: réplica do painel na home (fonte 1) e lista de
+recursos dos planos (fonte 2). Os nomes de menu foram **vistos na réplica**.
+
+| ID | tela (item do menu) | propósito | componentes / evidência | conf. |
+| --- | --- | --- | --- | --- |
+| S20 | Moldura do painel | navegar | seletor de loja ("Burger do Zé - Matriz") + botão "+" (**várias lojas**); "Loja aberta"; atalhos "Acessar cardápio" e "QR Code & Links"; menu lateral com os itens abaixo; "Tutoriais p/ crescer", "Indique e ganhe", "Suporte" | média (réplica) |
+| S21 | Gestor de pedidos | operar ao vivo | ver detalhe abaixo | média-alta (réplica detalhada) |
+| S22 | Detalhe do pedido ("Ver mais") | itens, cliente, pagamento | expansão do card | palpite |
+| S23 | Novo pedido (manual) | lançar pedido do balcão ou do telefone | botão "+ Novo pedido" | média |
+| S24 | Relatório diário / Relatórios | caixa e lucro ("o Finn fecha o caixa") | "Abrir relatório diário", item "Relatórios", relatórios de lucro, calculadora de CMV no site | média |
+| S25 | Atendimento | conversas no WhatsApp com a IA Brenda | item "Atendimento"; Brenda entende áudio e figurinha, tom de voz configurável, pedido dentro da conversa | média |
+| S26 | Brenda Gestora | assistente de IA para o dono (palpite: perguntas sobre a operação) | item no menu | palpite |
+| S27 | Editor de cardápio | categorias, produtos, tamanhos, grupos de opção, sabores, "em falta" | item "Editor de cardápio"; a estrutura vista em S02/S04 define o editor | média |
+| S28 | Cupons | galeria, valor, mínimo, limite | item "Cupons"; card "Desconto 5% Sem mínimo" visto no cardápio | média |
+| S29 | Disparos e Fidelização | disparos, recompra automática, recuperador, fidelidade/cashback | item no menu; "2% de Cashback" visto no cardápio | média |
+| S30 | Tráfego pago | anúncios gerenciados (serviço) | item "Tráfego Pago"; R$ 60/semana | alta (mas é serviço) |
+| S31 | Administrar loja | perfil, horários, áreas e taxas, pedido mínimo, formas de pagamento, retirada, motoboys | item no menu | média |
+| S32 | Financeiro | repasses dos pagamentos online, janela de repasse | item no menu; "janela de repasse que você configurar" | média |
+| S33 | Integrações | iFood, 99Food, Foody, Pick n Go, Glow, Saipos, Colibri, GA, GTM, Meta Pixel | item + lista na página de planos | alta (lista) |
+| S34 | QR Code & Links | link e QR do cardápio para divulgar | atalho no topo do menu | média |
+| S35 | Cadastro / teste grátis | criar conta e migrar ("no ar em 15 min", "migração feita junto com você") | CTA do site | média |
+
+**S21 Gestor de pedidos**, em detalhe:
+- **Barra superior:** busca "(Nome, Telefone ou Código)", "Pausar loja", "Informar alta demanda", "Abrir relatório diário", "+ Novo pedido", alternar visualização, notificações.
+- **5 colunas:** Em Análise, Em Preparo, Pronto, Em Entrega, Finalizados. Cada uma mostra quantos pedidos tem e a soma em R$.
+- **Card do pedido:** código "B-5018"; "Há 4 seg" e cronômetro; cliente com telefone; etiqueta ("Cliente novo", "Segundo pedido" ou "WhatsApp"); bairro ou "Retirada no local"; "Ver mais"; total; pagamento ("Pix · Aprovado", "Crédito · Visa", "Dinheiro · Troco R$ 0,00"); selo "A Cobrar"; botões Recusar e Aceitar, Pronto ou Finalizar.
+- **Aviso:** "Cliente avisado no WhatsApp: pedido saiu para entrega".
+
+Total: 11 telas do cliente + 16 do painel = **27 telas** (9 vistas de verdade).
 
 ## Fluxos
 
 ```
-F01 Cliente faz pedido para entrega com Pix
-    S01 -> S02 -> S03 -> S04 -> S05 -> S06
-    happy path cliques: ~8 (produto, tamanho, adicionar, sacola, continuar,
-      entrega+endereço, Pix, fazer pedido) + digitação de nome/telefone/endereço
-    edge: loja fecha no meio, endereço fora da área, abaixo do mínimo, sabor
-      esgotado, Pix expira, cliente volta e a sacola persiste
+F01 Cliente pede para entrega e paga com Pix (vista até S09)
+    S01 -> S02 -> (Adicionar) S01 -> Ver sacola S06 -> S07 (Entrega, endereço)
+        -> S08 (PIX) -> S09 -> S10 -> S11
+    happy path toques, medidos até S09: produto, Adicionar, Ver sacola,
+      Continuar, (endereço: localização ou digitar), Continuar, PIX, Revisar,
+      Ir para Pagamento = 9 + endereço. O login (S05) deve aparecer em
+      algum ponto antes de pagar: palpite.
+    edge: loja fecha no meio (S02 vira "Estamos fechados :("), fora da área,
+      abaixo do mínimo, item "Em falta", Pix expira
 
-F02 Cliente pede meio a meio para retirada, paga na loja
-    S01 -> S02 (2 sabores + borda) -> S03 -> S04 (retirada, dinheiro) -> S06
-    edge: preço do meio a meio (maior sabor vs média — regra a definir), troco
+F02 Cliente pede pizza meio a meio para retirada e paga na entrega
+    S01 -> S03 (tamanho -> nº de sabores) -> S04 (2 sabores, preço do maior)
+        -> S06 -> S07 (Retirada) -> S08 (Dinheiro/VR) -> S09 -> S11
+    edge: 3 sabores só no tamanho família; troco
 
-F03 Cliente recorrente usa cashback / cupom
-    S01 -> S02 -> S03 -> S04 (aplica saldo/cupom) -> S06
-    edge: cupom esgotado na semana, cashback vencido (40 dias), cupom + cashback juntos?
+F03 Cliente recorrente usa cashback ou cupom
+    S05 (login por celular + código) -> S01 -> ... -> S06 (Aplicar benefício)
+        -> S09 (cashback a receber de 2%)
+    edge: cupom com limite semanal esgotado, cashback vencido
 
-F04 Restaurante recebe e conclui um pedido
-    S11 (alerta) -> S12 -> aceitar -> imprimir -> atribuir motoboy -> despachar -> finalizar
-    happy path cliques: 3–4
-    edge: pedido Pix não pago, cancelar com motivo, cliente liga pedindo mudança
+F04 Restaurante opera um pedido
+    S21: Em Análise (Aceitar | Recusar) -> Em Preparo (Pronto) -> Pronto
+        -> Em Entrega (Finalizar) -> Finalizados
+    o cliente é avisado no WhatsApp a cada mudança; retirada pula Em Entrega (palpite)
+    edge: pedido "A Cobrar" (pagamento na entrega), recusa, alta demanda
+      (aumenta o prazo exibido: palpite), loja pausada
 
-F05 Restaurante monta a loja
-    S10 -> (importar iFood ou manual) S13 -> S14 -> S15 -> S16 -> S17 -> link publicado
-    edge: importação falha parcialmente, slug já usado
+F05 Restaurante lança pedido manual
+    S21 -> S23 (+ Novo pedido) -> Em Análise
 
-F06 Recuperar cliente inativo
-    S22 (liga) -> job diário acha clientes 21+ dias / carrinho abandonado
-      -> WhatsApp com cupom -> cliente cai em F03
-    edge: opt-out, limite de cupons da semana, número inválido
+F06 Restaurante monta a loja
+    S35 -> S31 (perfil, horários, áreas) -> S27 (cardápio) -> S34 (link/QR)
+    edge: importar do iFood (S33)
 
-F07 Cliente pede conversando com a IA no WhatsApp
-    WhatsApp -> IA responde e manda link do cardápio (~90%) -> F01
-             -> ou monta o pedido na conversa (~10%) -> S11
-    edge: áudio/imagem, pergunta fora do cardápio, humano assume (S24)
+F07 Recuperar cliente inativo
+    S29 (liga) -> job acha clientes com 21+ dias sem pedir e carrinhos abandonados
+        -> WhatsApp com cupom -> F03
+
+F08 Cliente pede conversando com a IA no WhatsApp
+    WhatsApp -> Brenda responde (texto, áudio, figurinha) -> manda o link do
+      cardápio (F01) ou fecha o pedido na conversa e manda o Pix -> S21 com
+      a etiqueta "WhatsApp"
 ```
 
-Número a bater: F01 em ~8 toques no celular, sem cadastro nem senha.
+Número a bater: **~9 toques** de "abrir a loja" até "Ir para Pagamento",
+num item sem opções obrigatórias, mais a digitação do endereço.
 
 ## Componentes
 
 | componente | variantes | estados | usado em |
 | --- | --- | --- | --- |
-| Botão | primário, secundário, fantasma, perigo, flutuante (sacola) | padrão, hover, foco, desabilitado, carregando | todas |
-| Cabeçalho da loja | completo, compacto (ao rolar) | aberto, fechado | S01 |
-| Abas de categoria | rolagem horizontal fixa | ativa, inativa | S01 |
-| Card de produto | com foto, sem foto, promo | normal, esgotado | S01, S03 (cross-sell) |
-| Bottom sheet / modal | item, confirmação | aberto, fechando | S02, S12 |
-| Grupo de opções | único (rádio), múltiplo (checkbox), quantidade (+/-) | obrigatório, completo, máx atingido | S02, S14 |
-| Stepper de quantidade | pequeno, grande | mín, máx | S02, S03 |
-| Campo de texto | texto, telefone, CEP, moeda | vazio, foco, erro | S04, S14, S17 |
-| Seletor segmentado | entrega/retirada, pontos/cashback | — | S04, S21 |
-| Cartão de forma de pagamento | Pix, cartão, dinheiro, maquininha | selecionado | S04 |
-| Bloco Pix | QR + copiar | aguardando, pago, expirado | S05 |
-| Linha do tempo de status | vertical | concluído, atual, futuro | S06 |
-| Coluna kanban + card de pedido | por status | novo (pulsando), atrasado | S11 |
-| Badge de status | aberto, fechado, pago, pendente, cancelado | — | S01, S11, S12 |
-| Tabela/lista | clientes, cupons, áreas | vazia, carregando | S15, S19, S20 |
-| Toggle | — | on, off | S16, S21, S22, S24 |
-| Toast | sucesso, erro, info | — | todas |
-| Navegação do painel | sidebar desktop, barra inferior mobile | ativa | S10–S26 |
+| Botão | primário (verde no cardápio), secundário com contorno, perigo (vermelho no painel), fixo ("Ver sacola R$ x") | padrão, desabilitado, carregando, **fechado** | todas |
+| Cabeçalho da loja | capa + card sobreposto com logo | aberto, fechado | S01 |
+| Faixa de informação | entrega, pedido mínimo, cashback | — | S01 |
+| Card de cupom | percentual + mínimo | — | S01 |
+| Carrossel "Mais Pedidos" | com selo "O favorito!" | — | S01 |
+| Chips de categoria | rolagem horizontal, fixos ao rolar | ativo | S01 |
+| Card de produto | com ou sem foto, "A partir de", "De/por", "Recomendado", "Serve N" | normal, em falta | S01, S06 ("Peça também") |
+| Bottom sheet | título + fechar + alça | — | S03, S05, S07 |
+| Card de escolha com ícone | 1/2/3 sabores | selecionado (borda verde) | S03 |
+| Grupo de opção | escolha única, múltipla ("até N"), meia pizza | "0 / N", **Obrigatório**, completo | S02, S04 |
+| Linha de opção | nome, descrição, "+R$" | marcada | S02, S04 |
+| Seletor de quantidade | − 1 + | mín 1 | S02, S06 |
+| Campo de observação | "Observações?" | — | S02, S06 |
+| Segmentado | Entrega / Retirada | — | S07 |
+| Autocompletar de endereço | Google Places + "Usar minha localização" | vazio, sugestões | S07 |
+| Opção de pagamento (rádio) | agrupada: online / na entrega | selecionada | S08 |
+| Linhas de resumo | subtotal, taxa "(a ser calculado)", total, cashback a receber | — | S06, S09 |
+| Barra "Tirar dúvidas no WhatsApp" | fixa no rodapé | — | S01, S02 |
+| Coluna kanban | 5 cores (vermelho, amarelo, azul, verde, cinza), contador + soma | — | S21 |
+| Card de pedido | código, cronômetro, etiqueta do cliente, forma de pagamento, "A Cobrar" | novo, atrasado | S21 |
+| Etiqueta | Cliente novo, Segundo pedido, WhatsApp, Pix · Aprovado | — | S21 |
+| Menu lateral do painel | itens com ícone, grupos que abrem | ativo | S20 |
+| Toast | "Cliente avisado no WhatsApp…" | — | S21 |
 
 ## Modelo de dados inferido
 
 ```
-Store        id, slug, name, logo_url, city, phone_whatsapp, is_open_override,
-             min_order_cents, pickup_enabled, payment_methods[], plan_status
-             evidência: S01 (rota /{slug}, cidade no título, pedido mínimo), planos
-             confiança: alta
+Store        id, slug, name, logo_url, cover_url, neighborhood, city, address, cep,
+             lat, lng, whatsapp, min_order_cents (0 = "sem mínimo"),
+             eta_min, eta_max, pickup_enabled, paused, high_demand,
+             cashback_percent, brand_id (várias lojas: "Matriz")
+             evidência: S01, S07 (retirada), S21 (Pausar loja, alta demanda), S20
+             confiança: vista/alta
+OpeningHours store_id, weekday, opens_at, closes_at    ("Abrimos hoje (quarta) às 18:00")
+DeliveryZone store_id, name, fee_cents, eta (polígono/raio: palpite)   evidência: fonte 7
+Category     id, store_id, name, position, is_special ("Mais Pedidos", "Em falta" = derivadas: palpite)
+Product      id, category_id, slug, name, description, image_url, price_cents,
+             compare_at_cents ("De/por"), serves, unit_label ("3un"), badge
+             ("Recomendado"), is_available, kind (simple | pizza_size)
+PizzaSize    product_id, slices, max_flavors, pricing_rule (max | avg: palpite;
+             visto "maior valor")       evidência: S03/S04   confiança: vista
+Flavor       id, store_id, name, description, price_by_size {size_id: cents}
+OptionGroup  id, product_id, name, min, max, required        evidência: "0 / 1 Obrigatório", "até 10"
+Option       id, group_id, name, description, price_cents, is_available
 
-OpeningHours store_id, weekday, opens_at, closes_at
-             evidência: importação de horários do iFood        confiança: alta
+Customer     id, store_id, name, phone (login por código), cashback_balance_cents,
+             order_count (etiquetas Cliente novo/Segundo pedido), last_order_at
+Address      id, customer_id, formatted, number, complement, lat, lng, place_id
 
-DeliveryZone store_id, name (bairro), fee_cents, eta_min, eta_max, (polygon|radius: palpite)
-             evidência: blog área por bairro, "Entrega 1 - 55min"   confiança: alta
+Order        id, store_id, code ("B-5018"), customer_id, channel (menu | whatsapp | manual | ifood),
+             fulfillment (delivery | pickup), scheduled_for?, address_snapshot,
+             subtotal, delivery_fee, discount, cashback_used, total,
+             status (em_analise | em_preparo | pronto | em_entrega | finalizado | recusado),
+             payment_method (pix | credit_online | cash | credit_on_delivery |
+               debit_on_delivery | meal_voucher | apple_pay | google_pay),
+             payment_status (aprovado | a_cobrar | pendente), change_for_cents,
+             cashback_earned_cents, notes, accepted_at, ready_at, dispatched_at, finished_at
+             evidência: S06–S09, S21     confiança: vista/média
+OrderItem / OrderItemOption   (snapshot de nome e preço; fração para meia pizza)
 
-Category     id, store_id, name, position, is_active          confiança: alta
-Product      id, category_id, name, description, image_url, base_price_cents,
-             is_available, position                          confiança: alta
-ProductSize  id, product_id, name (broto, média, grande, família), price_cents, max_flavors
-             evidência: lojas reais (tamanhos), blog meio a meio   confiança: média
-OptionGroup  id, product_id, name, min, max, kind (flavor|crust|addon), size_id?
-             evidência: "bordas por tamanho", "regras de combo"   confiança: média
-Option       id, group_id, name, price_cents, is_available    confiança: média
-
-Customer     id, store_id, name, phone, created_at, last_order_at, total_spent_cents,
-             cashback_balance_cents, points, opt_out
-             evidência: CRM, recuperador, cashback          confiança: média
-Address      id, customer_id, street, number, district, city, lat, lng, complement
-             evidência: geocoding do Google                    confiança: média
-
-Order        id, store_id, customer_id, number, channel (menu|whatsapp_ai|ifood),
-             fulfillment (delivery|pickup), zone_id, address_snapshot (json),
-             subtotal, delivery_fee, discount, cashback_used, total (cents),
-             status (received|accepted|preparing|dispatched|delivered|cancelled),
-             payment_method (pix|card|cash|card_on_delivery), change_for_cents,
-             payment_status (pending|paid|refunded), courier_id, created_at
-             evidência: gestor kanban (aceitar/despachar/finalizar), checkout
-             confiança: alta para o núcleo, palpite para os nomes de status
-OrderItem    id, order_id, product_id, size_id, name_snapshot, unit_price, qty, notes
-OrderItemOption order_item_id, option_id, name_snapshot, price, fraction (meio a meio)
-
-Payment      id, order_id, provider, provider_ref, pix_qr, amount, fee, status
-             evidência: Pix R$0,40 + 0,5%                      confiança: média
-Coupon       id, store_id, code, type (pct|fixed|free_delivery), value,
-             weekly_limit, used_this_week, min_order, valid_until
-             evidência: galeria de cupons com limite semanal   confiança: média
-LoyaltyEntry id, customer_id, order_id, kind (earn|spend|expire), points|cents, expires_at
-             evidência: pontos e cashback, 40 dias              confiança: média
-Campaign     id, store_id, type (inactive|abandoned_cart|broadcast), rules (json),
-             coupon_id, enabled                                  confiança: média
-CampaignSend id, campaign_id, customer_id, sent_at, converted_order_id   confiança: palpite
-Cart         id, store_id, customer_phone?, items (json), updated_at, recovered
-             evidência: recuperador de carrinho abandonado      confiança: palpite
-Courier      id, store_id, name, phone, active                confiança: média
-Conversation id, store_id, customer_id, channel (whatsapp), ai_enabled, assigned_user_id
-Message      id, conversation_id, role (customer|ai|staff), type (text|audio|image), body
-             evidência: Brenda texto/áudio/imagem               confiança: média
-Integration  id, store_id, provider (ifood|99food|saipos|colibri|meta_pixel|ga|gtm), config
-             confiança: alta (lista)
-User         id, email, store_id, role (owner|staff)          confiança: palpite
+Payment      order_id, method, provider_ref, fee_cents, settles_at (Pix D+1 após 12h)
+Coupon       id, store_id, percent|amount, min_order, weekly_limit, valid_until
+CashbackEntry customer_id, order_id, kind (earn | spend | expire), cents, expires_at (40 dias)
+Campaign / CampaignSend      (recompra, recuperador, disparo)
+Courier      id, store_id, name, phone
+Conversation / Message       (WhatsApp; texto, áudio, figurinha)
+Integration  store_id, provider, config
+User         id, email, role; StoreMember(user_id, store_id)
 ```
 
-Relações: Store 1-n Category 1-n Product 1-n ProductSize; Product 1-n OptionGroup
-1-n Option; Store 1-n DeliveryZone, OpeningHours, Customer, Order, Coupon,
-Campaign, Courier; Customer 1-n Address, Order, LoyaltyEntry; Order 1-n
-OrderItem 1-n OrderItemOption; Order 1-1 Payment; Order n-1 Courier.
+Relações:
+- Brand 1-n Store.
+- Store 1-n Category 1-n Product.
+- Product 1-n OptionGroup 1-n Option.
+- Pizza: Product(pizza_size) n-n Flavor, com preço por tamanho.
+- Store 1-n Order. Customer 1-n Order.
+- Order 1-n OrderItem 1-n OrderItemOption.
+- Customer 1-n CashbackEntry.
 
 ## Matriz de funcionalidades
 
-Ver `features.csv`. Must: 24, should: 17, could: 10, skip: 6.
+Ver `features.csv`. Must: 30, should: 20, could: 14, skip: 7 (71 linhas).
 
 ## Fora de escopo (não pode ou não deve ser clonado)
 
-- **Nome e marca "Brendi"/"Brenda"/"aíChef"**, logo, textos do site e fotos das lojas.
-- **A base de 8.500+ restaurantes e seus clientes** — a rede é deles.
-- **Importação do iFood**: só pela API oficial de parceiros do iFood (exige
-  credenciamento); nada de raspar a loja do restaurante no iFood.
-- **WhatsApp**: só pela WhatsApp Business Platform (Cloud API) oficial, com o
-  número do próprio restaurante; nada de WhatsApp Web não oficial.
-- **Integrações Saipos/Colibri/99Food**: dependem de acordo de parceria.
-- **Adquirência própria / taxa de Pix**: o clone usa um PSP (ex.: Mercado Pago,
-  Stripe BR, Asaas) — a margem sobre o Pix é negócio, não código.
-- **"Taxa de operação" e "investimento em mídia"**: serviço humano de
-  marketing, não software.
+- **Marca e conteúdo da Brendi:**
+  - Nome, logo, nomes dos agentes (Brenda, Anderson, Kleber, Marta, Finn, Wilson, Brendinha), textos, ilustrações e cores exatas.
+  - As fotos e os cardápios das lojas.
+- **A rede:** os 9.500+ restaurantes e os clientes deles.
+- **Tráfego pago gerenciado:** é um serviço humano, não software.
+- **Importar do iFood e integrações com 99Food, Saipos, Colibri, Foody, Pick n Go e Glow:** dependem de API de parceiro ou de acordo comercial.
+- **WhatsApp não oficial:** fica de fora. Usar só a WhatsApp Business Platform (Cloud API).
+- **As taxas de pagamento da Brendi:** são acordo comercial. O clone usa um PSP brasileiro (Mercado Pago, Asaas, Pagar.me ou Stripe BR) com as taxas que ele cobrar.
 
 ## Tamanho
 
-Telas 23, fluxos 7, entidades ~22. Partes difíceis:
+Telas 27, fluxos 8, entidades ~24.
 
-1. **Personalização de item** (tamanhos × sabores meio a meio × bordas por
-   tamanho × mín/máx) com preço correto no cliente e no servidor.
-2. **Pagamento Pix online com webhook** + estados pago/expirado e pedido em
-   tempo real no gestor (realtime/push + alerta sonoro + impressão).
-3. **Atendente de IA no WhatsApp** (Cloud API, áudio/imagem, handoff humano,
-   pedido completo na conversa).
+Partes difíceis:
+1. **Montagem do item:** pizza por tamanho → nº de sabores → meias com "preço do maior", grupos com mín/máx. O preço tem que bater no cliente e no servidor.
+2. **Pagamento online com webhook:** Pix e cartão, pedido "A Cobrar" × "Aprovado", repasses (Financeiro).
+3. **Tempo real no quadro de pedidos e avisos no WhatsApp a cada etapa:** os avisos exigem modelos de mensagem aprovados pela Meta.
+4. **Atendente de IA no WhatsApp:** áudio, figurinha e pedido dentro da conversa.
 
-Também: geocodificação de endereço e áreas, jobs agendados do recuperador,
-ledger de cashback com expiração.
-
-Tamanho: **L** (um trimestre) para tudo. O núcleo F01 + F04 + F05 (cardápio,
-checkout com Pix, gestor kanban, editor de cardápio, áreas e horários) é **M**
-(algumas semanas). Recomendação: fatiar assim e deixar IA no WhatsApp para a
-fase 2.
+Tamanho:
+- **Tudo:** **L** (um trimestre).
+- **Núcleo:** **M** (algumas semanas). Inclui S01–S09 e S21 com F01, F02 e F04, mais editor de cardápio, horários, áreas e login por código.
+- **Fase 2:** IA no WhatsApp, recuperador e disparos.

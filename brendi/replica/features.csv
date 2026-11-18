@@ -1,58 +1,72 @@
 feature,area,priority,original,clone,notes
-Página pública da loja em /{slug} sem app nem cadastro,cardápio,must,yes,no,S01; fonte 15
-Cabeçalho com nome cidade tempo de entrega e pedido mínimo,cardápio,must,yes,no,S01; "Entrega 1 - 55min"
-Estado loja aberta/fechada pelos horários,cardápio,must,yes,no,S01 S16
-Categorias com navegação fixa e lista de produtos,cardápio,must,yes,no,S01
-Detalhe do produto com tamanhos e complementos (mín/máx),cardápio,must,yes,no,S02; tela = palpite
-Pizza meio a meio com preço automático,cardápio,must,yes,no,S02; fonte 10; regra de preço a definir
-Sacola com editar quantidade e remover,cardápio,must,yes,no,S03; "Sua sacola"
-Aviso e bloqueio abaixo do pedido mínimo,cardápio,must,yes,no,S03 S04
-Checkout com nome e telefone,checkout,must,yes,no,S04 /{slug}/checkout
-Entrega ou retirada,checkout,must,palpite,no,S04; retirada não confirmada em fonte
-Endereço validado e taxa/prazo pela área de entrega,checkout,must,yes,no,S04 S15; fonte 9
-Pagamento na entrega (dinheiro com troco e maquininha),checkout,must,yes,no,fonte 2 e 14
-Pagamento Pix online com QR e confirmação automática,pagamentos,must,yes,no,S05; fonte 2
-Tela de pedido confirmado com status,pedido,must,palpite,no,S06
-Gestor de pedidos kanban em tempo real,gestor,must,yes,no,S11; fonte 5
-Aceitar despachar finalizar e cancelar pedido,gestor,must,yes,no,S11 S12
-Alerta sonoro de pedido novo,gestor,must,palpite,no,S11; padrão do mercado
-Impressão automática da comanda,gestor,must,yes,no,S12; fonte 8 e 11
-Editor de categorias e produtos com foto,cardápio admin,must,yes,no,S13 S14
-Pausar/esgotar produto,cardápio admin,must,palpite,no,S13
-Áreas de entrega por bairro com taxa e prazo,configurações,must,yes,no,S15
-Horários por dia da semana e pausa manual,configurações,must,yes,no,S16
-Configurações da loja (logo slug pedido mínimo formas de pagamento),configurações,must,yes,no,S17
-Login do restaurante e cadastro da loja,onboarding,must,yes,no,S10
-Pagamento com cartão online,pagamentos,should,yes,no,S04; fonte 6
-Cupons com galeria e limite semanal,marketing,should,yes,no,S20; fonte 12
-Fidelidade por cashback com validade (até 40 dias),fidelidade,should,yes,no,S21; fonte 13
-Fidelidade por pontos,fidelidade,should,yes,no,S21
-Aplicar cupom e cashback no checkout,checkout,should,yes,no,S04
-CRM de clientes com ativo/em risco/inativo,crm,should,yes,no,S19; 7 e 21 dias
-Recuperador de clientes inativos via WhatsApp com cupom,marketing,should,yes,no,S22; fonte 3
-Recuperador de carrinho abandonado,marketing,should,yes,no,S22; exige capturar telefone antes do checkout
-Módulo de motoboys e atribuição do pedido,entrega,should,yes,no,S18
-Atualizações de status ao cliente por WhatsApp,notificações,should,yes,no,fonte 8; WhatsApp Cloud API oficial
-Relatórios de pedidos faturamento e ticket médio,relatórios,should,yes,no,S23
-Cross-sell na sacola baseado em vendas de 90 dias,cardápio,should,yes,no,S03; fonte 6
-Atendente IA no WhatsApp que envia o link do cardápio,ia,should,yes,no,S24; fonte 7
-Humano assume a conversa (handoff),ia,should,palpite,no,S24
-Teste grátis de 15 dias e assinatura do restaurante,cobrança,should,yes,no,S26; fonte 4
-Pixel Meta GA e GTM no cardápio,integrações,should,yes,no,S25; fonte 11
-Busca no cardápio,cardápio,should,palpite,no,S01
-IA monta o pedido inteiro na conversa,ia,could,yes,no,~10% dos pedidos (fonte 18)
-IA entende áudio e imagem,ia,could,yes,no,fonte 7
-Pesquisa de satisfação 1h-1h30 após a entrega,notificações,could,yes,no,fonte 8
-Disparos/campanhas em massa por WhatsApp,marketing,could,yes,no,S22; templates aprovados pela Meta
-Relatório de lucro,relatórios,could,yes,no,fonte 1; exige custo dos itens
-Multiunidade (várias lojas numa conta),conta,could,palpite,no,citado por terceiros
-Equipe com papéis (dono/atendente),conta,could,palpite,no,
-Mensalidade variável por faturamento,cobrança,could,yes,no,fonte 4
-QR code do cardápio para mesa/balcão,cardápio,could,palpite,no,
-Pedido ser lembrado no navegador (sacola persistente),cardápio,could,palpite,no,
-Importar cardápio horários e áreas do iFood,integrações,skip,yes,skip,só via API oficial de parceiro iFood; credenciamento
-Integração com PDV Saipos e Colibri,integrações,skip,yes,skip,depende de parceria com cada PDV
-Receber pedidos do iFood e 99Food no gestor,integrações,skip,yes,skip,API de parceiro; fase futura
-"Margem própria sobre o Pix (R$0,40 + 0,5%)",pagamentos,skip,yes,skip,decisão de negócio sobre o PSP; não é código
-Serviço de marketing e mídia paga (taxa de operação),serviço,skip,yes,skip,serviço humano
-Marca Brendi/Brenda/aíChef e base de restaurantes,marca,skip,yes,skip,pertence à Brendi; rebrand com /replica-brand
+Página pública da loja em /{slug} sem app,cardápio,must,yes,no,S01 vista
+Cabeçalho com capa logo nome bairro e cidade,cardápio,must,yes,no,S01 vista
+Tempo de entrega e pedido mínimo (ou sem mínimo),cardápio,must,yes,no,S01 vista
+Estado aberto/fechado pelos horários com próximo horário,cardápio,must,yes,no,"S01 vista: ""Abrimos hoje (quarta) às 18:00"""
+Bloquear adicionar quando fechado,cardápio,must,yes,no,"S02 vista: ""Estamos fechados :("""
+Chips de categoria e lista de produtos,cardápio,must,yes,no,S01 vista
+Card de produto com A partir de / De-por / Serve N,cardápio,must,yes,no,S01 vista
+Página do produto com rota própria,cardápio,must,yes,no,/{slug}/produto/{slug} vista
+Grupos de opção com mín/máx e obrigatório,cardápio,must,yes,no,"S02 vista: ""0 / 1 Obrigatório"""
+Observação e quantidade no item,cardápio,must,yes,no,S02 vista
+Pizza: escolher nº de sabores por tamanho,cardápio,must,yes,no,S03 vista
+Pizza: meias com preço do sabor mais caro,cardápio,must,yes,no,"S04 vista: ""Preço com base no maior valor"""
+Botão fixo Ver sacola com total,cardápio,must,yes,no,S01 vista
+Sacola com quantidade limpar e adicionar mais,checkout,must,yes,no,S06 vista
+Subtotal taxa de entrega e total,checkout,must,yes,no,S06 vista
+Entrega ou retirada,checkout,must,yes,no,S07 vista
+Endereço por autocompletar e localização do aparelho,checkout,must,yes,no,S07 vista (Google)
+Retirada mostra endereço da loja e mapa,checkout,must,yes,no,S07 vista
+Taxa e prazo pela área de entrega,checkout,must,yes,no,fonte 7; cálculo não visto
+Pagamento na entrega: dinheiro com troco crédito débito,pagamentos,must,yes,no,S08 vista
+Pix online com confirmação automática,pagamentos,must,yes,no,S08 vista; S10 palpite
+Resumo do pedido antes de pagar,checkout,must,yes,no,S09 vista
+Login do cliente por celular com código,conta cliente,must,yes,no,S05 vista
+Tela de pedido feito com status,pedido,must,palpite,no,S11
+Quadro de pedidos com 5 colunas contador e soma,gestor,must,yes,no,S21 réplica
+Aceitar recusar pronto e finalizar,gestor,must,yes,no,S21 réplica
+Card de pedido com código cronômetro cliente e pagamento,gestor,must,yes,no,S21 réplica
+Pausar loja,gestor,must,yes,no,S21 réplica
+Editor de cardápio (categorias produtos opções sabores),cardápio admin,must,yes,no,S27
+Administrar loja (perfil horários áreas mínimo pagamentos retirada),configurações,must,yes,no,S31
+Cartão de crédito online,pagamentos,should,yes,no,S08 vista
+Vale refeição na entrega,pagamentos,should,yes,no,S08 vista
+Apple Pay e Google Pay,pagamentos,should,yes,no,taxas na página de planos
+Busca de pedido por nome telefone ou código,gestor,should,yes,no,S21 réplica
+Etiquetas Cliente novo / Segundo pedido / WhatsApp,gestor,should,yes,no,S21 réplica
+Selo A Cobrar para pagamento na entrega,gestor,should,yes,no,S21 réplica
+Novo pedido manual,gestor,should,yes,no,S23
+Informar alta demanda,gestor,should,yes,no,S21 réplica; efeito palpite
+Aviso ao cliente no WhatsApp a cada etapa,notificações,should,yes,no,toast da réplica; Cloud API oficial
+Impressão automática da comanda,gestor,should,yes,no,fonte 6
+Peça também (cross-sell na sacola),checkout,should,yes,no,S06 vista
+Cashback percentual com saldo e validade,fidelidade,should,yes,no,"S01 ""2% de Cashback"" e S09 ""Cashback a receber"""
+Aplicar cashback ou cupom na sacola,checkout,should,yes,no,"S06 vista ""Aplicar benefício"""
+Cupons com mínimo e limite semanal,marketing,should,yes,no,S01 card de cupom; fonte 9
+Carrossel Mais Pedidos e selos Favorito/Recomendado,cardápio,should,yes,no,S01 vista
+Categoria Em falta (itens indisponíveis visíveis),cardápio,should,yes,no,S01 vista
+Link e QR code do cardápio,divulgação,should,yes,no,S34
+Recuperador de inativos e carrinho abandonado,marketing,should,yes,no,S29; fonte 5
+Relatório diário (fechamento de caixa),relatórios,should,yes,no,S24
+Teste grátis 15 dias e assinatura por faixa de faturamento,cobrança,should,yes,no,fonte 2
+Atendente IA no WhatsApp (link do cardápio e dúvidas),ia,could,yes,no,S25; fase 2
+IA fecha o pedido na conversa e manda o Pix,ia,could,yes,no,fonte 2
+IA entende áudio e figurinha e tem tom configurável,ia,could,yes,no,fonte 2
+Assistente de IA para o dono (Brenda Gestora),ia,could,yes,no,S26 palpite
+Disparos personalizados e recompra automática,marketing,could,yes,no,S29
+Fidelidade por pontos,fidelidade,could,yes,no,fonte 10
+Várias lojas na mesma conta,conta,could,yes,no,S20 réplica (Matriz e +)
+Agendamento do pedido,checkout,could,palpite,no,"título ""Entrega e agendamento"""
+Módulo de motoboys,entrega,could,yes,no,fonte 6
+Financeiro e repasses dos pagamentos online,financeiro,could,yes,no,S32
+Relatórios de lucro e calculadora de CMV,relatórios,could,yes,no,S24
+Pesquisa de satisfação após a entrega,notificações,could,yes,no,fonte 11
+Indique e ganhe,crescimento,could,yes,no,S20 réplica
+Meta Pixel GA e GTM no cardápio,integrações,could,yes,no,S33
+Importar cardápio horários e áreas do iFood,integrações,skip,yes,skip,só com API oficial de parceiro iFood
+Integração com PDV Saipos e Colibri,integrações,skip,yes,skip,depende de parceria
+Receber pedidos de iFood 99Food Foody Pick n Go Glow,integrações,skip,yes,skip,API de parceiro; fase futura
+Tráfego pago gerenciado (R$ 60/semana),serviço,skip,yes,skip,serviço humano
+Taxas de pagamento da Brendi,pagamentos,skip,yes,skip,usar as do PSP escolhido
+Nomes dos agentes e marca Brendi,marca,skip,yes,skip,rebrand com /replica-brand
+Base de restaurantes e clientes,rede,skip,yes,skip,pertence à Brendi
