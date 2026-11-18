@@ -1,0 +1,428 @@
+{
+ "extracted_at": "2026-11-18T18:30:18.809Z",
+ "pass1": {
+  "meta": {
+   "title": "O maior sistema para restaurante do Brasil | Saipos",
+   "favicon": "https://saipos.com/favicon.ico",
+   "description": "Somos um ERP para restaurantes completo. Monitor KDS, PDV, CMV, cardápio digital, roteirização para motoboys, totem de autoatendimento e muito mais",
+   "themeColor": "",
+   "url": "https://saipos.com/"
+  },
+  "cssVars": {
+   "--nh-primary": "#280e59",
+   "--nh-secondary": "#286eff",
+   "--nh-accent": "#ff4b1e",
+   "--nh-bg": "#f0ebe2",
+   "--bf-banner-mobile-height": "7.7vw"
+  },
+  "colors": [
+   {
+    "raw": "rgb(40, 14, 89)",
+    "hex": "#280E59",
+    "count": 1254
+   },
+   {
+    "raw": "rgb(0, 0, 0)",
+    "hex": "#000000",
+    "count": 1228
+   },
+   {
+    "raw": "rgb(0, 0, 238)",
+    "hex": "#0000EE",
+    "count": 291
+   },
+   {
+    "raw": "rgb(35, 17, 88)",
+    "hex": "#231158",
+    "count": 196
+   },
+   {
+    "raw": "rgba(255, 255, 255, 0.72)",
+    "hex": "#FFFFFF",
+    "count": 160
+   },
+   {
+    "raw": "rgb(8, 66, 187)",
+    "hex": "#0842BB",
+    "count": 128
+   },
+   {
+    "raw": "rgb(255, 255, 255)",
+    "hex": "#FFFFFF",
+    "count": 117
+   },
+   {
+    "raw": "rgb(240, 235, 226)",
+    "hex": "#F0EBE2",
+    "count": 44
+   },
+   {
+    "raw": "rgb(250, 245, 235)",
+    "hex": "#FAF5EB",
+    "count": 27
+   },
+   {
+    "raw": "rgb(38, 55, 76)",
+    "hex": "#26374C",
+    "count": 24
+   },
+   {
+    "raw": "rgba(255, 255, 255, 0.9)",
+    "hex": "#FFFFFF",
+    "count": 24
+   },
+   {
+    "raw": "rgb(65, 65, 65)",
+    "hex": "#414141",
+    "count": 20
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.15)",
+    "hex": "#280E59",
+    "count": 18
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.65)",
+    "hex": "#280E59",
+    "count": 17
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.45)",
+    "hex": "#280E59",
+    "count": 16
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.35)",
+    "hex": "#280E59",
+    "count": 16
+   },
+   {
+    "raw": "rgb(197, 216, 255)",
+    "hex": "#C5D8FF",
+    "count": 15
+   },
+   {
+    "raw": "rgb(40, 110, 255)",
+    "hex": "#286EFF",
+    "count": 12
+   },
+   {
+    "raw": "rgb(40, 167, 69)",
+    "hex": "#28A745",
+    "count": 12
+   },
+   {
+    "raw": "rgb(74, 74, 74)",
+    "hex": "#4A4A4A",
+    "count": 12
+   },
+   {
+    "raw": "rgba(255, 255, 255, 0.6)",
+    "hex": "#FFFFFF",
+    "count": 12
+   },
+   {
+    "raw": "rgb(118, 118, 118)",
+    "hex": "#767676",
+    "count": 9
+   },
+   {
+    "raw": "rgb(244, 239, 230)",
+    "hex": "#F4EFE6",
+    "count": 8
+   },
+   {
+    "raw": "rgb(255, 75, 30)",
+    "hex": "#FF4B1E",
+    "count": 7
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.08)",
+    "hex": "#280E59",
+    "count": 6
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.1)",
+    "hex": "#280E59",
+    "count": 6
+   },
+   {
+    "raw": "SVG:#286eff",
+    "hex": "SVG:#286eff",
+    "count": 5
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.79)",
+    "hex": "#280E59",
+    "count": 4
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.7)",
+    "hex": "#280E59",
+    "count": 4
+   },
+   {
+    "raw": "rgba(8, 66, 187, 0.1)",
+    "hex": "#0842BB",
+    "count": 4
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.12) rgb(40, 14, 89) rgb(40, 14, 89)",
+    "hex": "#280E59",
+    "count": 4
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.12)",
+    "hex": "#280E59",
+    "count": 4
+   },
+   {
+    "raw": "rgb(1, 1, 1)",
+    "hex": "#010101",
+    "count": 4
+   },
+   {
+    "raw": "SVG:#f0ebe2",
+    "hex": "SVG:#f0ebe2",
+    "count": 4
+   },
+   {
+    "raw": "rgba(250, 245, 235, 0.4)",
+    "hex": "#FAF5EB",
+    "count": 3
+   },
+   {
+    "raw": "rgba(255, 255, 255, 0.3)",
+    "hex": "#FFFFFF",
+    "count": 3
+   },
+   {
+    "raw": "rgb(255, 255, 255) rgb(255, 255, 255) rgb(255, 18, 18)",
+    "hex": "#FFFFFF",
+    "count": 3
+   },
+   {
+    "raw": "rgb(255, 18, 18)",
+    "hex": "#FF1212",
+    "count": 3
+   },
+   {
+    "raw": "rgba(40, 14, 89, 0.08) rgb(0, 0, 0) rgb(0, 0, 0)",
+    "hex": "#280E59",
+    "count": 2
+   },
+   {
+    "raw": "rgb(0, 0, 0) rgb(0, 0, 0) rgb(0, 0, 0) rgba(40, 14, 89, 0.1)",
+    "hex": "#000000",
+    "count": 2
+   }
+  ],
+  "typography": {
+   "fonts": [
+    "Roboto",
+    "Arial",
+    "Iquost",
+    "Times New Roman",
+    "Georgia"
+   ],
+   "sizes": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    22,
+    24,
+    26,
+    27,
+    28,
+    32,
+    38,
+    45,
+    56,
+    58
+   ],
+   "weights": [
+    "400",
+    "500",
+    "700",
+    "600",
+    "900",
+    "800"
+   ]
+  },
+  "spacing": [
+   1,
+   2,
+   4,
+   5,
+   6,
+   7,
+   8,
+   10,
+   12,
+   14,
+   16,
+   19,
+   20,
+   24,
+   28,
+   32,
+   36,
+   40,
+   53,
+   58,
+   64,
+   80,
+   88,
+   120
+  ],
+  "borderRadius": [
+   6,
+   8,
+   10,
+   12,
+   15,
+   16,
+   18,
+   24,
+   28,
+   40,
+   48,
+   50,
+   137.6,
+   999
+  ],
+  "shadows": [
+   "rgba(40, 14, 89, 0.12) 0px 20px 40px 0px",
+   "rgba(40, 14, 89, 0.1) 0px 8px 40px 0px",
+   "rgba(40, 14, 89, 0.1) 0px 8px 24px 0px",
+   "rgba(8, 66, 187, 0.7) 0px 0px 8px 0px",
+   "rgba(0, 0, 0, 0.1) 0px 8px 32px 0px, rgba(255, 255, 255, 0.5) 0px 1px 0px 0px inset, rgba(255, 255, 255, 0.1) 0px -1px 0px 0px inset, rgba(255, 255, 255, 0.1) 0px 0px 2px 1px inset",
+   "rgba(0, 0, 0, 0.25) 0px 20px 60px 0px",
+   "rgba(0, 0, 0, 0.2) 0px 6px 20px 0px"
+  ],
+  "gradients": [
+   "linear-gradient(rgba(0, 0, 0, 0) 35%, rgb(40, 110, 255) 100%)",
+   "linear-gradient(rgba(0, 0, 0, 0) 35%, rgb(40, 14, 89) 100%)",
+   "linear-gradient(rgba(0, 0, 0, 0) 35%, rgb(255, 75, 30) 100%)",
+   "linear-gradient(rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.18) 100%)"
+  ],
+  "components": {
+   "buttons": [
+    {
+     "text": "",
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(0, 0, 0)",
+     "radius": "0px",
+     "padding": "5px",
+     "fontSize": "13.3333px",
+     "fontWeight": "400",
+     "border": "0px none rgb(0, 0, 0)",
+     "backgroundImage": "none"
+    },
+    {
+     "text": "Solicitar Demonstração Gratuita",
+     "bg": "rgb(255, 75, 30)",
+     "color": "rgb(255, 255, 255)",
+     "radius": "999px",
+     "padding": "15.2px 24px",
+     "fontSize": "16px",
+     "fontWeight": "700",
+     "border": "0px none rgb(255, 255, 255)",
+     "backgroundImage": "none"
+    },
+    {
+     "text": "Gestão completa",
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(40, 14, 89)",
+     "radius": "0px",
+     "padding": "19.2px",
+     "fontSize": "16px",
+     "fontWeight": "700",
+     "border": "0px none rgb(40, 14, 89)",
+     "backgroundImage": "none"
+    },
+    {
+     "text": "Tenha controle de custo",
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(40, 14, 89)",
+     "radius": "0px",
+     "padding": "19.2px",
+     "fontSize": "16px",
+     "fontWeight": "700",
+     "border": "0px none rgb(40, 14, 89)",
+     "backgroundImage": "none"
+    },
+    {
+     "text": "Decisões com dados, sem achismo",
+     "bg": "rgba(0, 0, 0, 0)",
+     "color": "rgb(40, 14, 89)",
+     "radius": "0px",
+     "padding": "19.2px",
+     "fontSize": "16px",
+     "fontWeight": "700",
+     "border": "0px none rgb(40, 14, 89)",
+     "backgroundImage": "none"
+    },
+    {
+     "text": "Agende a sua demonstração",
+     "bg": "rgb(40, 110, 255)",
+     "color": "rgb(255, 255, 255)",
+     "radius": "999px",
+     "padding": "16px 32px",
+     "fontSize": "19.2px",
+     "fontWeight": "600",
+     "border": "4px solid rgb(197, 216, 255)",
+     "backgroundImage": "none"
+    }
+   ]
+  }
+ },
+ "pass2": {
+  "accents": [
+   {
+    "hex": "#FF4B1E",
+    "selector": ":root"
+   },
+   {
+    "hex": "#FF4B1E",
+    "selector": ":root"
+   }
+  ],
+  "accentRules": [
+   ".nh2-blog__badge[data-astro-cid-gje3lje5] { display: flex; align-items: center; justify-content: center; width: fit-content; min-height: 1.3rem; paddi",
+   ".nh2-blog__title[data-astro-cid-gje3lje5] { font-family: Iquost, sans-serif; font-size: clamp(1.9rem, 3.2vw, 2.8rem); font-weight: 800; line-height: 1",
+   ".nh2-blog__featured-cta[data-astro-cid-gje3lje5] { font-size: 0.85rem; font-weight: 600; color: rgb(255, 255, 255); text-decoration: underline; text-u",
+   ".nh2-blog__item-title[data-astro-cid-gje3lje5] { font-size: 1.05rem; font-weight: 600; color: var(--nh-primary, #280e59); line-height: 1.3; margin: 0p",
+   ".nh-faq__tag[data-astro-cid-ur7olsa2] { display: inline-flex; align-items: center; justify-content: center; min-height: 1.3rem; padding: 0.25rem 1.75r",
+   ".nh-faq__title[data-astro-cid-ur7olsa2] { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: var(--nh-primary); margin-bottom: 0.75rem; lin",
+   ".nh-faq__badge--red[data-astro-cid-ur7olsa2] { background: var(--nh-accent); color: rgb(255, 255, 255); }",
+   ".nh-faq__badge--dark[data-astro-cid-ur7olsa2] { background: var(--nh-primary); color: rgb(255, 255, 255); }",
+   "body.is-collapsed .nh-header__nav[data-astro-cid-jenwdu5u], body.is-collapsed .nh-header__cta[data-astro-cid-jenwdu5u] { display: none; }",
+   "@media (max-width: 1024px) {\n  .nh-header__nav[data-astro-cid-jenwdu5u], .nh-header__cta[data-astro-cid-jenwdu5u] { display: none; }\n  .nh-header__ham",
+   ".nh-header__nav-link[data-astro-cid-jenwdu5u] { display: flex; align-items: center; gap: 0.3rem; color: var(--nh-primary); text-decoration: none; font",
+   ".nh-header__nav-chevron[data-astro-cid-jenwdu5u] { transition: transform 0.25s; flex-shrink: 0; color: var(--nh-primary); opacity: 0.6; }",
+   ".nh-header__cta-login[data-astro-cid-jenwdu5u] { display: flex; align-items: center; gap: 8px; background-color: transparent; color: var(--nh-header-b",
+   ".nh-header__cta-login[data-astro-cid-jenwdu5u]:hover { border-color: var(--nh-header-blue); background-color: rgba(8, 66, 187, 0.05); }",
+   ".nh-header__cta-login-icon[data-astro-cid-jenwdu5u] { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 32px; height"
+  ],
+  "allHex": [
+   "#F7F4EE",
+   "#280E59",
+   "#0842BB",
+   "#06318C",
+   "#FAF5EB",
+   "#286EFF",
+   "#FF4B1E",
+   "#F0EBE2",
+   "#406EFF"
+  ]
+ }
+}
