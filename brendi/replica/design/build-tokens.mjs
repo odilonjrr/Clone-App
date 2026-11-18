@@ -5,7 +5,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const t = JSON.parse(fs.readFileSync(path.join(here, "tokens.json"), "utf8"));
 const px = (n) => `${n / 16}rem`;
 const lines = [];
-for (const [k, v] of Object.entries(t.color)) lines.push(`  --${k}: ${v};`);
+const colorVars = (c) => Object.entries(c).map(([k, v]) => `  --${k}: ${v};`).join("\n");
+for (const [k, v] of Object.entries(t.gradient ?? {})) lines.push(`  --gradient-${k}: ${v};`);
+for (const [k, v] of Object.entries(t.glass ?? {})) lines.push(`  --glass-${k}: ${v};`);
 for (const [k, v] of Object.entries(t.type)) {
   lines.push(`  --type-${k}-size: ${px(v.size)};`, `  --type-${k}-line: ${px(v.line)};`, `  --type-${k}-weight: ${v.weight};`);
 }
@@ -15,12 +17,24 @@ for (const [k, v] of Object.entries(t.shadow)) lines.push(`  --shadow-${k}: ${v}
 lines.push(`  --ring-width: ${t.ring.width}px;`, `  --ring-color: var(--${t.ring.color});`);
 for (const [k, v] of Object.entries(t.motion)) lines.push(`  --motion-${k}: ${v};`);
 for (const [k, v] of Object.entries(t.layout)) if (typeof v === "number") lines.push(`  --layout-${k}: ${v}px;`);
-lines.push(`  --font-display: ${t.font.display};`, `  --font-sans: ${t.font.sans};`, `  --font-mono: ${t.font.mono};`);
+lines.push(`  --font-display: ${t.font.display};`, `  --font-sans: ${t.font.sans};`, `  --font-script: ${t.font.script};`, `  --font-mono: ${t.font.mono};`);
 fs.writeFileSync(path.join(here, "tokens.css"),
-`/* Delisys — gerado por build-tokens.mjs a partir de tokens.json. Não edite à mão. */
+`/* Delisys — gerado por build-tokens.mjs a partir de tokens.json. Não edite à mão.
+   Padrão: tema escuro (cardápio do cliente, marketing).
+   data-theme="light": tema claro (painel do restaurante). */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+${colorVars(t.color)}
 ${lines.join("\n")}
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+${colorVars(t.color_light)}
+  --shadow-card: 0 8px 24px rgba(26,21,18,.08);
+  --shadow-pop: 0 16px 40px rgba(26,21,18,.18);
+  --glass-bg: rgba(255,255,255,.8);
+  --glass-border: rgba(26,21,18,.08);
 }
 `);
 // Tailwind v4: bg-surface, text-muted, bg-secondary, text-on-accent, rounded-xl, shadow-card, font-display
@@ -30,7 +44,7 @@ const theme = [
   ...Object.entries(t.type).flatMap(([k]) => [`  --text-${k}: var(--type-${k}-size);`, `  --text-${k}--line-height: var(--type-${k}-line);`]),
   ...Object.keys(t.radius).map((k) => `  --radius-${k}: var(--radius-${k});`),
   ...Object.keys(t.shadow).map((k) => `  --shadow-${k}: var(--shadow-${k});`),
-  `  --font-display: var(--font-display);`, `  --font-sans: var(--font-sans);`,
+  `  --font-display: var(--font-display);`, `  --font-sans: var(--font-sans);`, `  --font-script: var(--font-script);`,
   ...Object.entries(t.layout.breakpoints).map(([k, v]) => `  --breakpoint-${k}: ${px(v)};`),
   `  --spacing: 0.25rem; /* base 4px: p-4 = 16px */`,
 ];

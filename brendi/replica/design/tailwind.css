@@ -4,6 +4,7 @@
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-surface-sunken: var(--surface-sunken);
   --color-surface-dark: var(--surface-dark);
   --color-border: var(--border);
@@ -13,16 +14,23 @@
   --color-on-dark: var(--on-dark);
   --color-on-dark-muted: var(--on-dark-muted);
   --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-bright: var(--accent-bright);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-secondary: var(--secondary);
   --color-secondary-strong: var(--secondary-strong);
   --color-secondary-bright: var(--secondary-bright);
   --color-secondary-soft: var(--secondary-soft);
   --color-on-secondary: var(--on-secondary);
-  --color-accent: var(--accent);
-  --color-accent-strong: var(--accent-strong);
-  --color-on-accent: var(--on-accent);
+  --color-highlight: var(--highlight);
+  --color-add: var(--add);
+  --color-on-add: var(--on-add);
   --color-link: var(--link);
   --color-danger: var(--danger);
+  --color-danger-solid: var(--danger-solid);
+  --color-on-danger: var(--on-danger);
   --color-danger-soft: var(--danger-soft);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
@@ -68,8 +76,10 @@
   --shadow-card: var(--shadow-card);
   --shadow-pop: var(--shadow-pop);
   --shadow-glow: var(--shadow-glow);
+  --shadow-glow-success: var(--shadow-glow-success);
   --font-display: var(--font-display);
   --font-sans: var(--font-sans);
+  --font-script: var(--font-script);
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;

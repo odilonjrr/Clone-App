@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Delisys · Cardápio (prévia)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&family=Satisfy&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<!-- Ícones de comida: Twemoji (CC-BY 4.0, Twitter/X e colaboradores). Ícones de interface: desenho no estilo Lucide (ISC). -->
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--gradient-page), var(--bg);
+    color: var(--text); font-family: var(--font-sans);
+    font-size: var(--type-sm-size); line-height: var(--type-sm-line);
+    max-width: 430px; margin: 0 auto; min-height: 100vh;
+    padding-bottom: calc(var(--layout-bottom-nav) + 88px + env(safe-area-inset-bottom));
+  }
+  svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .glass { background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-highlight);
+           -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+  .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--radius-pill);
+              background: transparent; border: 0; color: var(--text); cursor: pointer; position: relative; }
+  .icon-btn:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
+  .dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger-solid); box-shadow: 0 0 0 2px var(--bg); }
+  .px { padding-inline: 16px; }
+
+  /* topo */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 0; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 12px; background: var(--gradient-accent); display: grid; place-items: center; box-shadow: var(--shadow-glow); }
+  .brand-mark svg { width: 20px; height: 20px; stroke: #fff; }
+  .brand-name { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1; letter-spacing: -.01em; }
+  .brand-name b { color: var(--accent-bright); font-weight: 800; }
+  .brand-sub { font-size: 10px; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+
+  /* loja */
+  .store { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+  .store-logo { width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #FFB547, #E2560C 70%); display: grid; place-items: center;
+                box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent), var(--shadow-glow); flex: none; }
+  .store-logo img { width: 34px; height: 34px; }
+  .store h1 { font-family: var(--font-display); font-size: 20px; line-height: 26px; font-weight: 700; }
+  .open { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--success); font-weight: 600; }
+  .open::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: var(--shadow-glow-success); }
+  .loc { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 500; }
+  .loc svg { width: 16px; height: 16px; color: var(--highlight); }
+  .loc .chev { width: 14px; height: 14px; color: var(--text-muted); }
+  .facts { display: flex; gap: 8px; margin-top: 14px; }
+  .fact { flex: 1; border-radius: var(--radius-md); padding: 8px 10px; }
+  .fact small { display: block; font-size: 11px; color: var(--text-muted); }
+  .fact strong { font-size: 13px; font-weight: 600; }
+  .fact.cash strong { color: var(--success); }
+
+  /* busca */
+  .search { margin-top: 14px; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 8px 0 16px; border-radius: var(--radius-pill); }
+  .search input { flex: 1; background: none; border: 0; color: var(--text); font: inherit; font-size: 14px; outline: none; }
+  .search input::placeholder { color: var(--text-muted); }
+  .search svg { color: var(--text-muted); }
+
+  /* categorias */
+  .cats { display: flex; gap: 10px; overflow-x: auto; padding: 16px 16px 4px; scrollbar-width: none; }
+  .cat { flex: none; width: 72px; height: 76px; border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+         font-size: 11px; font-weight: 600; color: var(--text); cursor: pointer; }
+  .cat img { width: 30px; height: 30px; }
+  .cat[aria-selected="true"] { background: var(--gradient-accent); border-color: transparent; box-shadow: var(--shadow-glow); }
+
+  /* banner */
+  .promo { position: relative; margin: 14px 16px 0; height: 156px; border-radius: var(--radius-lg); overflow: hidden; background: var(--gradient-promo);
+           border: 1px solid rgba(255,138,61,.35); box-shadow: var(--shadow-card); padding: 16px 18px; }
+  .promo .script { font-family: var(--font-script); font-size: 26px; line-height: 1; color: #fff; }
+  .promo .big { font-family: var(--font-display); font-weight: 800; font-size: 30px; line-height: 1.05; color: var(--highlight); text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+  .promo p { margin-top: 6px; font-size: 12px; line-height: 16px; color: #FFE9DA; font-weight: 500; max-width: 170px; }
+  .promo .art { position: absolute; right: 8px; bottom: -10px; width: 140px; height: 140px; filter: drop-shadow(0 10px 18px rgba(0,0,0,.5)); }
+  .promo .off { position: absolute; right: 12px; top: 10px; width: 64px; height: 64px; border-radius: 50%; background: var(--danger-solid); color: var(--on-danger);
+                display: grid; place-items: center; text-align: center; font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 18px;
+                box-shadow: 0 0 0 3px rgba(255,255,255,.15), 0 6px 16px rgba(0,0,0,.4); transform: rotate(-8deg); }
+  .promo .off small { display: block; font-size: 9px; font-weight: 600; line-height: 11px; }
+  .dots { display: flex; gap: 5px; justify-content: center; margin-top: 8px; }
+  .dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--border); }
+  .dots i.on { width: 18px; background: var(--accent-bright); }
+
+  /* seção */
+  .sec { display: flex; align-items: center; justify-content: space-between; margin: 20px 16px 10px; }
+  .sec h2 { font-family: var(--font-display); font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .sec h2 img { width: 20px; height: 20px; }
+  .sec a { color: var(--link); font-weight: 600; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
+  .sec a svg { width: 16px; height: 16px; }
+
+  /* produtos */
+  .row { display: flex; gap: 10px; overflow-x: auto; padding: 0 16px 4px; scrollbar-width: none; }
+  .card { flex: none; width: 128px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); }
+  .card .ph { position: relative; height: 96px; display: grid; place-items: center; background: radial-gradient(circle at 50% 70%, #5A2810 0%, #241D18 70%); }
+  .card .ph img { width: 70px; height: 70px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+  .fav { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.35); color: #fff; border: 0; }
+  .fav svg { width: 15px; height: 15px; }
+  .card .body { padding: 8px 10px 10px; }
+  .card h3 { font-size: 13px; line-height: 17px; font-weight: 600; min-height: 34px; }
+  .rate { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .rate svg { width: 12px; height: 12px; fill: var(--highlight); stroke: var(--highlight); }
+  .rate b { color: var(--text); font-weight: 600; }
+  .buy { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+  .price { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+  .add { width: 30px; height: 30px; border-radius: 9px; background: var(--add); color: var(--on-add); border: 0; display: grid; place-items: center; cursor: pointer;
+         box-shadow: 0 0 12px rgba(245,184,46,.35); }
+  .add svg { width: 18px; height: 18px; stroke-width: 2.6; }
+
+  /* pedido ao vivo */
+  .live { margin: 18px 16px 0; border-radius: var(--radius-lg); padding: 14px; background: var(--gradient-live); border: 1px solid rgba(43,212,107,.35);
+          box-shadow: 0 0 24px rgba(43,212,107,.12), var(--shadow-card); display: grid; grid-template-columns: 1fr 104px; gap: 10px; }
+  .live h3 { font-family: var(--font-display); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .live h3 img { width: 20px; height: 20px; }
+  .live p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .steps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 12px; position: relative; }
+  .steps::before { content: ""; position: absolute; top: 10px; left: 12%; right: 12%; height: 3px; background: linear-gradient(90deg, var(--success) 70%, rgba(43,212,107,.25) 70%); border-radius: 2px; }
+  .steps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 9.5px; line-height: 12px; color: var(--text-muted); text-align: center; }
+  .steps .b { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--success); color: #062012; box-shadow: var(--shadow-glow-success); }
+  .steps .b svg { width: 13px; height: 13px; stroke-width: 3.2; }
+  .steps li.now .b { background: var(--success-soft); color: var(--success); border: 2px solid var(--success); }
+  .steps li.done, .steps li.now { color: var(--text); font-weight: 600; }
+  .map { position: relative; border-radius: var(--radius-md); overflow: hidden; background:
+           linear-gradient(0deg, transparent 47%, rgba(255,255,255,.07) 47% 53%, transparent 53%) 0 0/34px 34px,
+           linear-gradient(90deg, transparent 47%, rgba(255,255,255,.07) 47% 53%, transparent 53%) 0 0/34px 34px, #16201B; }
+  .map svg.route { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .eta { position: absolute; left: 6px; right: 6px; bottom: 6px; background: #fff; color: #0F0C0A; border-radius: 8px; padding: 4px 6px; text-align: center; font-size: 9.5px; line-height: 12px; }
+  .eta b { display: block; font-family: var(--font-display); font-size: 15px; line-height: 18px; }
+
+  /* barra da sacola */
+  .bagbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--layout-bottom-nav) + 10px + env(safe-area-inset-bottom)); width: min(398px, calc(100% - 32px));
+            border-radius: var(--radius-pill); padding: 6px 6px 6px 16px; display: flex; align-items: center; gap: 10px; background: var(--gradient-cta-strip); color: #2A1308; box-shadow: var(--shadow-pop); }
+  .bagbar .cb { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12.5px; line-height: 15px; flex: 1; min-width: 0; white-space: nowrap; }
+  .bagbar .cb svg { width: 26px; height: 26px; color: #C2410C; stroke-width: 2.2; }
+  .bagbar .sep { width: 1px; height: 30px; background: rgba(42,19,8,.18); }
+  .cta { border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 18px; border-radius: var(--radius-pill);
+         background: var(--gradient-accent); color: var(--on-accent); font-family: var(--font-display); font-weight: 700; font-size: 19px; box-shadow: var(--shadow-glow); white-space: nowrap; flex: none; }
+  .cta small { font-family: var(--font-sans); font-size: 13px; font-weight: 600; }
+  .cta svg { width: 20px; height: 20px; }
+
+  /* navegação inferior */
+  .nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: min(430px, 100%); height: calc(var(--layout-bottom-nav) + env(safe-area-inset-bottom));
+         padding: 6px 8px env(safe-area-inset-bottom); display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: rgba(15,12,10,.92); border-top: 1px solid var(--glass-border);
+         -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+  .nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: var(--radius-md); color: var(--text-muted);
+           font-size: 11px; font-weight: 500; text-decoration: none; position: relative; }
+  .nav a[aria-current="page"] { color: var(--accent-bright); background: var(--accent-soft); font-weight: 700; }
+  .nav .count { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--danger-solid); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; }
+  @media (prefers-reduced-motion: no-preference) { .cta, .add, .cat { transition: transform var(--motion-fast) var(--motion-ease); } .cta:active, .add:active, .cat:active { transform: scale(.97); } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></symbol>
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1Z"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+  <symbol id="receipt" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6M16 12h-6M13 16h-3"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+  <symbol id="bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="coins" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18M7 6h1v4M16.71 13.88l.7.71-2.82 2.82"/></symbol>
+</svg>
+
+<header class="topbar">
+  <button class="icon-btn" aria-label="Abrir menu"><svg class="i"><use href="#menu"/></svg></button>
+  <div class="brand" aria-label="Delisys">
+    <span class="brand-mark"><svg class="i"><use href="#bag"/></svg></span>
+    <div><div class="brand-name">Deli<b>sys</b></div><div class="brand-sub">Peça direto da loja</div></div>
+  </div>
+  <button class="icon-btn" aria-label="Notificações, 1 nova"><svg class="i"><use href="#bell"/></svg><span class="dot"></span></button>
+</header>
+
+<main>
+  <section class="px">
+    <div class="store">
+      <div class="store-logo"><img src="twemoji/1f354.svg" alt=""></div>
+      <div>
+        <span class="open">Aberto até 23:00</span>
+        <h1>Brasa &amp; Pão Burgers</h1>
+        <button class="loc glass" aria-label="Endereço de entrega: Vila Mariana, São Paulo. Trocar">
+          <svg class="i"><use href="#pin"/></svg> Vila Mariana, São Paulo <svg class="i chev"><use href="#chev"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="fact glass"><small>Entrega</small><strong>25–40 min</strong></div>
+      <div class="fact glass"><small>Pedido mínimo</small><strong>R$ 20,00</strong></div>
+      <div class="fact glass cash"><small>Cashback</small><strong>5% de volta</strong></div>
+    </div>
+    <label class="search glass">
+      <svg class="i"><use href="#search"/></svg>
+      <input type="search" placeholder="Buscar lanche, pizza ou bebida" aria-label="Buscar no cardápio">
+      <button class="icon-btn" aria-label="Buscar por voz"><svg class="i"><use href="#mic"/></svg></button>
+    </label>
+  </section>
+
+  <nav class="cats" role="tablist" aria-label="Categorias">
+    <button class="cat glass" role="tab" aria-selected="true"><img src="twemoji/1f354.svg" alt="">Lanches</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="twemoji/1f355.svg" alt="">Pizzas</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="twemoji/1f35f.svg" alt="">Porções</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="twemoji/1f371.svg" alt="">Marmitas</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="twemoji/1f9c1.svg" alt="">Doces</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="twemoji/1f964.svg" alt="">Bebidas</button>
+  </nav>
+
+  <article class="promo" aria-label="Promoção: combo Smash em dobro, até 30% de desconto">
+    <div class="script">Combo da casa</div>
+    <div class="big">Smash<br>em dobro</div>
+    <p>2 smashs + fritas + refri por R$ 49,90</p>
+    <img class="art" src="twemoji/1f354.svg" alt="">
+    <div class="off"><span><small>até</small>30%<small>OFF</small></span></div>
+  </article>
+  <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+
+  <div class="sec">
+    <h2><img src="twemoji/1f525.svg" alt="">Mais pedidos</h2>
+    <a href="#">Ver tudo <svg class="i"><use href="#arrow"/></svg></a>
+  </div>
+  <div class="row">
+    <div class="card glass">
+      <div class="ph"><img src="twemoji/1f354.svg" alt=""><button class="fav" aria-label="Favoritar Smash Clássico"><svg class="i"><use href="#heart"/></svg></button></div>
+      <div class="body"><h3>Smash Clássico</h3>
+        <div class="rate"><svg class="i"><use href="#star"/></svg><b>4,8</b> (1,2 mil)</div>
+        <div class="buy"><span class="price">R$ 29,90</span><button class="add" aria-label="Adicionar Smash Clássico"><svg class="i"><use href="#plus"/></svg></button></div></div>
+    </div>
+    <div class="card glass">
+      <div class="ph"><img src="twemoji/1f355.svg" alt=""><button class="fav" aria-label="Favoritar Pizza Calabresa"><svg class="i"><use href="#heart"/></svg></button></div>
+      <div class="body"><h3>Pizza Calabresa da Casa</h3>
+        <div class="rate"><svg class="i"><use href="#star"/></svg><b>4,7</b> (860)</div>
+        <div class="buy"><span class="price">R$ 54,90</span><button class="add" aria-label="Adicionar Pizza Calabresa"><svg class="i"><use href="#plus"/></svg></button></div></div>
+    </div>
+    <div class="card glass">
+      <div class="ph"><img src="twemoji/1f35f.svg" alt=""><button class="fav" aria-label="Favoritar Batata Rústica"><svg class="i"><use href="#heart"/></svg></button></div>
+      <div class="body"><h3>Batata Rústica com Cheddar</h3>
+        <div class="rate"><svg class="i"><use href="#star"/></svg><b>4,9</b> (2,1 mil)</div>
+        <div class="buy"><span class="price">R$ 22,90</span><button class="add" aria-label="Adicionar Batata Rústica"><svg class="i"><use href="#plus"/></svg></button></div></div>
+    </div>
+  </div>
+
+  <section class="live" aria-label="Pedido em andamento">
+    <div>
+      <h3><img src="twemoji/1f6f5.svg" alt="">Pedido #1042 a caminho</h3>
+      <p>O entregador saiu agora há pouco.</p>
+      <ol class="steps">
+        <li class="done"><span class="b"><svg class="i"><use href="#check"/></svg></span>Recebido</li>
+        <li class="done"><span class="b"><svg class="i"><use href="#check"/></svg></span>Preparado</li>
+        <li class="done"><span class="b"><svg class="i"><use href="#check"/></svg></span>Saiu</li>
+        <li class="now" aria-current="step"><span class="b"><img src="twemoji/1f6f5.svg" alt="" style="width:13px;height:13px"></span>Chegando</li>
+      </ol>
+    </div>
+    <div class="map" aria-hidden="true">
+      <svg class="route" viewBox="0 0 104 110"><path d="M14 92 C 30 70, 40 80, 52 58 S 78 40, 86 22" fill="none" stroke="#2BD46B" stroke-width="3" stroke-linecap="round" style="filter: drop-shadow(0 0 4px #2BD46B)"/>
+        <circle cx="14" cy="92" r="5" fill="#FFB547"/><path d="M86 8c-5 0-8 3.5-8 7.5C78 21 86 27 86 27s8-6 8-11.5C94 11.5 91 8 86 8Z" fill="#FF6B5E"/><circle cx="86" cy="15.5" r="2.6" fill="#16201B"/></svg>
+      <div class="eta">Chega em<b>12 min</b></div>
+    </div>
+  </section>
+</main>
+
+<div class="bagbar" role="region" aria-label="Sacola">
+  <div class="cb"><svg class="i"><use href="#coins"/></svg><span>+R$ 2,99<br>cashback</span></div>
+  <span class="sep" aria-hidden="true"></span>
+  <button class="cta">Ver sacola <small>R$ 59,80</small><svg class="i"><use href="#arrow"/></svg></button>
+</div>
+
+<nav class="nav" aria-label="Navegação principal">
+  <a href="#" aria-current="page"><svg class="i"><use href="#home"/></svg>Início</a>
+  <a href="#"><svg class="i"><use href="#utensils"/></svg>Cardápio</a>
+  <a href="#"><svg class="i"><use href="#receipt"/></svg>Pedidos<span class="count" aria-label="1 pedido em andamento">1</span></a>
+  <a href="#"><svg class="i"><use href="#heart"/></svg>Favoritos</a>
+  <a href="#"><svg class="i"><use href="#user"/></svg>Perfil</a>
+</nav>
+</body>
+</html>

@@ -1,5 +1,87 @@
 # Delisys: especificação de componentes
 
+> **v2 (2026-11-18):** pele trocada para o tema escuro "delivery noturno" da
+> imagem de referência enviada pelo usuário:
+> - laranja com brilho;
+> - cartões de vidro translúcido;
+> - chips de categoria com ícone;
+> - banner promocional;
+> - cartão de pedido ao vivo;
+> - barra inferior.
+>
+> A estrutura da v1 continua valendo (papéis, escala, espaçamentos, pílulas). Onde
+> um bloco abaixo cita uma cor, vale o **papel** (`secondary`, `accent`...), que
+> agora aponta para os valores do tema escuro.
+>
+> **Temas:**
+> - escuro é o padrão (cardápio do cliente e marketing);
+> - `data-theme="light"` vale para o painel do restaurante.
+>
+> **Prévia:** `mockups/cardapio-cliente.html` e `mockups/cardapio-cliente.png`.
+>
+> **Regra do laranja:** branco sobre `accent` só em texto grande (≥ 19px em negrito, 3:1).
+> Texto pequeno sobre laranja usa `accent-strong`. O botão "+" usa `add` (amarelo) com ícone escuro.
+
+## Novos na v2
+
+```
+Glass card (cartão de vidro)
+  fundo --glass-bg, borda 1px --glass-border, brilho interno --glass-highlight, blur 16px, radius lg (20)
+  sem suporte a backdrop-filter: fundo surface-raised sólido (mesmo contraste)
+  usado em   fatos da loja, busca, chips de categoria, cards de produto
+```
+
+```
+Category chip (categoria com ícone)
+  72×76, radius lg, ícone 30px + rótulo 11/600; ativo: --gradient-accent + --shadow-glow
+  role="tab" dentro de role="tablist"; setas trocam; rola na horizontal sem barra
+  usado em   S01
+```
+
+```
+Promo banner
+  156px, radius lg, --gradient-promo, borda 1px laranja translúcida
+  título em duas fontes: script (Satisfy) branca + display 800 na cor highlight
+  arte à direita saindo da borda; selo circular danger-solid girado -8° ("até 30% OFF")
+  carrossel com pontos (ativo = barra 18px accent-bright); pausa ao tocar; aria-roledescription="carrossel"
+  usado em   S01
+```
+
+```
+Product tile (cartão de produto em carrossel)
+  128px de largura, foto 96px sobre degradê radial quente, botão favoritar (coração) no canto
+  nome 13/600 (2 linhas), nota com estrela highlight, preço display 15/700, botão "+" 30px add/on-add com brilho
+  usado em   S01 "Mais pedidos", S06 "Peça também"
+```
+
+```
+Live order card (pedido ao vivo)
+  --gradient-live, borda verde translúcida, brilho success; à esquerda título + 4 etapas
+  (concluída = círculo success com check e brilho; atual = anel success; linha de progresso);
+  à direita minimapa com rota e etiqueta branca "Chega em 12 min"
+  aparece no topo do cardápio enquanto houver pedido do cliente em andamento; leva à S11
+  a11y       <ol> com aria-current="step"; a etiqueta de tempo é texto, não imagem
+  usado em   S01, S11
+```
+
+```
+Bag bar (barra da sacola)
+  pílula flutuante acima da navegação: lado esquerdo claro (--gradient-cta-strip) com cashback a ganhar,
+  divisória, botão CTA "Ver sacola · R$ total" (display 19/700, gradiente laranja, brilho)
+  some quando a sacola está vazia
+  usado em   S01, S02
+```
+
+```
+Bottom nav
+  72px + área segura, fundo escuro translúcido com blur, 5 destinos (Início, Cardápio, Pedidos, Favoritos, Perfil)
+  ativo: fundo accent-soft, ícone e rótulo accent-bright; contador danger-solid em Pedidos
+  <nav> com aria-current="page"
+  usado em   cliente (todas as telas do cardápio)
+```
+
+---
+
 **Fontes:**
 - Tokens: `tokens.json`.
 - Padrões visuais medidos em saipos.com (2026-11-18).
@@ -208,4 +290,6 @@ Floating bar (cardápio)
 - O logo da Saipos (raposa), as ilustrações de traço azul (bicicleta, mão), as fotos e os mockups de produto.
 - A fonte Iquost. O Delisys usa **Outfit** nos títulos (licença OFL).
 - Os textos da Saipos e da Brendi. Todo rótulo e toda mensagem são escritos do zero.
-- A combinação roxo-escuro + azul royal + laranja sobre creme. O Delisys usa verde-petróleo + teal + mostarda sobre creme claro.
+- A combinação roxo-escuro + azul royal + laranja sobre creme da Saipos.
+- O nome, o logo, as fotos e o mockup da imagem de referência ("FoodHub"). Do mockup, só o estilo visual foi aproveitado.
+- Ícones de comida na prévia: Twemoji (CC-BY 4.0, crédito obrigatório). No produto, usar fotos reais de cada restaurante.
