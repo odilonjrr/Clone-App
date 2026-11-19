@@ -56,7 +56,6 @@ export function priceItem(product: MenuProduct, item: CartItemInput): { line?: P
     unit += gp;
     for (const o of valid)
       opts.push({ groupName: g.name, name: o.name, priceCents: g.pricing === "max" ? 0 : o.price_cents });
-    if (g.pricing === "max" && valid.length) opts.push({ groupName: g.name, name: `Preço pelo sabor mais caro`, priceCents: gp });
   }
   if (errors.length) return { errors };
   return {
