@@ -51,6 +51,7 @@ export function SignupForm({ needsCode }: { needsCode: boolean }) {
         <span>Começar com um cardápio de exemplo (lanches, pizza meio a meio, bairros e um motoboy). Dá para editar ou apagar depois.</span>
       </label>
       {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+      <p className="text-xs text-muted">Ao criar a loja você declara ter lido a <a className="underline" href="/privacidade" target="_blank">Política de privacidade</a>. Sua loja será a controladora dos dados dos seus clientes.</p>
       <button className="btn btn-primary" disabled={busy}>{busy ? "Criando…" : "Criar loja"}</button>
       <p className="text-sm text-muted">Já tem conta? <Link className="font-semibold text-accent underline" href="/painel/entrar">Entrar</Link></p>
     </form>

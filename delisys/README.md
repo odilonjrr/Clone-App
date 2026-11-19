@@ -41,9 +41,25 @@ npm run typecheck
 Veja [docs/colocar-no-ar.md](docs/colocar-no-ar.md): Vercel + Neon, em uns 15 minutos.
 Os modelos de mensagem do WhatsApp estão em [docs/whatsapp-modelos.md](docs/whatsapp-modelos.md).
 
+## Segurança e privacidade
+
+- **Senhas e sessões:**
+  - senhas com scrypt; sessão em cookie `httpOnly` + `SameSite=Lax` + `Secure`, guardada só como hash;
+  - recuperação de senha por link de uso único (30 min), que encerra as sessões abertas.
+- **Limite de tentativas no Postgres** (vale para todas as instâncias), guardando só o hash do IP ou do e-mail:
+  - login: 10 por IP e 8 por conta a cada 15 min;
+  - criação de loja, pedidos, Pix e recuperação de senha também têm limite.
+- **Isolamento:** cada loja só acessa os próprios dados; o motoboy só vê os pedidos dele; o cliente só vê o próprio pedido (links com códigos aleatórios de 144 bits).
+- **Cabeçalhos:**
+  - CSP com nonce por requisição (scripts só do próprio app);
+  - HSTS, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (só localização);
+  - `Cache-Control: no-store` em rotas com dados pessoais.
+- **LGPD:** política em `/privacidade`; limpeza diária (`/api/cron/limpeza`) apaga localização do motoboy, tentativas, sessões e links vencidos nos prazos da política.
+- **Testes:** `tests/e2e/seguranca.spec.ts` cobre cabeçalhos/CSP, recuperação de senha, não revelar e-mails cadastrados e o limite por conta.
+
 ## Ainda não tem
 
 - Horários de funcionamento automáticos. Hoje a loja abre e fecha por um botão no painel.
 - Login do cliente por código, cashback, cupons, recuperador de clientes, relatórios, impressão automática da comanda e upload de foto (hoje a foto é um link).
-- Limite de tentativas guardado no banco. O limite atual fica na memória do servidor, o que é só um freio leve em servidor sem estado.
+- Ferramenta no painel para exportar ou apagar os dados de um cliente a pedido dele (LGPD). Hoje é feito por solicitação ao suporte.
 - Asaas testado de verdade contra o sandbox.

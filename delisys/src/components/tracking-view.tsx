@@ -160,6 +160,7 @@ export function TrackingView({ token, initial }: { token: string; initial: Track
         {t.store?.whatsapp && <a className="btn btn-outline" href={`https://wa.me/${t.store.whatsapp}?text=${encodeURIComponent(`Olá! Sobre o pedido #${t.number}:`)}`} target="_blank" rel="noreferrer"><MessageCircle className="size-4" aria-hidden />Falar com a loja</a>}
         {t.store && <Link className="btn btn-outline" href={`/${t.store.slug}`}>Ver o cardápio</Link>}
       </div>
+      <p className="mt-8 text-xs text-muted">Este link é pessoal: quem o tiver vê os dados deste pedido. Não repasse. <a className="underline" href="/privacidade">Política de privacidade</a></p>
     </main>
   );
 }

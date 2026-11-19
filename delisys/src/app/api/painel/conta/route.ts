@@ -3,7 +3,8 @@ import { z } from "zod";
 import { HttpError, startSession } from "@/lib/auth";
 import { one } from "@/lib/db";
 import { createStoreWithOwner } from "@/lib/demo";
-import { clientIp, handle, rateLimit } from "@/lib/http";
+import { clientIp, handle} from "@/lib/http";
+import { rateLimit } from "@/lib/rate-limit";
 import { normalizeBrPhone } from "@/lib/phone";
 
 const Body = z.object({
@@ -18,7 +19,7 @@ const Body = z.object({
 });
 
 export const POST = handle(async (req: Request) => {
-  rateLimit(`signup:${clientIp(req)}`, 5, 10 * 60_000);
+  await rateLimit(`signup:${clientIp(req)}`, 5, 600);
   const b = Body.parse(await req.json());
   if (process.env.SETUP_CODE && b.setupCode !== process.env.SETUP_CODE)
     throw new HttpError(403, "Código de criação inválido. Peça o código a quem administra o Delisys.");

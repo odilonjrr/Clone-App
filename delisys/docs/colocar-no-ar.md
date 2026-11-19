@@ -15,6 +15,8 @@ nunca no chat nem no código.
    - **Environment Variables**: adicione
      - `PAYMENT_PROVIDER` = `mock` (Pix de teste, nada é cobrado);
      - `SETUP_CODE` = um código só seu, por exemplo `minha-loja-2026`. Ele é pedido para criar a primeira loja e impede que um estranho crie uma loja no seu app.
+     - `CRON_SECRET` = um texto longo e aleatório (ex.: gere em um gerador de senhas). A Vercel usa para chamar a limpeza diária de dados vencidos.
+     - `LEGAL_NAME`, `LEGAL_DOCUMENT` (CNPJ) e `PRIVACY_EMAIL`: dados da sua empresa, mostrados na Política de privacidade (`/privacidade`).
 4. Clique em **Deploy**. O primeiro deploy **vai falhar** por falta de banco. É esperado.
 5. No projeto, abra **Storage → Create Database → Neon (Postgres)**. Escolha a região mais perto (São Paulo, se aparecer), o plano gratuito, e conecte ao projeto.
    Isso cria a variável `DATABASE_URL` sozinho.
@@ -30,7 +32,19 @@ nunca no chat nem no código.
 Pronto: abra `https://SEU-PROJETO.vercel.app/painel/criar-conta`, use o `SETUP_CODE` e marque
 "cardápio de exemplo". O cardápio fica em `https://SEU-PROJETO.vercel.app/<endereço-da-loja>`.
 
-## 2. WhatsApp automático (opcional, liga depois)
+## 2. E-mail para recuperar senha (recomendado)
+
+Sem isso, "Esqueci minha senha" avisa que a recuperação ainda não foi configurada.
+
+1. Crie uma conta em **resend.com** e verifique o seu domínio (eles mostram os registros de DNS).
+2. Gere uma **API key**.
+3. Na Vercel:
+   - `RESEND_API_KEY` = a chave;
+   - `EMAIL_FROM` = `Delisys <nao-responda@seudominio.com.br>`.
+
+   Depois, faça **Redeploy**.
+
+## 3. WhatsApp automático (opcional, liga depois)
 
 Sem isso, o app funciona em **modo manual**: o quadro de pedidos mostra o botão *Avisar no
 WhatsApp* em cada etapa, que abre o WhatsApp com a mensagem pronta.
@@ -50,7 +64,7 @@ Para o envio automático pela API oficial da Meta:
 
    Depois, faça **Redeploy**.
 
-## 3. Pix de verdade (opcional)
+## 4. Pix de verdade (opcional)
 
 1. Crie uma conta no **sandbox do Asaas** (`sandbox.asaas.com`). É ambiente de teste, sem dinheiro real.
 2. Gere a **chave de API** em *Integrações*.
@@ -75,7 +89,17 @@ Para o envio automático pela API oficial da Meta:
 | --- | --- | --- |
 | `DATABASE_URL` | sim | Postgres (Neon ou Supabase, porta do pooler) |
 | `SETUP_CODE` | recomendada | código para criar loja |
-| `APP_URL` | não | endereço público; sem ela, usa o domínio de produção da Vercel |
+| `APP_URL` | fora da Vercel: sim | endereço público usado nos links de rastreio e de senha; na Vercel, usa o domínio de produção |
+| `CRON_SECRET` | recomendada | protege a limpeza diária (`/api/cron/limpeza`) |
+| `RESEND_API_KEY`, `EMAIL_FROM` | recomendada | e-mail de recuperação de senha |
+| `LEGAL_NAME`, `LEGAL_DOCUMENT`, `PRIVACY_EMAIL` | sim, antes de abrir para clientes | dados da empresa na política de privacidade |
 | `PAYMENT_PROVIDER` | não | `mock` (padrão) ou `asaas` |
 | `ASAAS_API_KEY`, `ASAAS_WEBHOOK_TOKEN`, `ASAAS_BASE_URL` | se `asaas` | Pix real |
 | `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_API_VERSION` | não | envio automático |
+
+## Antes de receber clientes de verdade
+
+- [ ] Troque `PAYMENT_PROVIDER` de `mock` para `asaas`. No modo teste, qualquer cliente consegue "simular" o pagamento do Pix.
+- [ ] Preencha `LEGAL_NAME`, `LEGAL_DOCUMENT` e `PRIVACY_EMAIL`, e peça a um advogado para revisar `/privacidade`.
+- [ ] Configure o e-mail (Resend) para a recuperação de senha.
+- [ ] Confira em **Settings → Cron Jobs** se a limpeza diária aparece.

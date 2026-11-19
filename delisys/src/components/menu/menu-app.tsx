@@ -168,6 +168,9 @@ export function MenuApp({ store, categories, products }: { store: MenuStore; cat
             </section>
           ))}
         </div>
+        <footer className="px-4 pt-10 text-center text-xs text-muted">
+          Cardápio digital Delisys · <a className="underline" href="/privacidade">Política de privacidade</a>
+        </footer>
       </div>
 
       {open && (

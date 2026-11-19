@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { courierByToken } from "@/lib/courier";
 import { q } from "@/lib/db";
-import { handle, rateLimit } from "@/lib/http";
+import { handle} from "@/lib/http";
+import { rateLimit } from "@/lib/rate-limit";
 
 /** Posição do motoboy: vale para todos os pedidos dele que estão "saiu para entrega". */
 export const POST = handle(async (req: Request, ctx: { params: Promise<{ token: string }> }) => {
   const c = await courierByToken((await ctx.params).token);
-  rateLimit(`loc:${c.id}`, 30, 60_000);
+  await rateLimit(`loc:${c.id}`, 30, 60);
   const b = z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180), accuracy: z.number().min(0).max(100000).nullable().optional() }).parse(await req.json());
   const rows = await q(
     `insert into courier_positions (order_id, courier_id, lat, lng, accuracy_m, updated_at)

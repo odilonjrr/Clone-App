@@ -156,6 +156,8 @@ export function CourierApp({ token }: { token: string }) {
         </details>
       )}
 
+      <p className="text-center text-xs text-muted">Sua localização só é enviada enquanto o compartilhamento está ligado e há entrega em andamento, e é apagada 24 h após a entrega. <a className="underline" href="/privacidade">Privacidade</a></p>
+
       <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
         {toast && <p className="rounded-md bg-surface-raised px-4 py-3 text-sm" style={{ boxShadow: "var(--shadow-pop)" }}>{toast}</p>}
       </div>

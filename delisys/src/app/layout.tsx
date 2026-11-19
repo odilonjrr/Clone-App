@@ -6,6 +6,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 const poppins = Poppins({ subsets: ["latin"], weight: ["600", "700", "800"], variable: "--font-poppins", display: "swap" });
 const satisfy = Satisfy({ subsets: ["latin"], weight: "400", variable: "--font-satisfy", display: "swap" });
 
+// CSP com nonce exige renderização por requisição em todas as páginas
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: { default: "Delisys", template: "%s · Delisys" },
   description: "Cardápio digital e gestor de pedidos sem comissão.",

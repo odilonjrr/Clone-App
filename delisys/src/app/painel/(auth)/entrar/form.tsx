@@ -25,6 +25,7 @@ export function LoginForm() {
       <label className="field"><span>Senha</span><input className="input" id="password" name="password" type="password" autoComplete="current-password" required /></label>
       {error && <p role="alert" className="text-sm text-danger">{error}</p>}
       <button className="btn btn-primary" disabled={busy}>{busy ? "Entrando…" : "Entrar"}</button>
+      <Link className="text-sm font-semibold text-accent underline" href="/painel/esqueci-senha">Esqueci minha senha</Link>
       <p className="text-sm text-muted">Ainda não tem loja? <Link className="font-semibold text-accent underline" href="/painel/criar-conta">Criar conta</Link></p>
     </form>
   );

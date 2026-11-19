@@ -24,19 +24,11 @@ export function handle<A extends unknown[]>(fn: (...a: A) => Promise<Response>) 
 export function appUrl(req?: Request) {
   if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, "");
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  // sem endereço configurado, só em desenvolvimento usamos o Host da requisição:
+  // em produção ele poderia ser forjado e iria parar nos links enviados por WhatsApp e e-mail
+  if (process.env.NODE_ENV === "production") throw new Error("APP_URL não configurada.");
   if (req) return new URL(req.url).origin;
   return "http://localhost:3100";
-}
-
-/** Limite simples por chave (memória do processo). Em servidor sem estado é só um freio leve. */
-const hits = new Map<string, number[]>();
-export function rateLimit(key: string, max: number, windowMs: number) {
-  const now = Date.now();
-  const list = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
-  if (list.length >= max)
-    throw new HttpError(429, "Muitas tentativas seguidas. Espere um pouco e tente de novo.");
-  list.push(now);
-  hits.set(key, list);
 }
 
 export function clientIp(req: Request) {

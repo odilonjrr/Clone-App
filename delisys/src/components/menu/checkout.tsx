@@ -238,6 +238,8 @@ export function Checkout({ store, zones, pixNeedsDocument, pixTestMode }: Props)
           {belowMin && <p className="text-xs text-warning">Pedido mínimo da loja: {formatBRL(store.minOrderCents)}.</p>}
         </section>
 
+        <p className="text-xs text-muted">Seu nome, WhatsApp e endereço são usados pela {store.name} para preparar, entregar e avisar sobre este pedido. Veja a <a className="underline" href="/privacidade" target="_blank">Política de privacidade</a>.</p>
+
         {formError && <p role="alert" className="rounded-md border border-danger/50 bg-danger-soft p-3 text-sm">{formError}</p>}
 
         <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-bg/95 px-4 pt-3 backdrop-blur" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>

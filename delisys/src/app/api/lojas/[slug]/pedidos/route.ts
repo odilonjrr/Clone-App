@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { HttpError } from "@/lib/auth";
-import { appUrl, clientIp, handle, rateLimit } from "@/lib/http";
+import { appUrl, clientIp, handle} from "@/lib/http";
+import { rateLimit } from "@/lib/rate-limit";
 import { createOrder } from "@/lib/orders";
 import { normalizeBrPhone } from "@/lib/phone";
 import { getStoreBySlug } from "@/lib/store";
@@ -37,7 +38,7 @@ const Body = z.object({
 });
 
 export const POST = handle(async (req: Request, ctx: { params: Promise<{ slug: string }> }) => {
-  rateLimit(`order:${clientIp(req)}`, 12, 10 * 60_000);
+  await rateLimit(`order:${clientIp(req)}`, 12, 600);
   const store = await getStoreBySlug((await ctx.params).slug);
   if (!store) throw new HttpError(404, "Loja não encontrada.");
   const b = Body.parse(await req.json());
