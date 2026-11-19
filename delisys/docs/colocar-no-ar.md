@@ -17,7 +17,7 @@ nunca no chat nem no código.
      - `SETUP_CODE` = um código só seu, por exemplo `minha-loja-2026`. Ele é pedido para criar a primeira loja e impede que um estranho crie uma loja no seu app.
      - `CRON_SECRET` = um texto longo e aleatório (ex.: gere em um gerador de senhas). A Vercel usa para chamar a limpeza diária de dados vencidos.
      - `LEGAL_NAME`, `LEGAL_DOCUMENT` (CNPJ) e `PRIVACY_EMAIL`: dados da sua empresa, mostrados na Política de privacidade (`/privacidade`).
-4. Clique em **Deploy**. O primeiro deploy **vai falhar** por falta de banco. É esperado.
+4. Clique em **Deploy**. Sem banco, o deploy termina, mas o app mostra erro ao abrir. É esperado: o banco vem no próximo passo.
 5. No projeto, abra **Storage → Create Database → Neon (Postgres)**. Escolha a região mais perto (São Paulo, se aparecer), o plano gratuito, e conecte ao projeto.
    Isso cria a variável `DATABASE_URL` sozinho.
 6. **Deployments → ⋯ → Redeploy.** O build cria as tabelas e o app sobe.
