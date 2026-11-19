@@ -100,6 +100,8 @@ async function createPglite(): Promise<Db> {
 export function db(): Promise<Db> {
   if (!g.__delisysDb) {
     const url = process.env.DATABASE_URL;
+    if (!url && (process.env.VERCEL || process.env.NODE_ENV === "production" && !process.env.ALLOW_LOCAL_DB))
+      throw new Error("DATABASE_URL não configurada. Conecte um banco Postgres (veja delisys/docs/colocar-no-ar.md).");
     g.__delisysDb = url ? createPg(url) : createPglite();
   }
   return g.__delisysDb;

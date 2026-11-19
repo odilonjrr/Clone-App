@@ -191,7 +191,8 @@ function OrderCard({ o, now, couriers, busy, onMove, run }: {
   const late = o.placed_at && now - new Date(o.placed_at).getTime() > 45 * 60000;
   const pay = o.payment_method === "pix" ? (o.payment_status === "aprovado" ? "Pix · pago" : "Pix · pendente")
     : o.payment_method === "cash" ? `Dinheiro · cobrar${o.change_for_cents ? ` · troco p/ ${formatBRL(o.change_for_cents)}` : ""}` : "Cartão na entrega · cobrar";
-  const pendingNotice = o.notifications.find((n) => n.status !== "sent");
+  // no modo manual, oferece o aviso da etapa mais recente (o de etapas antigas já perdeu o sentido)
+  const pendingNotice = [...o.notifications].reverse().find((n) => n.status !== "sent");
   const isBusy = busy?.startsWith(o.id);
 
   return (
