@@ -22,9 +22,11 @@ export async function createStoreWithOwner(input: NewStore) {
     const used = await t.query(`select 1 from users where email = $1`, [input.email]);
     if (used.length) throw new HttpError(409, "Já existe uma conta com esse e-mail. Entre com ela.");
     const [store] = await t.query<{ id: string }>(
-      `insert into stores (slug, name, whatsapp_phone, address_line, district, city) values ($1,$2,$3,$4,$5,$6) returning id`,
+      `insert into stores (slug, name, whatsapp_phone, address_line, district, city, lat, lng) values ($1,$2,$3,$4,$5,$6,$7,$8) returning id`,
       [input.slug, input.storeName, input.whatsapp ?? null, input.withDemoMenu ? "Rua Domingos de Morais, 1200" : null,
-       input.withDemoMenu ? "Vila Mariana" : null, input.withDemoMenu ? "São Paulo" : null],
+       input.withDemoMenu ? "Vila Mariana" : null, input.withDemoMenu ? "São Paulo" : null,
+       // ponto aproximado da Vila Mariana, só para a loja de exemplo aparecer no mapa
+       input.withDemoMenu ? -23.5893 : null, input.withDemoMenu ? -46.6369 : null],
     );
     const [user] = await t.query<{ id: string }>(
       `insert into users (store_id, email, name, password_hash, role) values ($1,$2,$3,$4,'owner') returning id`,

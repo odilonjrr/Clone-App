@@ -58,3 +58,13 @@
   --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-script: var(--font-satisfy), cursive;
 }
+
+/* Mapa do rastreio: balão "Como chegar" e pins sem o fundo padrão do Leaflet */
+.leaflet-div-icon.dl-pin, .dl-pin { background: transparent; border: 0; }
+.leaflet-tooltip.dl-bubble {
+  background: #fff; color: #1A1512; border: 2px solid #1A1512; border-radius: 16px; padding: 8px 18px;
+  font: 700 17px/1.2 var(--font-display); box-shadow: 0 6px 18px rgba(0,0,0,.18); white-space: nowrap;
+}
+.leaflet-tooltip.dl-bubble::before { display: none; }
+.leaflet-tooltip.dl-bubble a { color: inherit; text-decoration: none; }
+.leaflet-container { font-family: var(--font-sans); background: #E8E4DE; }

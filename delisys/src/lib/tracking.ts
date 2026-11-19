@@ -8,8 +8,9 @@ export async function getTracking(token: string) {
   const o = await one<OrderRow>(`select * from orders where public_token = $1`, [token]);
   if (!o) return null;
   const [detail] = await loadOrderDetails([o]);
-  const store = await one<{ name: string; slug: string; whatsapp_phone: string | null; lat: number | null; lng: number | null }>(
-    `select name, slug, whatsapp_phone, lat, lng from stores where id = $1`, [o.store_id]);
+  const store = await one<{ name: string; slug: string; whatsapp_phone: string | null; lat: number | null; lng: number | null;
+    address_line: string | null; district: string | null; city: string | null; eta_min_minutes: number; eta_max_minutes: number }>(
+    `select name, slug, whatsapp_phone, lat, lng, address_line, district, city, eta_min_minutes, eta_max_minutes from stores where id = $1`, [o.store_id]);
   const pix = o.status === "aguardando_pagamento"
     ? await one<{ provider: string; pix_payload: string; pix_qr_data_url: string; expires_at: string; status: string }>(
         `select provider, pix_payload, pix_qr_data_url, expires_at, status from payments where order_id = $1 order by created_at desc limit 1`, [o.id])
@@ -28,7 +29,12 @@ export async function getTracking(token: string) {
     payment: { method: o.payment_method, status: o.payment_status, changeForCents: o.change_for_cents },
     totals: { subtotal: o.subtotal_cents, fee: o.delivery_fee_cents, total: o.total_cents },
     items: detail.items.map((i) => ({ name: i.name, quantity: i.quantity, total: i.unit_price_cents * i.quantity, options: i.options.map((x) => x.name) })),
-    store: store ? { name: store.name, slug: store.slug, whatsapp: store.whatsapp_phone, location: store.lat != null && store.lng != null ? { lat: store.lat, lng: store.lng } : null } : null,
+    store: store ? {
+      name: store.name, slug: store.slug, whatsapp: store.whatsapp_phone,
+      location: store.lat != null && store.lng != null ? { lat: store.lat, lng: store.lng } : null,
+      address: [store.address_line, store.district, store.city].filter(Boolean).join(" - ") || null,
+      etaMin: store.eta_min_minutes, etaMax: store.eta_max_minutes,
+    } : null,
     courier: detail.courier ? { firstName: detail.courier.name.split(" ")[0] } : null,
     courierPosition: pos ? { lat: pos.lat, lng: pos.lng, updatedAt: pos.updated_at } : null,
     pix: pix ? { testMode: pix.provider === "mock", payload: pix.pix_payload, qr: pix.pix_qr_data_url, expiresAt: pix.expires_at, expired: new Date(pix.expires_at) < new Date() } : null,
