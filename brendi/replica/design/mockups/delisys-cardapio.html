@@ -1,0 +1,407 @@
+<title>Delisys Cardápio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&family=Satisfy&display=swap" rel="stylesheet">
+<!-- Prévia do cardápio do cliente do Delisys. Ícones de comida: Twemoji (CC-BY 4.0, Twitter/X e colaboradores). Ícones de interface no estilo Lucide (ISC). -->
+<style>
+/* Delisys — gerado por build-tokens.mjs a partir de tokens.json. Não edite à mão.
+   Padrão: tema escuro (cardápio do cliente, marketing).
+   data-theme="light": tema claro (painel do restaurante). */
+:root {
+  color-scheme: dark;
+  --bg: #0F0C0A;
+  --surface: #1A1512;
+  --surface-raised: #241D18;
+  --surface-sunken: #0A0807;
+  --surface-dark: #0A0807;
+  --border: #3A2F28;
+  --border-input: #8A7A6E;
+  --text: #FFFFFF;
+  --text-muted: #B8ACA2;
+  --on-dark: #FFFFFF;
+  --on-dark-muted: #B8ACA2;
+  --primary: #E2560C;
+  --accent: #E2560C;
+  --accent-strong: #C2410C;
+  --accent-bright: #FF8A3D;
+  --accent-soft: #3A1D0E;
+  --on-accent: #FFFFFF;
+  --secondary: #FF8A3D;
+  --secondary-strong: #C2410C;
+  --secondary-bright: #FF8A3D;
+  --secondary-soft: #3A1D0E;
+  --on-secondary: #FFFFFF;
+  --highlight: #FFB547;
+  --add: #F5B82E;
+  --on-add: #1A0E05;
+  --link: #FFB547;
+  --danger: #FF6B5E;
+  --danger-solid: #D42A22;
+  --on-danger: #FFFFFF;
+  --danger-soft: #3A1512;
+  --success: #2BD46B;
+  --success-soft: #0F2A1B;
+  --warning: #FFB547;
+  --warning-soft: #3A2A0E;
+  --info: #6EA8FF;
+  --info-soft: #12233D;
+  --status-analise: #FFB547;
+  --status-analise-soft: #3A2A0E;
+  --status-preparo: #6EA8FF;
+  --status-preparo-soft: #12233D;
+  --status-pronto: #B794FF;
+  --status-pronto-soft: #26193F;
+  --status-entrega: #2BD46B;
+  --status-entrega-soft: #0F2A1B;
+  --status-finalizado: #B8ACA2;
+  --status-finalizado-soft: #241D18;
+  --gradient-accent: linear-gradient(135deg, #F06A1C 0%, #C2410C 100%);
+  --gradient-promo: linear-gradient(115deg, #2A1308 0%, #6B2A0C 55%, #B8470F 100%);
+  --gradient-live: linear-gradient(135deg, #0F2A1B 0%, #0B1A12 100%);
+  --gradient-cta-strip: linear-gradient(90deg, #FFE3CC 0%, #FFD0A8 100%);
+  --gradient-page: radial-gradient(120% 60% at 50% 0%, #2A1A10 0%, #0F0C0A 60%);
+  --glass-bg: rgba(36,29,24,.72);
+  --glass-border: rgba(255,255,255,.08);
+  --glass-blur: 16px;
+  --glass-highlight: inset 0 1px 0 rgba(255,255,255,.06);
+  --type-2xs-size: 0.6875rem;
+  --type-2xs-line: 1rem;
+  --type-2xs-weight: 700;
+  --type-xs-size: 0.75rem;
+  --type-xs-line: 1.125rem;
+  --type-xs-weight: 400;
+  --type-sm-size: 0.875rem;
+  --type-sm-line: 1.25rem;
+  --type-sm-weight: 400;
+  --type-base-size: 1rem;
+  --type-base-line: 1.5rem;
+  --type-base-weight: 400;
+  --type-lg-size: 1.125rem;
+  --type-lg-line: 1.625rem;
+  --type-lg-weight: 600;
+  --type-xl-size: 1.375rem;
+  --type-xl-line: 2rem;
+  --type-xl-weight: 700;
+  --type-2xl-size: 2rem;
+  --type-2xl-line: 2.25rem;
+  --type-2xl-weight: 800;
+  --type-3xl-size: 2.75rem;
+  --type-3xl-line: 3.25rem;
+  --type-3xl-weight: 800;
+  --type-display-size: 3.5rem;
+  --type-display-line: 3.875rem;
+  --type-display-weight: 800;
+  --space-0: 0rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 2rem;
+  --space-8: 2.5rem;
+  --space-9: 3rem;
+  --space-10: 4rem;
+  --space-11: 5rem;
+  --space-12: 7.5rem;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 40px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-card: 0 8px 24px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
+  --shadow-pop: 0 16px 40px rgba(0,0,0,.6);
+  --shadow-glow: 0 0 24px rgba(240,106,28,.45);
+  --shadow-glow-success: 0 0 16px rgba(43,212,107,.45);
+  --ring-width: 3px;
+  --ring-color: var(--accent-bright);
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-ease: cubic-bezier(.2,.8,.2,1);
+  --layout-container: 1200px;
+  --layout-container-wide: 1400px;
+  --layout-container-text: 750px;
+  --layout-header: 72px;
+  --layout-sidebar: 248px;
+  --layout-kanban-col: 300px;
+  --layout-bottom-nav: 72px;
+  --layout-phone: 390px;
+  --font-display: 'Poppins', 'Inter', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-script: 'Satisfy', 'Poppins', cursive;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+
+:root { color-scheme: dark; }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--gradient-page), var(--bg);
+    color: var(--text); font-family: var(--font-sans);
+    font-size: var(--type-sm-size); line-height: var(--type-sm-line);
+    max-width: 430px; margin: 0 auto; min-height: 100vh;
+    padding-bottom: calc(var(--layout-bottom-nav) + 88px + env(safe-area-inset-bottom));
+  }
+  svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .glass { background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-highlight);
+           -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+  .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--radius-pill);
+              background: transparent; border: 0; color: var(--text); cursor: pointer; position: relative; }
+  .icon-btn:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
+  .dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger-solid); box-shadow: 0 0 0 2px var(--bg); }
+  .px { padding-inline: 16px; }
+
+  /* topo */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 0; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-mark { width: 36px; height: 36px; border-radius: 12px; background: var(--gradient-accent); display: grid; place-items: center; box-shadow: var(--shadow-glow); }
+  .brand-mark svg { width: 20px; height: 20px; stroke: #fff; }
+  .brand-name { font-family: var(--font-display); font-weight: 800; font-size: 22px; line-height: 1; letter-spacing: -.01em; }
+  .brand-name b { color: var(--accent-bright); font-weight: 800; }
+  .brand-sub { font-size: 10px; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+
+  /* loja */
+  .store { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+  .store-logo { width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #FFB547, #E2560C 70%); display: grid; place-items: center;
+                box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent), var(--shadow-glow); flex: none; }
+  .store-logo img { width: 34px; height: 34px; }
+  .store h1 { font-family: var(--font-display); font-size: 20px; line-height: 26px; font-weight: 700; }
+  .open { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--success); font-weight: 600; }
+  .open::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: var(--shadow-glow-success); }
+  .loc { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 500; }
+  .loc svg { width: 16px; height: 16px; color: var(--highlight); }
+  .loc .chev { width: 14px; height: 14px; color: var(--text-muted); }
+  .facts { display: flex; gap: 8px; margin-top: 14px; }
+  .fact { flex: 1; border-radius: var(--radius-md); padding: 8px 10px; }
+  .fact small { display: block; font-size: 11px; color: var(--text-muted); }
+  .fact strong { font-size: 13px; font-weight: 600; }
+  .fact.cash strong { color: var(--success); }
+
+  /* busca */
+  .search { margin-top: 14px; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 8px 0 16px; border-radius: var(--radius-pill); }
+  .search input { flex: 1; background: none; border: 0; color: var(--text); font: inherit; font-size: 14px; outline: none; }
+  .search input::placeholder { color: var(--text-muted); }
+  .search svg { color: var(--text-muted); }
+
+  /* categorias */
+  .cats { display: flex; gap: 10px; overflow-x: auto; padding: 16px 16px 4px; scrollbar-width: none; }
+  .cat { flex: none; width: 72px; height: 76px; border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+         font-size: 11px; font-weight: 600; color: var(--text); cursor: pointer; }
+  .cat img { width: 30px; height: 30px; }
+  .cat[aria-selected="true"] { background: var(--gradient-accent); border-color: transparent; box-shadow: var(--shadow-glow); }
+
+  /* banner */
+  .promo { position: relative; margin: 14px 16px 0; height: 156px; border-radius: var(--radius-lg); overflow: hidden; background: var(--gradient-promo);
+           border: 1px solid rgba(255,138,61,.35); box-shadow: var(--shadow-card); padding: 16px 18px; }
+  .promo .script { font-family: var(--font-script); font-size: 26px; line-height: 1; color: #fff; }
+  .promo .big { font-family: var(--font-display); font-weight: 800; font-size: 30px; line-height: 1.05; color: var(--highlight); text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+  .promo p { margin-top: 6px; font-size: 12px; line-height: 16px; color: #FFE9DA; font-weight: 500; max-width: 170px; }
+  .promo .art { position: absolute; right: 8px; bottom: -10px; width: 140px; height: 140px; filter: drop-shadow(0 10px 18px rgba(0,0,0,.5)); }
+  .promo .off { position: absolute; right: 12px; top: 10px; width: 64px; height: 64px; border-radius: 50%; background: var(--danger-solid); color: var(--on-danger);
+                display: grid; place-items: center; text-align: center; font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 18px;
+                box-shadow: 0 0 0 3px rgba(255,255,255,.15), 0 6px 16px rgba(0,0,0,.4); transform: rotate(-8deg); }
+  .promo .off small { display: block; font-size: 9px; font-weight: 600; line-height: 11px; }
+  .dots { display: flex; gap: 5px; justify-content: center; margin-top: 8px; }
+  .dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--border); }
+  .dots i.on { width: 18px; background: var(--accent-bright); }
+
+  /* seção */
+  .sec { display: flex; align-items: center; justify-content: space-between; margin: 20px 16px 10px; }
+  .sec h2 { font-family: var(--font-display); font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .sec h2 img { width: 20px; height: 20px; }
+  .sec a { color: var(--link); font-weight: 600; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
+  .sec a svg { width: 16px; height: 16px; }
+
+  /* produtos */
+  .row { display: flex; gap: 10px; overflow-x: auto; padding: 0 16px 4px; scrollbar-width: none; }
+  .card { flex: none; width: 128px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); }
+  .card .ph { position: relative; height: 96px; display: grid; place-items: center; background: radial-gradient(circle at 50% 70%, #5A2810 0%, #241D18 70%); }
+  .card .ph img { width: 70px; height: 70px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+  .fav { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.35); color: #fff; border: 0; }
+  .fav svg { width: 15px; height: 15px; }
+  .card .body { padding: 8px 10px 10px; }
+  .card h3 { font-size: 13px; line-height: 17px; font-weight: 600; min-height: 34px; }
+  .rate { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .rate svg { width: 12px; height: 12px; fill: var(--highlight); stroke: var(--highlight); }
+  .rate b { color: var(--text); font-weight: 600; }
+  .buy { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+  .price { font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+  .add { width: 30px; height: 30px; border-radius: 9px; background: var(--add); color: var(--on-add); border: 0; display: grid; place-items: center; cursor: pointer;
+         box-shadow: 0 0 12px rgba(245,184,46,.35); }
+  .add svg { width: 18px; height: 18px; stroke-width: 2.6; }
+
+  /* pedido ao vivo */
+  .live { margin: 18px 16px 0; border-radius: var(--radius-lg); padding: 14px; background: var(--gradient-live); border: 1px solid rgba(43,212,107,.35);
+          box-shadow: 0 0 24px rgba(43,212,107,.12), var(--shadow-card); display: grid; grid-template-columns: 1fr 104px; gap: 10px; }
+  .live h3 { font-family: var(--font-display); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .live h3 img { width: 20px; height: 20px; }
+  .live p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .steps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 12px; position: relative; }
+  .steps::before { content: ""; position: absolute; top: 10px; left: 12%; right: 12%; height: 3px; background: linear-gradient(90deg, var(--success) 70%, rgba(43,212,107,.25) 70%); border-radius: 2px; }
+  .steps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 9.5px; line-height: 12px; color: var(--text-muted); text-align: center; }
+  .steps .b { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--success); color: #062012; box-shadow: var(--shadow-glow-success); }
+  .steps .b svg { width: 13px; height: 13px; stroke-width: 3.2; }
+  .steps li.now .b { background: var(--success-soft); color: var(--success); border: 2px solid var(--success); }
+  .steps li.done, .steps li.now { color: var(--text); font-weight: 600; }
+  .map { position: relative; border-radius: var(--radius-md); overflow: hidden; background:
+           linear-gradient(0deg, transparent 47%, rgba(255,255,255,.07) 47% 53%, transparent 53%) 0 0/34px 34px,
+           linear-gradient(90deg, transparent 47%, rgba(255,255,255,.07) 47% 53%, transparent 53%) 0 0/34px 34px, #16201B; }
+  .map svg.route { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .eta { position: absolute; left: 6px; right: 6px; bottom: 6px; background: #fff; color: #0F0C0A; border-radius: 8px; padding: 4px 6px; text-align: center; font-size: 9.5px; line-height: 12px; }
+  .eta b { display: block; font-family: var(--font-display); font-size: 15px; line-height: 18px; }
+
+  /* barra da sacola */
+  .bagbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--layout-bottom-nav) + 10px + env(safe-area-inset-bottom)); width: min(398px, calc(100% - 32px));
+            border-radius: var(--radius-pill); padding: 6px 6px 6px 16px; display: flex; align-items: center; gap: 10px; background: var(--gradient-cta-strip); color: #2A1308; box-shadow: var(--shadow-pop); }
+  .bagbar .cb { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12.5px; line-height: 15px; flex: 1; min-width: 0; white-space: nowrap; }
+  .bagbar .cb svg { width: 26px; height: 26px; color: #C2410C; stroke-width: 2.2; }
+  .bagbar .sep { width: 1px; height: 30px; background: rgba(42,19,8,.18); }
+  .cta { border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 18px; border-radius: var(--radius-pill);
+         background: var(--gradient-accent); color: var(--on-accent); font-family: var(--font-display); font-weight: 700; font-size: 19px; box-shadow: var(--shadow-glow); white-space: nowrap; flex: none; }
+  .cta small { font-family: var(--font-sans); font-size: 13px; font-weight: 600; }
+  .cta svg { width: 20px; height: 20px; }
+
+  /* navegação inferior */
+  .nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: min(430px, 100%); height: calc(var(--layout-bottom-nav) + env(safe-area-inset-bottom));
+         padding: 6px 8px env(safe-area-inset-bottom); display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; background: rgba(15,12,10,.92); border-top: 1px solid var(--glass-border);
+         -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+  .nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: var(--radius-md); color: var(--text-muted);
+           font-size: 11px; font-weight: 500; text-decoration: none; position: relative; }
+  .nav a[aria-current="page"] { color: var(--accent-bright); background: var(--accent-soft); font-weight: 700; }
+  .nav .count { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--danger-solid); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; }
+  @media (prefers-reduced-motion: no-preference) { .cta, .add, .cat { transition: transform var(--motion-fast) var(--motion-ease); } .cta:active, .add:active, .cat:active { transform: scale(.97); } }
+
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></symbol>
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1Z"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+  <symbol id="receipt" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6M16 12h-6M13 16h-3"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+  <symbol id="bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="coins" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18M7 6h1v4M16.71 13.88l.7.71-2.82 2.82"/></symbol>
+</svg>
+
+<header class="topbar">
+  <button class="icon-btn" aria-label="Abrir menu"><svg class="i"><use href="#menu"/></svg></button>
+  <div class="brand" aria-label="Delisys">
+    <span class="brand-mark"><svg class="i"><use href="#bag"/></svg></span>
+    <div><div class="brand-name">Deli<b>sys</b></div><div class="brand-sub">Peça direto da loja</div></div>
+  </div>
+  <button class="icon-btn" aria-label="Notificações, 1 nova"><svg class="i"><use href="#bell"/></svg><span class="dot"></span></button>
+</header>
+
+<main>
+  <section class="px">
+    <div class="store">
+      <div class="store-logo"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Q5OUU4MiIgZD0iTTE4IDIwLjQxMWMtOS4zNzEgMC0xNi45NjctLjIyNS0xNi45NjcgNi40MjdDMS4wMzMgMzMuNDg3IDguNjI5IDM1IDE4IDM1YzkuMzcxIDAgMTYuOTY3LTEuNTEzIDE2Ljk2Ny04LjE2MiAwLTYuNjUxLTcuNTk2LTYuNDI3LTE2Ljk2Ny02LjQyN3oiLz48cGF0aCBmaWxsPSIjNjYyMTEzIiBkPSJNMzQuNDcgMjAuOTE2UzI2LjI1MSAxOS45MzIgMTggMTkuODljLTguMjUxLjA0Mi0xNi40NyAxLjAyNi0xNi40NyAxLjAyNkMuNzE3IDI3LjM5IDcuNDY3IDMwLjA1NyAxOCAzMC4wNTdzMTcuMjgzLTIuNjY3IDE2LjQ3LTkuMTQxeiIvPjxwYXRoIGZpbGw9IiNGRkNDNEQiIGQ9Im0zMy44ODYgMTguMzI4LTMxLjg1NS42NDZjLTEuMSAwLTIuMDIxIDIuMjI5LS44NTQgMi44MTIgOC43MDggMi43MDggMTUuNzA4IDUuNDQ4IDE1LjcwOCA1LjQ0OC45NjIuNTMyIDEuMjg3LjUzNCAyLjI1LjAwMyAwIDAgOS42NjYtMy44NjggMTUuODc1LTUuNDkzLjg4MS0uMjMtLjAyNS0zLjQxNi0xLjEyNC0zLjQxNnoiLz48cGF0aCBmaWxsPSIjNzdCMjU1IiBkPSJNMzQuNzI1IDE4LjQxMmMtMS45LTEuNzUxLTEuNzktLjgxOS0zLjI0Ni0xLjIzLS41NTMtLjE1Ni00LjUxLTUuMjcxLTEzLjUyOS01LjI3MWgtLjAyYy05LjAxOSAwLTEyLjk3NiA1LjExNS0xMy41MjkgNS4yNzEtMS40NTYuNDExLTEuMzQ2LS41MjEtMy4yNDYgMS4yMy0uODcyLjgwNC0xLjEwOCAxLjIyMi0uMTg4IDEuNDMgMS4zODYuMzEzIDEuMjYgMS4xNTIgMi4yNTMgMS40NDQgMS4yMDIuMzUzIDEuNjk2LS4yOTIgMy42MzQtLjAyOCAxLjY1My4yMjUgMS43NjEgMi4zNjkgMy40MjkgMi4zNjlzMS42NjgtLjggMy4zMzUtLjggMi42NTMgMi4xNDYgNC4zMjEgMi4xNDYgMi42NTMtMi4xNDYgNC4zMjEtMi4xNDZjMS42NjggMCAxLjY2OC44IDMuMzM1LjggMS42NjggMCAxLjc3Ni0yLjE0NCAzLjQyOS0yLjM2OSAxLjkzOC0uMjYzIDIuNDMzLjM4MSAzLjYzNC4wMjguOTkzLS4yOTIuODY3LTEuMTMgMi4yNTMtMS40NDQuOTIyLS4yMDcuNjg3LS42MjYtLjE4Ni0xLjQzeiIvPjxwYXRoIGZpbGw9IiNERDJFNDQiIGQ9Ik0zNC4wNzcgMTYuNTJjMCAyLjk4NC03LjE5OCA0LjM5My0xNi4wNzcgNC4zOTNTMS45MjMgMTkuNTA0IDEuOTIzIDE2LjUyYzAtNS40MDMuOTY2LTUuNDAzIDE2LjA3Ny01LjQwM3MxNi4wNzcuMDAxIDE2LjA3NyA1LjQwM3oiLz48cGF0aCBmaWxsPSIjRDk5RTgyIiBkPSJNMTggLjUyNEM4LjYyOS41MjQgMS4wMzMgNC45MTUgMS4wMzMgMTEuNTY2YzAgNi4xMjUgNy41OTYgNi4zNzUgMTYuOTY3IDYuMzc1czE2Ljk2Ny0uMjUgMTYuOTY3LTYuMzc1QzM0Ljk2NyA0LjkxNCAyNy4zNzEuNTI0IDE4IC41MjR6Ii8+PHBhdGggZmlsbD0iI0ZGRThCNiIgZD0iTTEwLjc4NCAzLjY5NWExLjA2OSAxLjA2OSAwIDEgMC0xLjE1MiAxLjgwMmMuNDk4LjMxOSAxLjc2LjU1NyAyLjA3OS4wNTkuMzE4LS40OTgtLjQyOS0xLjU0My0uOTI3LTEuODYxem05LjczNC0xLjAzNWMtLjU2Mi4xODItMS41NDkgMS4wMDYtMS4zNjYgMS41NjguMTgzLjU2MiAxLjQ2NC42NDggMi4wMjYuNDY2YTEuMDY5IDEuMDY5IDAgMCAwLS42Ni0yLjAzNHptMTAuOTA5IDcuMDM1Yy0uNDUyLS4zOC0xLjU4NS4yMjUtMS45NjYuNjc3YTEuMDcgMS4wNyAwIDAgMCAxLjYzOCAxLjM3NmMuMzgxLS40NTMuNzgxLTEuNjczLjMyOC0yLjA1M3ptLTMuNjQzLTVhMS4wNyAxLjA3IDAgMCAwLTEuMTUyIDEuODAzYy40OTguMzE5IDEuNzYuNTU3IDIuMDc4LjA1OS4zMTktLjQ5OS0uNDI4LTEuNTQ0LS45MjYtMS44NjJ6bS0xNSA3YTEuMDcgMS4wNyAwIDAgMC0xLjQ3OC4zMjYgMS4wNjggMS4wNjggMCAwIDAgLjMyNiAxLjQ3NmMuNDk4LjMxOSAxLjc2LjU1OCAyLjA3OC4wNTkuMzE5LS40OTgtLjQyOC0xLjU0My0uOTI2LTEuODYxem0zLjA0Ni00LjgwOGMtLjMzNi40ODYtLjYyIDEuNzM5LS4xMzMgMi4wNzUuNDg2LjMzNiAxLjU1Ny0uMzc0IDEuODkzLS44NmExLjA3IDEuMDcgMCAwIDAtMS43Ni0xLjIxNXptNy45NTQgNC44MDhhMS4wNyAxLjA3IDAgMCAwLTEuNDc4LjMyNiAxLjA2OCAxLjA2OCAwIDAgMCAuMzI2IDEuNDc2Yy40OTguMzE5IDEuNzYuNTU4IDIuMDc4LjA1OS4zMTktLjQ5OC0uNDI4LTEuNTQzLS45MjYtMS44NjF6TTQuOTQ4IDcuODA4Yy0uMzk0LjQ0MS0uODMzIDEuNjQ4LS4zOTIgMi4wNDIuNDM5LjM5NCAxLjU5MS0uMTc0IDEuOTg1LS42MTVhMS4wNyAxLjA3IDAgMSAwLTEuNTkzLTEuNDI3eiIvPjwvc3ZnPg==" alt=""></div>
+      <div>
+        <span class="open">Aberto até 23:00</span>
+        <h1>Brasa &amp; Pão Burgers</h1>
+        <button class="loc glass" aria-label="Endereço de entrega: Vila Mariana, São Paulo. Trocar">
+          <svg class="i"><use href="#pin"/></svg> Vila Mariana, São Paulo <svg class="i chev"><use href="#chev"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="fact glass"><small>Entrega</small><strong>25–40 min</strong></div>
+      <div class="fact glass"><small>Pedido mínimo</small><strong>R$ 20,00</strong></div>
+      <div class="fact glass cash"><small>Cashback</small><strong>5% de volta</strong></div>
+    </div>
+    <label class="search glass">
+      <svg class="i"><use href="#search"/></svg>
+      <input type="search" placeholder="Buscar lanche, pizza ou bebida" aria-label="Buscar no cardápio">
+      <button class="icon-btn" aria-label="Buscar por voz"><svg class="i"><use href="#mic"/></svg></button>
+    </label>
+  </section>
+
+  <nav class="cats" role="tablist" aria-label="Categorias">
+    <button class="cat glass" role="tab" aria-selected="true"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Q5OUU4MiIgZD0iTTE4IDIwLjQxMWMtOS4zNzEgMC0xNi45NjctLjIyNS0xNi45NjcgNi40MjdDMS4wMzMgMzMuNDg3IDguNjI5IDM1IDE4IDM1YzkuMzcxIDAgMTYuOTY3LTEuNTEzIDE2Ljk2Ny04LjE2MiAwLTYuNjUxLTcuNTk2LTYuNDI3LTE2Ljk2Ny02LjQyN3oiLz48cGF0aCBmaWxsPSIjNjYyMTEzIiBkPSJNMzQuNDcgMjAuOTE2UzI2LjI1MSAxOS45MzIgMTggMTkuODljLTguMjUxLjA0Mi0xNi40NyAxLjAyNi0xNi40NyAxLjAyNkMuNzE3IDI3LjM5IDcuNDY3IDMwLjA1NyAxOCAzMC4wNTdzMTcuMjgzLTIuNjY3IDE2LjQ3LTkuMTQxeiIvPjxwYXRoIGZpbGw9IiNGRkNDNEQiIGQ9Im0zMy44ODYgMTguMzI4LTMxLjg1NS42NDZjLTEuMSAwLTIuMDIxIDIuMjI5LS44NTQgMi44MTIgOC43MDggMi43MDggMTUuNzA4IDUuNDQ4IDE1LjcwOCA1LjQ0OC45NjIuNTMyIDEuMjg3LjUzNCAyLjI1LjAwMyAwIDAgOS42NjYtMy44NjggMTUuODc1LTUuNDkzLjg4MS0uMjMtLjAyNS0zLjQxNi0xLjEyNC0zLjQxNnoiLz48cGF0aCBmaWxsPSIjNzdCMjU1IiBkPSJNMzQuNzI1IDE4LjQxMmMtMS45LTEuNzUxLTEuNzktLjgxOS0zLjI0Ni0xLjIzLS41NTMtLjE1Ni00LjUxLTUuMjcxLTEzLjUyOS01LjI3MWgtLjAyYy05LjAxOSAwLTEyLjk3NiA1LjExNS0xMy41MjkgNS4yNzEtMS40NTYuNDExLTEuMzQ2LS41MjEtMy4yNDYgMS4yMy0uODcyLjgwNC0xLjEwOCAxLjIyMi0uMTg4IDEuNDMgMS4zODYuMzEzIDEuMjYgMS4xNTIgMi4yNTMgMS40NDQgMS4yMDIuMzUzIDEuNjk2LS4yOTIgMy42MzQtLjAyOCAxLjY1My4yMjUgMS43NjEgMi4zNjkgMy40MjkgMi4zNjlzMS42NjgtLjggMy4zMzUtLjggMi42NTMgMi4xNDYgNC4zMjEgMi4xNDYgMi42NTMtMi4xNDYgNC4zMjEtMi4xNDZjMS42NjggMCAxLjY2OC44IDMuMzM1LjggMS42NjggMCAxLjc3Ni0yLjE0NCAzLjQyOS0yLjM2OSAxLjkzOC0uMjYzIDIuNDMzLjM4MSAzLjYzNC4wMjguOTkzLS4yOTIuODY3LTEuMTMgMi4yNTMtMS40NDQuOTIyLS4yMDcuNjg3LS42MjYtLjE4Ni0xLjQzeiIvPjxwYXRoIGZpbGw9IiNERDJFNDQiIGQ9Ik0zNC4wNzcgMTYuNTJjMCAyLjk4NC03LjE5OCA0LjM5My0xNi4wNzcgNC4zOTNTMS45MjMgMTkuNTA0IDEuOTIzIDE2LjUyYzAtNS40MDMuOTY2LTUuNDAzIDE2LjA3Ny01LjQwM3MxNi4wNzcuMDAxIDE2LjA3NyA1LjQwM3oiLz48cGF0aCBmaWxsPSIjRDk5RTgyIiBkPSJNMTggLjUyNEM4LjYyOS41MjQgMS4wMzMgNC45MTUgMS4wMzMgMTEuNTY2YzAgNi4xMjUgNy41OTYgNi4zNzUgMTYuOTY3IDYuMzc1czE2Ljk2Ny0uMjUgMTYuOTY3LTYuMzc1QzM0Ljk2NyA0LjkxNCAyNy4zNzEuNTI0IDE4IC41MjR6Ii8+PHBhdGggZmlsbD0iI0ZGRThCNiIgZD0iTTEwLjc4NCAzLjY5NWExLjA2OSAxLjA2OSAwIDEgMC0xLjE1MiAxLjgwMmMuNDk4LjMxOSAxLjc2LjU1NyAyLjA3OS4wNTkuMzE4LS40OTgtLjQyOS0xLjU0My0uOTI3LTEuODYxem05LjczNC0xLjAzNWMtLjU2Mi4xODItMS41NDkgMS4wMDYtMS4zNjYgMS41NjguMTgzLjU2MiAxLjQ2NC42NDggMi4wMjYuNDY2YTEuMDY5IDEuMDY5IDAgMCAwLS42Ni0yLjAzNHptMTAuOTA5IDcuMDM1Yy0uNDUyLS4zOC0xLjU4NS4yMjUtMS45NjYuNjc3YTEuMDcgMS4wNyAwIDAgMCAxLjYzOCAxLjM3NmMuMzgxLS40NTMuNzgxLTEuNjczLjMyOC0yLjA1M3ptLTMuNjQzLTVhMS4wNyAxLjA3IDAgMCAwLTEuMTUyIDEuODAzYy40OTguMzE5IDEuNzYuNTU3IDIuMDc4LjA1OS4zMTktLjQ5OS0uNDI4LTEuNTQ0LS45MjYtMS44NjJ6bS0xNSA3YTEuMDcgMS4wNyAwIDAgMC0xLjQ3OC4zMjYgMS4wNjggMS4wNjggMCAwIDAgLjMyNiAxLjQ3NmMuNDk4LjMxOSAxLjc2LjU1OCAyLjA3OC4wNTkuMzE5LS40OTgtLjQyOC0xLjU0My0uOTI2LTEuODYxem0zLjA0Ni00LjgwOGMtLjMzNi40ODYtLjYyIDEuNzM5LS4xMzMgMi4wNzUuNDg2LjMzNiAxLjU1Ny0uMzc0IDEuODkzLS44NmExLjA3IDEuMDcgMCAwIDAtMS43Ni0xLjIxNXptNy45NTQgNC44MDhhMS4wNyAxLjA3IDAgMCAwLTEuNDc4LjMyNiAxLjA2OCAxLjA2OCAwIDAgMCAuMzI2IDEuNDc2Yy40OTguMzE5IDEuNzYuNTU4IDIuMDc4LjA1OS4zMTktLjQ5OC0uNDI4LTEuNTQzLS45MjYtMS44NjF6TTQuOTQ4IDcuODA4Yy0uMzk0LjQ0MS0uODMzIDEuNjQ4LS4zOTIgMi4wNDIuNDM5LjM5NCAxLjU5MS0uMTc0IDEuOTg1LS42MTVhMS4wNyAxLjA3IDAgMSAwLTEuNTkzLTEuNDI3eiIvPjwvc3ZnPg==" alt="">Lanches</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Y0OTAwQyIgZD0iTTE4IDRjNy4yNTcgMCAxMyA0IDE0LjY5OSAyIC4xOTctLjMyMy4zMDEtLjY1Ny4zMDEtMSAwLTItNi43MTYtNS0xNS01QzkuNzE2IDAgMyAzIDMgNWMwIC4zNDMuMTA0LjY3Ny4zMDEgMUM1IDggMTAuNzQzIDQgMTggNHoiLz48cGF0aCBmaWxsPSIjRkZDQzREIiBkPSJNMTggM0MxMS43ODcgMyA3LjM4NCA0LjgxIDUuNzI3IDUuNjE4Yy0uNDc3LjIzMy0uNTM5Ljg0LS40MTUgMS4yNzhTMTYgMzQgMTYgMzRzLjg5NiAyIDIgMiAyLTIgMi0yTDMwLjcwNCA2Ljc3OXMuMjEzLS44NDItLjU2OS0xLjIyOUMyOC4zOTIgNC42ODkgMjQuMDQ3IDMgMTggM3oiLz48ZyBmaWxsPSIjQkUxOTMxIj48cGF0aCBkPSJNMTggMzFhNCA0IDAgMCAwLTQtNGMtLjI1NCAwLS41LjAyOS0uNzQxLjA3NUwxNiAzNHMuMDcxLjE0LjE5LjM0MkEzLjk5MiAzLjk5MiAwIDAgMCAxOCAzMXptLTEtMTFhNCA0IDAgMCAwLTQtNGMtMS40MjYgMC0yLjY3Ljc1Mi0zLjM3OCAxLjg3NmwyLjM2MiA1Ljk3OEEzLjk3IDMuOTcgMCAwIDAgMTMgMjRjMi4yMDggMCA0LTEuNzkyIDQtNHoiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjgiIHI9IjQiLz48cGF0aCBkPSJNMjUgOWE0IDQgMCAwIDAgMCA4Yy42ODIgMCAxLjMxNS0uMTg3IDEuODc3LS40ODhsMS44OS00LjgwNkMyOC4yMjcgMTAuMTM1IDI2Ljc1MiA5IDI1IDl6bS02IDE2YTMuOTkyIDMuOTkyIDAgMCAwIDMuMDE5IDMuODY0bDIuODkzLTcuMzU3QTMuOTU0IDMuOTU0IDAgMCAwIDIzIDIxYy0yLjIwOCAwLTQgMS43OTItNCA0em0tOS0xM2E0IDQgMCAwIDAtNC00Yy0uMDg3IDAtLjE2OS4wMi0uMjU1LjAyNi41NSAxLjQxMiAxLjU3NSA0LjAxNiAyLjc3NSA3LjA1N0M5LjQxNiAxNC4zNDkgMTAgMTMuMjQ4IDEwIDEyeiIvPjwvZz48L3N2Zz4=" alt="">Pizzas</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0JFMTkzMSIgZD0iTTE4IDJDOS43MTYgMiAzIDYuNDkyIDMgMTQuNWMwIC4wNTkuMDUyLjc1OC4xMjUgMS41MDlDMy4zOTEgMTUuOTk1IDE4IDI4IDE4IDI4czE0LjYwNy0xMi4wMDYgMTQuODcxLTExLjk5MmMuMDUtLjQ5NC4xMjktMS40MzEuMTI5LTEuNTA4QzMzIDYuNDkyIDI2LjI4NCAyIDE4IDJ6Ii8+PHBhdGggZmlsbD0iI0Y0OTAwQyIgZD0iTTMwLjE2NiAxMS41MDlhMS40ODQgMS40ODQgMCAwIDAtLjkxOC4xOTZjLS4wMDMtLjQzMi0uMDU5LS44MTEtLjIwMi0xLjEwNGwuMzc2LTEuMTI4YTEuNSAxLjUgMCAwIDAtLjk0OC0xLjg5NyAxLjQ3NCAxLjQ3NCAwIDAgMC0xLjAzMi4wMzYgMS40OSAxLjQ5IDAgMCAwLTEuNjQ1LTEuMSAxLjQ3OSAxLjQ3OSAwIDAgMC0uMzQ4LjA5NiAxLjUwMSAxLjUwMSAwIDAgMC0yLjkzNS4xODhMMjIuMiA5LjEwMmExLjQ4MyAxLjQ4MyAwIDAgMC0xLjMwNi0uNiAxLjQ5NyAxLjQ5NyAwIDAgMC0xLjMyOSAxLjA3NWwtLjA3My0uNzI4YTEuNDk5IDEuNDk5IDAgMCAwLTIuOTg1LjI3NmwtLjAyLjAxYTEuNDk1IDEuNDk1IDAgMCAwLS42LTEuMzQ2bC0uNDE3LTIuMDg0YTEuNSAxLjUgMCAwIDAtMi45NDIuNTg4bC43MTggMy41OTEtLjM4MiAxLjYwNS0xLjQ1NC00LjAwMmExLjUgMS41IDAgMSAwLTIuODIgMS4wMjZsMS4xMDggMy4wNDdjLS4zNDUuMjM2LS41OTQuNjEtLjY0NiAxLjA1OGwtLjI0NSAyLjA5OS0uMzI3LTEuOTYzYTEuNSAxLjUgMCAwIDAtMi45NTkuNDkzbDEuNTUgOS4yOTloMjMuMzA1Yy4wNDktLjEyMiAxLjExNi05LjM4IDEuMTE2LTkuMzhhMS41MDIgMS41MDIgMCAwIDAtMS4zMjYtMS42NTd6Ii8+PHBhdGggZmlsbD0iI0ZGQ0M0RCIgZD0iTTI3LjQ4NiA3Ljc5N2MtLjAwOS0uMDY0LS4wMjgtLjEyMy0uMDQ0LS4xODRhMS40OSAxLjQ5IDAgMCAwLTEuNjQ1LTEuMSAxLjQ3OSAxLjQ3OSAwIDAgMC0uMzQ4LjA5NiAxLjQ5NSAxLjQ5NSAwIDAgMC0uOTM1IDEuNTkzbDEuOTU2IDE0LjM0M2gzLjAyOEwyNy40ODYgNy43OTd6bS00Ljk5IDIuMDk2YTEuNDk4IDEuNDk4IDAgMCAwLS4yOTctLjc5IDEuNDgzIDEuNDgzIDAgMCAwLTEuMzA2LS42IDEuNDk3IDEuNDk3IDAgMCAwLTEuMzI5IDEuMDc1IDEuNDk0IDEuNDk0IDAgMCAwLS4wNjEuNTI4bC44NzkgMTIuMzEyLjAwOS4xMjdIMjMuNGwtLjAwMi0uMDI3LS45MDItMTIuNjI1em0tMTEuNzgxIDEuNDA4YTEuNDkgMS40OSAwIDAgMC0xLjAxNy4yNThjLS4zNDUuMjM2LS41OTQuNjEtLjY0NiAxLjA1OGwtMS4xNTkgOS45MjloMy4wMmwxLjExOC05LjU4MWExLjUgMS41IDAgMCAwLTEuMzE2LTEuNjY0em00Ljc1Ni01LjU5NWExLjUgMS41IDAgMCAwLTIuOTQyLjU4OGwzLjI1IDE2LjI1MmgzLjA1OWwtMy4zNjctMTYuODR6Ii8+PHBhdGggZmlsbD0iI0REMkU0NCIgZD0iTTI5IDE3YzAgMi43NjItNC4zNzMgNS0xMSA1UzcgMTkuNzYyIDcgMTdjMC0xLjEwNC0xLjg5Ni0xLTMtMS0uMzE2IDAtLjYwOS0uMDA1LS44NzUuMDA5QzMuMTg2IDE2LjY0NCA1IDMxIDUgMzFhNCA0IDAgMCAwIDQgNGgxOGE0IDQgMCAwIDAgNC00czEuODU4LTE0Ljg2NCAxLjg3MS0xNC45OTJDMzIuNjA3IDE1Ljk5NCAzMi4zMTQgMTYgMzIgMTZjLTEuMTA0IDAtMy0uMTA0LTMgMXoiLz48Y2lyY2xlIGN4PSIxOCIgY3k9IjI4IiByPSI0IiBmaWxsPSIjQkUxOTMxIi8+PC9zdmc+" alt="">Porções</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iIzI5MkYzMyIgZD0iTTMxIDBINWE0IDQgMCAwIDAtNCA0djI4YTQgNCAwIDAgMCA0IDRoMjZhNCA0IDAgMCAwIDQtNFY0YTQgNCAwIDAgMC00LTR6Ii8+PHBhdGggZmlsbD0iIzI5MkYzMyIgZD0iTTE0IDExYTQgNCAwIDAgMS00IDRIOWE0IDQgMCAwIDEtNC00VjlhNCA0IDAgMCAxIDQtNGgxYTQgNCAwIDAgMSA0IDR2MnoiLz48cGF0aCBmaWxsPSIjQkUxOTMxIiBkPSJNMjIgMjdhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ2LThhMiAyIDAgMCAxIDItMmgxNWEyIDIgMCAwIDEgMiAydjh6bTExLThhMiAyIDAgMCAwLTItMmgtNWEyIDIgMCAwIDAtMiAydjhhMiAyIDAgMCAwIDIgMmg1YTIgMiAwIDAgMCAyLTJ2LTh6TTE2IDRhMiAyIDAgMCAxIDItMmgxM2EyIDIgMCAwIDEgMiAydjlhMiAyIDAgMCAxLTIgMkgxOGEyIDIgMCAwIDEtMi0yVjR6bS0yIDlhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWNGEyIDIgMCAwIDEgMi0yaDdhMiAyIDAgMCAxIDIgMnY5eiIvPjxwYXRoIGZpbGw9IiNERDJFNDQiIGQ9Ik0xNCAxM2EyIDIgMCAwIDEtMiAySDVhMiAyIDAgMCAxLTItMlY3YTIgMiAwIDAgMSAyLTJoN2EyIDIgMCAwIDEgMiAydjZ6bTE5IDBhMiAyIDAgMCAxLTIgMkgxOGEyIDIgMCAwIDEtMi0yVjdhMiAyIDAgMCAxIDItMmgxM2EyIDIgMCAwIDEgMiAydjZ6Ii8+PHBhdGggZmlsbD0iI0UxRThFRCIgZD0iTTIyIDI3YTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0ydi01YTIgMiAwIDAgMSAyLTJoMTVhMiAyIDAgMCAxIDIgMnY1eiIvPjxwYXRoIGZpbGw9IiNERDJFNDQiIGQ9Ik0zMyAyN2EyIDIgMCAwIDEtMiAyaC01YTIgMiAwIDAgMS0yLTJ2LTVhMiAyIDAgMCAxIDItMmg1YTIgMiAwIDAgMSAyIDJ2NXoiLz48cGF0aCBmaWxsPSIjRkZBQzMzIiBkPSJNMjcuMDE1IDkuMjRjMS4zMTUgMS40NzggMS45MDggMy4wOTggMS4zMjIgMy42MTlsLTEuMDU5Ljk0MWMtLjU4NS41MjItMi4xMjYtLjI1NS0zLjQ0LTEuNzMzbC0zLjU3MS00LjAxM2MtMS4zMTQtMS40NzktMS45MDctMy4wOTktMS4zMjEtMy42MmwxLjA1OS0uOTQxYy41ODYtLjUyMSAyLjEyNC4yNTUgMy40MzggMS43MzNsMy41NzIgNC4wMTR6Ii8+PHBhdGggZmlsbD0iI0ZGRDk4MyIgZD0iTTIyLjI4IDExLjA3NmMtLjU5OCAxLjUzOS0xLjQ3NyAyLjYzMy0xLjk2MSAyLjQ0NGwtLjg3Ny0uMzQxYy0uNDg1LS4xODgtLjM5My0xLjU4OC4yMDUtMy4xMjZsMS42MjUtNC4xNzhjLjU5OS0xLjUzOCAxLjQ3Ny0yLjYzMiAxLjk2Mi0yLjQ0NGwuODc2LjM0MWMuNDg1LjE4OC4zOTQgMS41ODgtLjIwNSAzLjEyNmwtMS42MjUgNC4xNzh6Ii8+PHBhdGggZmlsbD0iI0ZGRDk4MyIgZD0iTTIzLjExMyAxMS41MzZjLTEuNTYyLjUzNS0yLjk2NS41NjgtMy4xMzMuMDc2bC0uMzA1LS44OTFjLS4xNjktLjQ5Mi45NjItMS4zMjQgMi41MjItMS44NThsNC4yNDItMS40NWMxLjU2Mi0uNTM0IDIuOTY0LS41NjcgMy4xMzMtLjA3NWwuMzA0Ljg5Yy4xNjkuNDkzLS45NjEgMS4zMjUtMi41MjMgMS44NThsLTQuMjQgMS40NXoiLz48cGF0aCBmaWxsPSIjNUM5MTNCIiBkPSJNNi40NDIgNy44NzNjLjM3My00LjEwNiA0LjkwNy0uOTYxIDcuMTM1IDEuMDQ5LTEuMzQgMS40ODUtNy41ODYgMy45My03LjEzNS0xLjA0OXoiLz48cGF0aCBmaWxsPSIjNUM5MTNCIiBkPSJNNi41ODQgNy43ODRjMy43MzktMS43MzcgMy4yOTMgMy43NjMgMi42NzIgNi42OTgtMS45NTYtLjQxNC03LjIwNi00LjU5LTIuNjcyLTYuNjk4eiIvPjxwYXRoIGZpbGw9IiM3N0IyNTUiIGQ9Ik01IDhjLTEuMi0xLjYgMS01IDYtNSAxIDEtMyA5LTYgNXoiLz48cGF0aCBmaWxsPSIjQjJDMkNDIiBkPSJNNiAyN2EuOTk5Ljk5OSAwIDAgMS0uNzA3LTEuNzA3bDEtMWEuOTk5Ljk5OSAwIDEgMSAxLjQxNCAxLjQxNGwtMSAxQS45OTcuOTk3IDAgMCAxIDYgMjd6bTEyLjQxNy40OTlhLjk5Ny45OTcgMCAwIDEtLjcwNy0uMjkzbC0xLTFhMSAxIDAgMSAxIDEuNDE1LTEuNDE0bDEgMWEuOTk5Ljk5OSAwIDAgMS0uNzA4IDEuNzA3em0tNi4xNjctNC4yOTFjLS4yNTUgMC0uNTExLS4wOTgtLjcwNy0uMjkybC0uNDU5LS40NThhMSAxIDAgMSAxIDEuNDEzLTEuNDE2bC40NTkuNDU4YTEgMSAwIDAgMS0uNzA2IDEuNzA4eiIvPjxwYXRoIGZpbGw9IiNCMjYzMDQiIGQ9Ik0zMi4xNDkgMjMuNDEyYTEuOTk5IDEuOTk5IDAgMCAxLS4yNTcgMi44MTZsLTIuMzA1IDEuOTIxYTEuOTk5IDEuOTk5IDAgMCAxLTIuODE2LS4yNTdsLTEuOTIxLTIuMzA1YTEuOTk5IDEuOTk5IDAgMCAxIC4yNTctMi44MTZsMi4zMDUtMS45MjFhMS45OTkgMS45OTkgMCAwIDEgMi44MTYuMjU3bDEuOTIxIDIuMzA1eiIvPjxwYXRoIGZpbGw9IiNGNDkwMEMiIGQ9Ik0zMi4xNDkgMjEuNDEyYTEuOTk5IDEuOTk5IDAgMCAxLS4yNTcgMi44MTZsLTIuMzA1IDEuOTIxYTEuOTk5IDEuOTk5IDAgMCAxLTIuODE2LS4yNTdsLTEuOTIxLTIuMzA1YTEuOTk5IDEuOTk5IDAgMCAxIC4yNTctMi44MTZsMi4zMDUtMS45MjFhMS45OTkgMS45OTkgMCAwIDEgMi44MTYuMjU3bDEuOTIxIDIuMzA1eiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMjYiIHI9IjEiIGZpbGw9IiNDQ0Q2REQiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjIyIiByPSIxIiBmaWxsPSIjQ0NENkREIi8+PC9zdmc+" alt="">Marmitas</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0JCRERGNSIgZD0iTTUgMjEuODc1czEuNTg5IDUuNzI3IDIgOC40ODJjLjQ2NCAzLjExMSAzLjU3MSA1LjU3MSAxMSA1LjU3MXMxMC41MzYtMi40NjEgMTEtNS41NzFjLjQxMS0yLjc1NSAyLTguNDgyIDItOC40ODJINXoiLz48cGF0aCBmaWxsPSIjNjYyMTEzIiBkPSJNNS4wOTQgMjEuOTY5Yy4yNSAxLjIxOS42OTQgMS45OTQgMS4zNDQgMS41OTQuNjUtLjQgMS42NS0uMTkzIDEuMzQ0LjYyNS0uMjgxLjc1Ljk2OSAxLjA5NCAxLjUuNjU2LjUwOS0uNDE5IDEuNTU1LS44ODEgMS42NTYuMDYyLjA5NC44NzUgMS4xNjggMS4xMSAxLjY1Ni40NjkuNS0uNjU2IDEuODc1LS4zOTQgMi4xMjUuNDA2czEuNTk0LjY4OCAxLjk2OS4xMjVjLjM1NS0uNTMzLjcxMy0uODg1IDEuMzEyLS44ODVWMjVjLjYgMCAuOTU3LjM3MyAxLjMxMi45MDYuMzc1LjU2MiAxLjcxOS42NzUgMS45NjktLjEyNXMxLjYyNS0xLjA2MiAyLjEyNS0uNDA2Yy40ODkuNjQxIDEuNTYyLjQwNiAxLjY1Ni0uNDY5LjEwMS0uOTQzIDEuMTQ3LS40ODIgMS42NTYtLjA2Mi41MzEuNDM4IDEuNzgxLjA5NCAxLjUtLjY1Ni0uMzA3LS44MTguNjk0LTEuMDI1IDEuMzQ0LS42MjUuNjUuNCAxLjA5NC0uMzc1IDEuMzQ0LTEuNTk0SDUuMDk0eiIvPjxwYXRoIGZpbGw9IiNDMTY5NEYiIGQ9Ik0zMyAxOC45NjljMC00LjkxOS02LjczMS04LjkwNi0xNS4wMzMtOC45MDYtOC4zMDMgMC0xNS4wMzMgMy45ODctMTUuMDMzIDguOTA2IDAgMy45NjkgOSA2LjAzMSAxNS4wMzMgNi4wMzFTMzMgMjMgMzMgMTguOTY5eiIvPjxwYXRoIGZpbGw9IiM4OEM5RjkiIGQ9Ik0xOCAzNS41YS41LjUgMCAwIDEtLjUtLjV2LTguNjQ2YS41LjUgMCAwIDEgMSAwVjM1YS41LjUgMCAwIDEtLjUuNXptLTYuNjk5LTEuMjY4YS41MDEuNTAxIDAgMCAxLS40OTYtLjQzNmwtMS4wMzEtNy45ODJhLjUwMi41MDIgMCAwIDEgLjQzMi0uNTYxLjQ5Ny40OTcgMCAwIDEgLjU2LjQzMmwxLjAzMSA3Ljk4MmEuNTAyLjUwMiAwIDAgMS0uNDk2LjU2NXptMy4xNzkuOTc2YS41LjUgMCAwIDEtLjQ5OC0uNDU5bC0uNzA4LTguNTIxYS41LjUgMCAxIDEgLjk5Ny0uMDgybC43MDggOC41MjFhLjUuNSAwIDAgMS0uNDU3LjUzOWwtLjA0Mi4wMDJ6bS01Ljk1OS0zLjA0MWEuMzc1LjM3NSAwIDAgMS0uMzY3LS4zMDFsLTEuNS03LjQzOGEuMzc0LjM3NCAwIDAgMSAuMjkzLS40NDFjLjE5OC0uMDQ4LjQuMDkuNDQyLjI5M2wxLjUgNy40MzhhLjM3NC4zNzQgMCAwIDEtLjM2OC40NDl6bTE2LjEgMS45NTJhLjUuNSAwIDAgMS0uNDk2LS41NzFsMS4xMy03Ljg2OWEuNTA3LjUwNyAwIDAgMSAuNTY2LS40MjQuNS41IDAgMCAxIC40MjQuNTY2bC0xLjEzIDcuODY5YS41LjUgMCAwIDEtLjQ5NC40Mjl6bS0zLjA0MiAxLjA4OS0uMDQyLS4wMDJhLjUuNSAwIDAgMS0uNDU3LS41MzlsLjcwOC04LjUyMWMuMDIyLS4yNzYuMjkyLS40NzQuNTM5LS40NTdhLjUuNSAwIDAgMSAuNDU3LjUzOWwtLjcwOCA4LjUyMWEuNDk5LjQ5OSAwIDAgMS0uNDk3LjQ1OXptNS45ODMtM2EuMzc0LjM3NCAwIDAgMS0uMzY4LS40NDVsMS40MzgtNy40NzlhLjM3NC4zNzQgMCAxIDEgLjczNi4xNGwtMS40MzggNy40NzlhLjM3NC4zNzQgMCAwIDEtLjM2OC4zMDV6Ii8+PHBhdGggZmlsbD0iI0ZGRThCNiIgZD0iTTE2LjkxMi0uMDExczEuMDg3IDEuMTQ0IDIuMTc1IDEuMTY3YzIuMjY4LjA0OSA0LjM1NSAxLjMxNSA0LjM1NSAzLjUwNiAwIDAgNS4yNjEgMCA1LjQ0MyA0LjY3NCAwIDAgMi42NTUuMDQ1IDMuMjYzIDQuNjcyLjQ1NCAzLjQ1Ni0zLjAzOCA4LjIyNy0xNC4xNDggOC4xNzgtOS43OTUtLjA0My0xNC44MDYtMy41MjQtMTQuMTQ4LTguMTc2LjYzNC00LjQ4IDQuMzU0LTQuNjczIDQuMzU0LTQuNjczcy0uNjM2LTUuODQzIDYuNTI5LTUuODQyYzAgMCAuNzI2LTIuMzM3IDIuMTc3LTMuNTA2eiIvPjxwYXRoIGZpbGw9IiNGRkNDNEQiIGQ9Ik0xNy45MSAxMC41MDRjMi45MzYtMS4xMDggNS42MjMtMy4xMTUgNS41MzMtNS44NDEgMC0uODU4LS4zMjctMS41NjgtLjg1Mi0yLjEyNS42NDMgMi44MDgtMy42NTEgNi04LjM5OSA2LjUwNi01Ljk0MS42MzMtNS4yNjEtMi44NzItNS4yNjEtMi44NzJsLS4wMDcuMDA3Yy0uODgzIDEuNTM2LS43MTcgMy4xNTktLjcxNyAzLjE1OS45MDUgMi4zODMgNS41NzYgMi43MjQgOS43MDMgMS4xNjZ6Ii8+PHBhdGggZmlsbD0iI0ZGQ0M0RCIgZD0iTTI4Ljg4NSA5LjMzN2MtLjAwNi0uMTQzLS4wMy0uMjY4LS4wNDUtLjQwMi0uMTE2LS42NzctLjQ1My0xLjUwNi0uNzc0LTIuMTM4LS4xOS0uMjY1LS40LS40OTktLjYzLS43MDIgMS4xMDkgNC40MjYtNS41NjMgOS43NDktMTEuOTMgMTAuOTgyLTguMjk5IDEuNjA2LTExLjY1NC0zLjA2NS0xMS42NTQtMy4wNjUtLjM0MiAyLjQxNS44NTggNC41MDkgMy40NDkgNS45NzYgMTAuMjI3IDQuMTY5IDIxLjY3My02LjA5NSAyMS41ODQtMTAuNjUxeiIvPjxwYXRoIGZpbGw9IiNERDJFNDQiIGQ9Im04LjY4OSAxNC4yMDEtMS4xODEgMS42MTRhMS4wMDMgMS4wMDMgMCAwIDEtMS4zOTguMjE2IDEuMDAzIDEuMDAzIDAgMCAxLS4yMTYtMS4zOThsMS4xODEtMS42MTRhMS4wMDMgMS4wMDMgMCAwIDEgMS4zOTgtLjIxNmMuNDQ0LjMyNS41NDEuOTU0LjIxNiAxLjM5OHoiLz48cGF0aCBmaWxsPSIjNTVBQ0VFIiBkPSJtMTQuOTM1IDguMTg3LTEuOTU2LS40MTlhMS4wMDIgMS4wMDIgMCAwIDEtLjc2OC0xLjE4N2MuMTE1LS41MzguNjUtLjg4NCAxLjE4Ny0uNzY4bDEuOTU2LjQxOWMuNTM4LjExNS44ODQuNjUuNzY4IDEuMTg3YTEuMDAxIDEuMDAxIDAgMCAxLTEuMTg3Ljc2OHoiLz48cGF0aCBmaWxsPSIjNzdCMjU1IiBkPSJtMTYuNDMxIDE0LjE3MyAxLjMxMyAxLjUwOWMuMzYxLjQxNS4zMTcgMS4wNS0uMDk4IDEuNDExYTEuMDAzIDEuMDAzIDAgMCAxLTEuNDExLS4wOThsLTEuMzEzLTEuNTA5YTEuMDAzIDEuMDAzIDAgMCAxIC4wOTgtMS40MTEgMS4wMDMgMS4wMDMgMCAwIDEgMS40MTEuMDk4eiIvPjxwYXRoIGZpbGw9IiNGNDkwMEMiIGQ9Im0yNC4zNzIgMTEuNDk5LTEuODcxLjcwN2ExLjAwMyAxLjAwMyAwIDAgMS0xLjI4OS0uNTgyIDEuMDAzIDEuMDAzIDAgMCAxIC41ODItMS4yODlsMS44NzEtLjcwN2ExLjAwMyAxLjAwMyAwIDAgMSAxLjI4OS41ODIgMS4wMDMgMS4wMDMgMCAwIDEtLjU4MiAxLjI4OXoiLz48cGF0aCBmaWxsPSIjQUE4REQ4IiBkPSJtMzAuMzY2IDE0LjA1MS0xIDEuNzMyYy0uMjc1LjQ3Ni0uODkuNjQxLTEuMzY2LjM2NmExLjAwMyAxLjAwMyAwIDAgMS0uMzY2LTEuMzY2bDEtMS43MzJjLjI3NS0uNDc2Ljg5LS42NDEgMS4zNjYtLjM2Ni40NzYuMjc1LjY0MS44ODkuMzY2IDEuMzY2eiIvPjwvc3ZnPg==" alt="">Doces</button>
+    <button class="cat glass" role="tab" aria-selected="false"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iIzg4OTlBNiIgZD0iTTI2Ljg2NCA4SDE4djI4YzYgMCAxMC0xIDExLjM5My03LjAxNS43NzQtMy4zNDIgMS42NjMtMTIuMzM1IDEuNjYzLTE3Ljg0MUMzMS4wNTYgOS4yNzkgMjkuNjIzIDggMjYuODY0IDh6TTguODkyIDhIMTh2MjhjLTYgMC0xMC0xLTExLjUxNS03LjAxNS0uODM4LTMuMzI3LTEuNzI0LTEyLjMzNS0xLjcyNC0xNy44NDFDNC43NjEgOS4yNzkgNi4xMzIgOCA4Ljg5MiA4eiIvPjxwYXRoIGZpbGw9IiNDQ0Q2REQiIGQ9Ik0zMS4wNTIgMTAuNWMwIDIuMDcxLTMuMTMgMy43NS0xMy4wNTcgMy43NS05LjkyNiAwLTEzLjA1Ny0xLjY3OS0xMy4wNTctMy43NSAwLTIuMDcyIDMuMTMxLTMuNzUgMTMuMDU3LTMuNzUgOS45MjcgMCAxMy4wNTcgMS42NzggMTMuMDU3IDMuNzV6Ii8+PHBhdGggZmlsbD0iI0NDRDZERCIgZD0iTTE4LjAyNSAxMi45OTcgNi41MTYgMTJjMCA3IDEuMTA0IDE0LjM4MiAxLjY4MSAxNi41NzJDOC44NTkgMzEuMDgxIDExIDMwLjk4MSAxOCAzMC45OThWMzF2LS4wMDJjNy0uMDE4IDkuMTY2LjA4MyA5LjgyNy0yLjQyNkMyOC40MDUgMjYuMzgyIDI5LjUyIDE5IDI5LjUyIDEybC0xMS40OTUuOTk3eiIvPjxwYXRoIGZpbGw9IiM1NUFDRUUiIGQ9Ik0xOCAyMXYxM2M3IDAgOS0xIDkuODU3LTUuNDI4LjI0MS0xLjI0My44MDctNC4wNzUgMS4xNzQtNy41NzJIMTh6TTcuMDE5IDIxYy4zNjYgMy40OTcuOTE1IDYuMzI3IDEuMTQ5IDcuNTcyQzkgMzMgMTEgMzQgMTggMzRWMjFINy4wMTl6Ii8+PHBhdGggZmlsbD0iIzNCODhDMyIgZD0iTTE4IDMwLjE2Yy00LjU1NiAwLTguMjQ5Ljg5NS04LjI0OSAyIDAgLjAwOS4wMDUuMDE4LjAwNi4wMjhDMTEuMTU0IDMzLjU5OCAxMy41NzggMzQgMTggMzRjNC40MTMgMCA2LjgzNi0uNCA4LjI0MS0xLjgwMy4wMDEtLjAxMi4wMDgtLjAyNC4wMDgtLjAzNyAwLTEuMTA1LTMuNjkzLTItOC4yNDktMnoiLz48ZWxsaXBzZSBjeD0iMTcuOTk1IiBjeT0iMjEiIGZpbGw9IiM4OEM5RjkiIHJ4PSIxMS4wMTYiIHJ5PSIyIi8+PHBhdGggZmlsbD0iI0UxRThFRCIgZD0ibTMzLjk1OC45MzYtNi44MjQgMS42OTdjLS43NTEuMTg3LTEuNTY1LjU3Ny0yLjQ0IDEuMjM5LTEuNjQzIDEuMjQzLTEuOTc4IDIuOTMtMi4yNDYgMy44NjFMMTguMzQgMjJoMy4xMjJMMjUuMzMgOC41NjRjLjI2NC0uOTE2LjUyNi0xLjcwMiAxLjEyOS0yLjI0OS41MzQtLjQ4NCAxLjQxNy0uNzY5IDIuMjQ0LS45ODNsNS45NzctMS40ODNhMS41MDUgMS41MDUgMCAwIDAgMS4wOTUtMS44MTdBMS41MDQgMS41MDQgMCAwIDAgMzMuOTU4LjkzNnoiLz48cGF0aCBmaWxsPSIjODhDOUY5IiBkPSJtMTguMzQgMjItMi42NzEgOS4yNzdhMS41MDYgMS41MDYgMCAwIDAgMS4wMjYgMS44NTcgMS41MDQgMS41MDQgMCAwIDAgMS44NTYtMS4wMjZMMjEuNDYyIDIySDE4LjM0eiIvPjxwYXRoIGZpbGw9IiM3NDRFQUEiIGQ9Im0xOC42NDEgMjIuNjc3LS41ODguMzIyLS4yNzMuOTQ3IDIuMDY2IDMuNjY5Ljc3Ni0yLjY5Ni0xLjI2MS0yLjI0MXoiLz48cGF0aCBmaWxsPSIjREQyRTQ0IiBkPSJtMjcuOTA2IDIuNDQxLTEuMTI4IDMuNjQ3Yy41MzEtLjM0NyAxLjI0Mi0uNTggMS45MjctLjc1N2wuNDM0LS4xMDggMS4wMzUtMy4zNDYtMi4yNjguNTY0eiIvPjxwYXRoIGZpbGw9IiM3NDRFQUEiIGQ9Im0xNy4wNDUgMjYuNDk5LS43NzcgMi42OTcgMS45NjIgMy40ODVjLjE0NC0uMTYyLjI1OC0uMzUzLjMyMi0uNTc0bC41NTgtMS45MzktMi4wNjUtMy42Njl6Ii8+PHBhdGggZmlsbD0iI0REMkU0NCIgZD0ibTIwLjA0OCAxNi4wNjgtLjc3NyAyLjY5OCAxLjM4MSAyLjQ1Mi40NzIuMTA1LjYyNi0uMzIzLjM2NC0xLjI2MnpNMzQuNDk1LjkwN2ExLjQ4MiAxLjQ4MiAwIDAgMC0uNTM3LjAyOWwtMS42OTYuNDIyLTEuMDM2IDMuMzQ3IDIuMjY3LS41NjNMMzQuNDk1LjkwN3pNMjAuNzkxIDEzLjQ4OGwyLjA2NiAzLjY2OC43NzYtMi42OTYtMi4wNjUtMy42Njl6bTMuODYyLTkuNTc5YTUuMzM4IDUuMzM4IDAgMCAwLTEuNjAxIDIuMDIybDEuMzIgNS45NjguOTYtMy4zMzVjLjA2Ni0uMjMuMTMzLS40NTIuMjA0LS42NjRsLS44ODMtMy45OTF6Ii8+PHBhdGggZmlsbD0iIzU1QUNFRSIgZD0iTTE4LjY2MyAyMC44ODEgMTguMDUzIDIzYTU4LjMxOSA1OC4zMTkgMCAwIDAgMy4xNDctLjA4NmwuNTg1LTIuMDMyYy0uOTM4LjQ4My0yLjg5NC4xODEtMy4xMjItLjAwMXoiLz48cGF0aCBmaWxsPSIjRkZGIiBkPSJNMjkuNjE1IDExLjMwOWExLjIxNiAxLjIxNiAwIDAgMC0xLjU4NC0uNzI0IDI4LjA2IDI4LjA2IDAgMCAxLTEwLjAzNiAxLjkzN3YyLjQ5MmMzLjMzMy0uMDM0IDcuMDg5LS41NzcgMTAuOTEzLTIuMDguNjMzLS4yNDguOTUtLjk3Ni43MDctMS42MjV6bS0yMy4yNCAwYTEuMjE2IDEuMjE2IDAgMCAxIDEuNTg0LS43MjQgMjguMDYgMjguMDYgMCAwIDAgMTAuMDM2IDEuOTM3djIuNDkyYy0zLjMzMy0uMDM0LTcuMDg5LS41NzctMTAuOTEzLTIuMDhhMS4yNjggMS4yNjggMCAwIDEtLjcwNy0xLjYyNXoiLz48L3N2Zz4=" alt="">Bebidas</button>
+  </nav>
+
+  <article class="promo" aria-label="Promoção: combo Smash em dobro, até 30% de desconto">
+    <div class="script">Combo da casa</div>
+    <div class="big">Smash<br>em dobro</div>
+    <p>2 smashs + fritas + refri por R$ 49,90</p>
+    <img class="art" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Q5OUU4MiIgZD0iTTE4IDIwLjQxMWMtOS4zNzEgMC0xNi45NjctLjIyNS0xNi45NjcgNi40MjdDMS4wMzMgMzMuNDg3IDguNjI5IDM1IDE4IDM1YzkuMzcxIDAgMTYuOTY3LTEuNTEzIDE2Ljk2Ny04LjE2MiAwLTYuNjUxLTcuNTk2LTYuNDI3LTE2Ljk2Ny02LjQyN3oiLz48cGF0aCBmaWxsPSIjNjYyMTEzIiBkPSJNMzQuNDcgMjAuOTE2UzI2LjI1MSAxOS45MzIgMTggMTkuODljLTguMjUxLjA0Mi0xNi40NyAxLjAyNi0xNi40NyAxLjAyNkMuNzE3IDI3LjM5IDcuNDY3IDMwLjA1NyAxOCAzMC4wNTdzMTcuMjgzLTIuNjY3IDE2LjQ3LTkuMTQxeiIvPjxwYXRoIGZpbGw9IiNGRkNDNEQiIGQ9Im0zMy44ODYgMTguMzI4LTMxLjg1NS42NDZjLTEuMSAwLTIuMDIxIDIuMjI5LS44NTQgMi44MTIgOC43MDggMi43MDggMTUuNzA4IDUuNDQ4IDE1LjcwOCA1LjQ0OC45NjIuNTMyIDEuMjg3LjUzNCAyLjI1LjAwMyAwIDAgOS42NjYtMy44NjggMTUuODc1LTUuNDkzLjg4MS0uMjMtLjAyNS0zLjQxNi0xLjEyNC0zLjQxNnoiLz48cGF0aCBmaWxsPSIjNzdCMjU1IiBkPSJNMzQuNzI1IDE4LjQxMmMtMS45LTEuNzUxLTEuNzktLjgxOS0zLjI0Ni0xLjIzLS41NTMtLjE1Ni00LjUxLTUuMjcxLTEzLjUyOS01LjI3MWgtLjAyYy05LjAxOSAwLTEyLjk3NiA1LjExNS0xMy41MjkgNS4yNzEtMS40NTYuNDExLTEuMzQ2LS41MjEtMy4yNDYgMS4yMy0uODcyLjgwNC0xLjEwOCAxLjIyMi0uMTg4IDEuNDMgMS4zODYuMzEzIDEuMjYgMS4xNTIgMi4yNTMgMS40NDQgMS4yMDIuMzUzIDEuNjk2LS4yOTIgMy42MzQtLjAyOCAxLjY1My4yMjUgMS43NjEgMi4zNjkgMy40MjkgMi4zNjlzMS42NjgtLjggMy4zMzUtLjggMi42NTMgMi4xNDYgNC4zMjEgMi4xNDYgMi42NTMtMi4xNDYgNC4zMjEtMi4xNDZjMS42NjggMCAxLjY2OC44IDMuMzM1LjggMS42NjggMCAxLjc3Ni0yLjE0NCAzLjQyOS0yLjM2OSAxLjkzOC0uMjYzIDIuNDMzLjM4MSAzLjYzNC4wMjguOTkzLS4yOTIuODY3LTEuMTMgMi4yNTMtMS40NDQuOTIyLS4yMDcuNjg3LS42MjYtLjE4Ni0xLjQzeiIvPjxwYXRoIGZpbGw9IiNERDJFNDQiIGQ9Ik0zNC4wNzcgMTYuNTJjMCAyLjk4NC03LjE5OCA0LjM5My0xNi4wNzcgNC4zOTNTMS45MjMgMTkuNTA0IDEuOTIzIDE2LjUyYzAtNS40MDMuOTY2LTUuNDAzIDE2LjA3Ny01LjQwM3MxNi4wNzcuMDAxIDE2LjA3NyA1LjQwM3oiLz48cGF0aCBmaWxsPSIjRDk5RTgyIiBkPSJNMTggLjUyNEM4LjYyOS41MjQgMS4wMzMgNC45MTUgMS4wMzMgMTEuNTY2YzAgNi4xMjUgNy41OTYgNi4zNzUgMTYuOTY3IDYuMzc1czE2Ljk2Ny0uMjUgMTYuOTY3LTYuMzc1QzM0Ljk2NyA0LjkxNCAyNy4zNzEuNTI0IDE4IC41MjR6Ii8+PHBhdGggZmlsbD0iI0ZGRThCNiIgZD0iTTEwLjc4NCAzLjY5NWExLjA2OSAxLjA2OSAwIDEgMC0xLjE1MiAxLjgwMmMuNDk4LjMxOSAxLjc2LjU1NyAyLjA3OS4wNTkuMzE4LS40OTgtLjQyOS0xLjU0My0uOTI3LTEuODYxem05LjczNC0xLjAzNWMtLjU2Mi4xODItMS41NDkgMS4wMDYtMS4zNjYgMS41NjguMTgzLjU2MiAxLjQ2NC42NDggMi4wMjYuNDY2YTEuMDY5IDEuMDY5IDAgMCAwLS42Ni0yLjAzNHptMTAuOTA5IDcuMDM1Yy0uNDUyLS4zOC0xLjU4NS4yMjUtMS45NjYuNjc3YTEuMDcgMS4wNyAwIDAgMCAxLjYzOCAxLjM3NmMuMzgxLS40NTMuNzgxLTEuNjczLjMyOC0yLjA1M3ptLTMuNjQzLTVhMS4wNyAxLjA3IDAgMCAwLTEuMTUyIDEuODAzYy40OTguMzE5IDEuNzYuNTU3IDIuMDc4LjA1OS4zMTktLjQ5OS0uNDI4LTEuNTQ0LS45MjYtMS44NjJ6bS0xNSA3YTEuMDcgMS4wNyAwIDAgMC0xLjQ3OC4zMjYgMS4wNjggMS4wNjggMCAwIDAgLjMyNiAxLjQ3NmMuNDk4LjMxOSAxLjc2LjU1OCAyLjA3OC4wNTkuMzE5LS40OTgtLjQyOC0xLjU0My0uOTI2LTEuODYxem0zLjA0Ni00LjgwOGMtLjMzNi40ODYtLjYyIDEuNzM5LS4xMzMgMi4wNzUuNDg2LjMzNiAxLjU1Ny0uMzc0IDEuODkzLS44NmExLjA3IDEuMDcgMCAwIDAtMS43Ni0xLjIxNXptNy45NTQgNC44MDhhMS4wNyAxLjA3IDAgMCAwLTEuNDc4LjMyNiAxLjA2OCAxLjA2OCAwIDAgMCAuMzI2IDEuNDc2Yy40OTguMzE5IDEuNzYuNTU4IDIuMDc4LjA1OS4zMTktLjQ5OC0uNDI4LTEuNTQzLS45MjYtMS44NjF6TTQuOTQ4IDcuODA4Yy0uMzk0LjQ0MS0uODMzIDEuNjQ4LS4zOTIgMi4wNDIuNDM5LjM5NCAxLjU5MS0uMTc0IDEuOTg1LS42MTVhMS4wNyAxLjA3IDAgMSAwLTEuNTkzLTEuNDI3eiIvPjwvc3ZnPg==" alt="">
+    <div class="off"><span><small>até</small>30%<small>OFF</small></span></div>
+  </article>
+  <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+
+  <div class="sec">
+    <h2><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Y0OTAwQyIgZD0iTTM1IDE5YTE2Ljk2IDE2Ljk2IDAgMCAwLTEuMDQtNS44NjhjLS40NiA1LjM4OS0zLjMzMyA4LjE1Ny02LjMzNSA2Ljg2OC0yLjgxMi0xLjIwOC0uOTE3LTUuOTE3LS43NzctOC4xNjQuMjM2LTMuODA5LS4wMTItOC4xNjktNi45MzEtMTEuNzk0IDIuODc1IDUuNS4zMzMgOC45MTctMi4zMzMgOS4xMjUtMi45NTguMjMxLTUuNjY3LTIuNTQyLTQuNjY3LTcuMDQyLTMuMjM4IDIuMzg2LTMuMzMyIDYuNDAyLTIuMzMzIDkgMS4wNDIgMi43MDgtLjA0MiA0Ljk1OC0yLjU4MyA1LjIwOC0yLjg0LjI4LTQuNDE4LTMuMDQxLTIuOTYzLTguMzMzQTE2LjkzNiAxNi45MzYgMCAwIDAgMSAxOWMwIDkuMzg5IDcuNjExIDE3IDE3IDE3czE3LTcuNjExIDE3LTE3eiIvPjxwYXRoIGZpbGw9IiNGRkNDNEQiIGQ9Ik0yOC4zOTQgMjMuOTk5Yy4xNDggMy4wODQtMi41NjEgNC4yOTMtNC4wMTkgMy43MDktMi4xMDYtLjg0My0xLjU0MS0yLjI5MS0yLjA4My01LjI5MXMtMi42MjUtNS4wODMtNS43MDgtNmMyLjI1IDYuMzMzLTEuMjQ3IDguNjY3LTMuMDggOS4wODQtMS44NzIuNDI2LTMuNzUzLS4wMDEtMy45NjgtNC4wMDdBMTEuOTY0IDExLjk2NCAwIDAgMCA2IDMwYzAgLjM2OC4wMjMuNzMuMDU1IDEuMDlDOS4xMjUgMzQuMTI0IDEzLjM0MiAzNiAxOCAzNnM4Ljg3NS0xLjg3NiAxMS45NDUtNC45MWMuMDMyLS4zNi4wNTUtLjcyMi4wNTUtMS4wOSAwLTIuMTg3LS41ODQtNC4yMzYtMS42MDYtNi4wMDF6Ii8+PC9zdmc+" alt="">Mais pedidos</h2>
+    <a href="#">Ver tudo <svg class="i"><use href="#arrow"/></svg></a>
+  </div>
+  <div class="row">
+    <div class="card glass">
+      <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Q5OUU4MiIgZD0iTTE4IDIwLjQxMWMtOS4zNzEgMC0xNi45NjctLjIyNS0xNi45NjcgNi40MjdDMS4wMzMgMzMuNDg3IDguNjI5IDM1IDE4IDM1YzkuMzcxIDAgMTYuOTY3LTEuNTEzIDE2Ljk2Ny04LjE2MiAwLTYuNjUxLTcuNTk2LTYuNDI3LTE2Ljk2Ny02LjQyN3oiLz48cGF0aCBmaWxsPSIjNjYyMTEzIiBkPSJNMzQuNDcgMjAuOTE2UzI2LjI1MSAxOS45MzIgMTggMTkuODljLTguMjUxLjA0Mi0xNi40NyAxLjAyNi0xNi40NyAxLjAyNkMuNzE3IDI3LjM5IDcuNDY3IDMwLjA1NyAxOCAzMC4wNTdzMTcuMjgzLTIuNjY3IDE2LjQ3LTkuMTQxeiIvPjxwYXRoIGZpbGw9IiNGRkNDNEQiIGQ9Im0zMy44ODYgMTguMzI4LTMxLjg1NS42NDZjLTEuMSAwLTIuMDIxIDIuMjI5LS44NTQgMi44MTIgOC43MDggMi43MDggMTUuNzA4IDUuNDQ4IDE1LjcwOCA1LjQ0OC45NjIuNTMyIDEuMjg3LjUzNCAyLjI1LjAwMyAwIDAgOS42NjYtMy44NjggMTUuODc1LTUuNDkzLjg4MS0uMjMtLjAyNS0zLjQxNi0xLjEyNC0zLjQxNnoiLz48cGF0aCBmaWxsPSIjNzdCMjU1IiBkPSJNMzQuNzI1IDE4LjQxMmMtMS45LTEuNzUxLTEuNzktLjgxOS0zLjI0Ni0xLjIzLS41NTMtLjE1Ni00LjUxLTUuMjcxLTEzLjUyOS01LjI3MWgtLjAyYy05LjAxOSAwLTEyLjk3NiA1LjExNS0xMy41MjkgNS4yNzEtMS40NTYuNDExLTEuMzQ2LS41MjEtMy4yNDYgMS4yMy0uODcyLjgwNC0xLjEwOCAxLjIyMi0uMTg4IDEuNDMgMS4zODYuMzEzIDEuMjYgMS4xNTIgMi4yNTMgMS40NDQgMS4yMDIuMzUzIDEuNjk2LS4yOTIgMy42MzQtLjAyOCAxLjY1My4yMjUgMS43NjEgMi4zNjkgMy40MjkgMi4zNjlzMS42NjgtLjggMy4zMzUtLjggMi42NTMgMi4xNDYgNC4zMjEgMi4xNDYgMi42NTMtMi4xNDYgNC4zMjEtMi4xNDZjMS42NjggMCAxLjY2OC44IDMuMzM1LjggMS42NjggMCAxLjc3Ni0yLjE0NCAzLjQyOS0yLjM2OSAxLjkzOC0uMjYzIDIuNDMzLjM4MSAzLjYzNC4wMjguOTkzLS4yOTIuODY3LTEuMTMgMi4yNTMtMS40NDQuOTIyLS4yMDcuNjg3LS42MjYtLjE4Ni0xLjQzeiIvPjxwYXRoIGZpbGw9IiNERDJFNDQiIGQ9Ik0zNC4wNzcgMTYuNTJjMCAyLjk4NC03LjE5OCA0LjM5My0xNi4wNzcgNC4zOTNTMS45MjMgMTkuNTA0IDEuOTIzIDE2LjUyYzAtNS40MDMuOTY2LTUuNDAzIDE2LjA3Ny01LjQwM3MxNi4wNzcuMDAxIDE2LjA3NyA1LjQwM3oiLz48cGF0aCBmaWxsPSIjRDk5RTgyIiBkPSJNMTggLjUyNEM4LjYyOS41MjQgMS4wMzMgNC45MTUgMS4wMzMgMTEuNTY2YzAgNi4xMjUgNy41OTYgNi4zNzUgMTYuOTY3IDYuMzc1czE2Ljk2Ny0uMjUgMTYuOTY3LTYuMzc1QzM0Ljk2NyA0LjkxNCAyNy4zNzEuNTI0IDE4IC41MjR6Ii8+PHBhdGggZmlsbD0iI0ZGRThCNiIgZD0iTTEwLjc4NCAzLjY5NWExLjA2OSAxLjA2OSAwIDEgMC0xLjE1MiAxLjgwMmMuNDk4LjMxOSAxLjc2LjU1NyAyLjA3OS4wNTkuMzE4LS40OTgtLjQyOS0xLjU0My0uOTI3LTEuODYxem05LjczNC0xLjAzNWMtLjU2Mi4xODItMS41NDkgMS4wMDYtMS4zNjYgMS41NjguMTgzLjU2MiAxLjQ2NC42NDggMi4wMjYuNDY2YTEuMDY5IDEuMDY5IDAgMCAwLS42Ni0yLjAzNHptMTAuOTA5IDcuMDM1Yy0uNDUyLS4zOC0xLjU4NS4yMjUtMS45NjYuNjc3YTEuMDcgMS4wNyAwIDAgMCAxLjYzOCAxLjM3NmMuMzgxLS40NTMuNzgxLTEuNjczLjMyOC0yLjA1M3ptLTMuNjQzLTVhMS4wNyAxLjA3IDAgMCAwLTEuMTUyIDEuODAzYy40OTguMzE5IDEuNzYuNTU3IDIuMDc4LjA1OS4zMTktLjQ5OS0uNDI4LTEuNTQ0LS45MjYtMS44NjJ6bS0xNSA3YTEuMDcgMS4wNyAwIDAgMC0xLjQ3OC4zMjYgMS4wNjggMS4wNjggMCAwIDAgLjMyNiAxLjQ3NmMuNDk4LjMxOSAxLjc2LjU1OCAyLjA3OC4wNTkuMzE5LS40OTgtLjQyOC0xLjU0My0uOTI2LTEuODYxem0zLjA0Ni00LjgwOGMtLjMzNi40ODYtLjYyIDEuNzM5LS4xMzMgMi4wNzUuNDg2LjMzNiAxLjU1Ny0uMzc0IDEuODkzLS44NmExLjA3IDEuMDcgMCAwIDAtMS43Ni0xLjIxNXptNy45NTQgNC44MDhhMS4wNyAxLjA3IDAgMCAwLTEuNDc4LjMyNiAxLjA2OCAxLjA2OCAwIDAgMCAuMzI2IDEuNDc2Yy40OTguMzE5IDEuNzYuNTU4IDIuMDc4LjA1OS4zMTktLjQ5OC0uNDI4LTEuNTQzLS45MjYtMS44NjF6TTQuOTQ4IDcuODA4Yy0uMzk0LjQ0MS0uODMzIDEuNjQ4LS4zOTIgMi4wNDIuNDM5LjM5NCAxLjU5MS0uMTc0IDEuOTg1LS42MTVhMS4wNyAxLjA3IDAgMSAwLTEuNTkzLTEuNDI3eiIvPjwvc3ZnPg==" alt=""><button class="fav" aria-label="Favoritar Smash Clássico"><svg class="i"><use href="#heart"/></svg></button></div>
+      <div class="body"><h3>Smash Clássico</h3>
+        <div class="rate"><svg class="i"><use href="#star"/></svg><b>4,8</b> (1,2 mil)</div>
+        <div class="buy"><span class="price">R$ 29,90</span><button class="add" aria-label="Adicionar Smash Clássico"><svg class="i"><use href="#plus"/></svg></button></div></div>
+    </div>
+    <div class="card glass">
+      <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Y0OTAwQyIgZD0iTTE4IDRjNy4yNTcgMCAxMyA0IDE0LjY5OSAyIC4xOTctLjMyMy4zMDEtLjY1Ny4zMDEtMSAwLTItNi43MTYtNS0xNS01QzkuNzE2IDAgMyAzIDMgNWMwIC4zNDMuMTA0LjY3Ny4zMDEgMUM1IDggMTAuNzQzIDQgMTggNHoiLz48cGF0aCBmaWxsPSIjRkZDQzREIiBkPSJNMTggM0MxMS43ODcgMyA3LjM4NCA0LjgxIDUuNzI3IDUuNjE4Yy0uNDc3LjIzMy0uNTM5Ljg0LS40MTUgMS4yNzhTMTYgMzQgMTYgMzRzLjg5NiAyIDIgMiAyLTIgMi0yTDMwLjcwNCA2Ljc3OXMuMjEzLS44NDItLjU2OS0xLjIyOUMyOC4zOTIgNC42ODkgMjQuMDQ3IDMgMTggM3oiLz48ZyBmaWxsPSIjQkUxOTMxIj48cGF0aCBkPSJNMTggMzFhNCA0IDAgMCAwLTQtNGMtLjI1NCAwLS41LjAyOS0uNzQxLjA3NUwxNiAzNHMuMDcxLjE0LjE5LjM0MkEzLjk5MiAzLjk5MiAwIDAgMCAxOCAzMXptLTEtMTFhNCA0IDAgMCAwLTQtNGMtMS40MjYgMC0yLjY3Ljc1Mi0zLjM3OCAxLjg3NmwyLjM2MiA1Ljk3OEEzLjk3IDMuOTcgMCAwIDAgMTMgMjRjMi4yMDggMCA0LTEuNzkyIDQtNHoiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjgiIHI9IjQiLz48cGF0aCBkPSJNMjUgOWE0IDQgMCAwIDAgMCA4Yy42ODIgMCAxLjMxNS0uMTg3IDEuODc3LS40ODhsMS44OS00LjgwNkMyOC4yMjcgMTAuMTM1IDI2Ljc1MiA5IDI1IDl6bS02IDE2YTMuOTkyIDMuOTkyIDAgMCAwIDMuMDE5IDMuODY0bDIuODkzLTcuMzU3QTMuOTU0IDMuOTU0IDAgMCAwIDIzIDIxYy0yLjIwOCAwLTQgMS43OTItNCA0em0tOS0xM2E0IDQgMCAwIDAtNC00Yy0uMDg3IDAtLjE2OS4wMi0uMjU1LjAyNi41NSAxLjQxMiAxLjU3NSA0LjAxNiAyLjc3NSA3LjA1N0M5LjQxNiAxNC4zNDkgMTAgMTMuMjQ4IDEwIDEyeiIvPjwvZz48L3N2Zz4=" alt=""><button class="fav" aria-label="Favoritar Pizza Calabresa"><svg class="i"><use href="#heart"/></svg></button></div>
+      <div class="body"><h3>Pizza Calabresa da Casa</h3>
+        <div class="rate"><svg class="i"><use href="#star"/></svg><b>4,7</b> (860)</div>
+        <div class="buy"><span class="price">R$ 54,90</span><button class="add" aria-label="Adicionar Pizza Calabresa"><svg class="i"><use href="#plus"/></svg></button></div></div>
+    </div>
+    <div class="card glass">
+      <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0JFMTkzMSIgZD0iTTE4IDJDOS43MTYgMiAzIDYuNDkyIDMgMTQuNWMwIC4wNTkuMDUyLjc1OC4xMjUgMS41MDlDMy4zOTEgMTUuOTk1IDE4IDI4IDE4IDI4czE0LjYwNy0xMi4wMDYgMTQuODcxLTExLjk5MmMuMDUtLjQ5NC4xMjktMS40MzEuMTI5LTEuNTA4QzMzIDYuNDkyIDI2LjI4NCAyIDE4IDJ6Ii8+PHBhdGggZmlsbD0iI0Y0OTAwQyIgZD0iTTMwLjE2NiAxMS41MDlhMS40ODQgMS40ODQgMCAwIDAtLjkxOC4xOTZjLS4wMDMtLjQzMi0uMDU5LS44MTEtLjIwMi0xLjEwNGwuMzc2LTEuMTI4YTEuNSAxLjUgMCAwIDAtLjk0OC0xLjg5NyAxLjQ3NCAxLjQ3NCAwIDAgMC0xLjAzMi4wMzYgMS40OSAxLjQ5IDAgMCAwLTEuNjQ1LTEuMSAxLjQ3OSAxLjQ3OSAwIDAgMC0uMzQ4LjA5NiAxLjUwMSAxLjUwMSAwIDAgMC0yLjkzNS4xODhMMjIuMiA5LjEwMmExLjQ4MyAxLjQ4MyAwIDAgMC0xLjMwNi0uNiAxLjQ5NyAxLjQ5NyAwIDAgMC0xLjMyOSAxLjA3NWwtLjA3My0uNzI4YTEuNDk5IDEuNDk5IDAgMCAwLTIuOTg1LjI3NmwtLjAyLjAxYTEuNDk1IDEuNDk1IDAgMCAwLS42LTEuMzQ2bC0uNDE3LTIuMDg0YTEuNSAxLjUgMCAwIDAtMi45NDIuNTg4bC43MTggMy41OTEtLjM4MiAxLjYwNS0xLjQ1NC00LjAwMmExLjUgMS41IDAgMSAwLTIuODIgMS4wMjZsMS4xMDggMy4wNDdjLS4zNDUuMjM2LS41OTQuNjEtLjY0NiAxLjA1OGwtLjI0NSAyLjA5OS0uMzI3LTEuOTYzYTEuNSAxLjUgMCAwIDAtMi45NTkuNDkzbDEuNTUgOS4yOTloMjMuMzA1Yy4wNDktLjEyMiAxLjExNi05LjM4IDEuMTE2LTkuMzhhMS41MDIgMS41MDIgMCAwIDAtMS4zMjYtMS42NTd6Ii8+PHBhdGggZmlsbD0iI0ZGQ0M0RCIgZD0iTTI3LjQ4NiA3Ljc5N2MtLjAwOS0uMDY0LS4wMjgtLjEyMy0uMDQ0LS4xODRhMS40OSAxLjQ5IDAgMCAwLTEuNjQ1LTEuMSAxLjQ3OSAxLjQ3OSAwIDAgMC0uMzQ4LjA5NiAxLjQ5NSAxLjQ5NSAwIDAgMC0uOTM1IDEuNTkzbDEuOTU2IDE0LjM0M2gzLjAyOEwyNy40ODYgNy43OTd6bS00Ljk5IDIuMDk2YTEuNDk4IDEuNDk4IDAgMCAwLS4yOTctLjc5IDEuNDgzIDEuNDgzIDAgMCAwLTEuMzA2LS42IDEuNDk3IDEuNDk3IDAgMCAwLTEuMzI5IDEuMDc1IDEuNDk0IDEuNDk0IDAgMCAwLS4wNjEuNTI4bC44NzkgMTIuMzEyLjAwOS4xMjdIMjMuNGwtLjAwMi0uMDI3LS45MDItMTIuNjI1em0tMTEuNzgxIDEuNDA4YTEuNDkgMS40OSAwIDAgMC0xLjAxNy4yNThjLS4zNDUuMjM2LS41OTQuNjEtLjY0NiAxLjA1OGwtMS4xNTkgOS45MjloMy4wMmwxLjExOC05LjU4MWExLjUgMS41IDAgMCAwLTEuMzE2LTEuNjY0em00Ljc1Ni01LjU5NWExLjUgMS41IDAgMCAwLTIuOTQyLjU4OGwzLjI1IDE2LjI1MmgzLjA1OWwtMy4zNjctMTYuODR6Ii8+PHBhdGggZmlsbD0iI0REMkU0NCIgZD0iTTI5IDE3YzAgMi43NjItNC4zNzMgNS0xMSA1UzcgMTkuNzYyIDcgMTdjMC0xLjEwNC0xLjg5Ni0xLTMtMS0uMzE2IDAtLjYwOS0uMDA1LS44NzUuMDA5QzMuMTg2IDE2LjY0NCA1IDMxIDUgMzFhNCA0IDAgMCAwIDQgNGgxOGE0IDQgMCAwIDAgNC00czEuODU4LTE0Ljg2NCAxLjg3MS0xNC45OTJDMzIuNjA3IDE1Ljk5NCAzMi4zMTQgMTYgMzIgMTZjLTEuMTA0IDAtMy0uMTA0LTMgMXoiLz48Y2lyY2xlIGN4PSIxOCIgY3k9IjI4IiByPSI0IiBmaWxsPSIjQkUxOTMxIi8+PC9zdmc+" alt=""><button class="fav" aria-label="Favoritar Batata Rústica"><svg class="i"><use href="#heart"/></svg></button></div>
+      <div class="body"><h3>Batata Rústica com Cheddar</h3>
+        <div class="rate"><svg class="i"><use href="#star"/></svg><b>4,9</b> (2,1 mil)</div>
+        <div class="buy"><span class="price">R$ 22,90</span><button class="add" aria-label="Adicionar Batata Rústica"><svg class="i"><use href="#plus"/></svg></button></div></div>
+    </div>
+  </div>
+
+  <section class="live" aria-label="Pedido em andamento">
+    <div>
+      <h3><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Y0OTAwQyIgZD0iTTMyIDI0aC0xYy0uNTUgMC0xLS40NS0xLTFzLjQ1LTEgMS0xaDFjLjU1IDAgMSAuNDUgMSAxcy0uNDUgMS0xIDEiLz48cGF0aCBmaWxsPSIjMjkyRjMzIiBkPSJNMTAgMzEuNWE0LjUgNC41IDAgMSAxLTkgMCA0LjUgNC41IDAgMCAxIDkgMG0yNCAwYTQuNSA0LjUgMCAxIDEtOSAwIDQuNSA0LjUgMCAwIDEgOSAwIi8+PHBhdGggZmlsbD0iIzk5QUFCNSIgZD0iTTggMzEuNWEyLjUgMi41IDAgMSAxLTUgMCAyLjUgMi41IDAgMCAxIDUgMG0yNCAwYTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAwIDEgNSAwIi8+PHBhdGggZmlsbD0iI0REMkU0NCIgZD0ibTUuODU0IDI0LjA4MiAyLjYxNS02Ljk4OUw4IDE2cy0uOTE2LjAwOC0xLTFjLS4wODMtMS4wMDcgMi40MDgtMy4wNzkgMy0zIC41OTMuMDggMCAyIDAgMnMyLjMyLjU1NyAyIDJjLS4zMTkgMS40NDQtMi4zNzUgOC42ODgtMi4zNzUgOC42ODhTMTEuMzc1IDI1LjU2MyAxMiAyN2MuNDQ5IDEuMDMyIDEuNjgxIDEuMDE4IDMgMSAxLjMxOS0uMDE2IDQuMzkzLS4wMDcgNS0yIC42MDYtMS45OTEgMS0zIDEtM2wtMS0xIDEwLTJzLS44OTEgMS45ODIgMSAzYzIuMTY4IDEuMTY5IDIuODYgMi42NjkgNCA1IC43NDkgMS41MzQuNDQ4IDEuODk3LTEgMi0xLjk0MS4xNC00LjQ0LjM4Ni01Ljc5LjUzNS0xLjE5Ny4xMzQtMi4yODQgMS42NS00LjE2NCAxLjY1cy0xMC4wNTIuMDQ5LTEyLjA0Ni0uMTg2Yy0zLjQ5Ni0uNDA5LTQuNzU4LTMtMTAtMy0yLjA3MiAwLTEuMDYtMS41NjMuMDI4LTIuNjY1IDEuMjA5LTEuMjI2IDMuODAxLTIuNCAzLjgyNi0yLjI1MiIvPjxwYXRoIGZpbGw9IiNCRTE5MzEiIGQ9Ik0yMiAzM2gtM2MtMS4xIDAtMi0uOS0yLTJzLjktMiAyLTJoM2MxLjEgMCAyIC45IDIgMnMtLjkgMi0yIDIiLz48cGF0aCBmaWxsPSIjQkUxOTMxIiBkPSJNMTkgMzNoLTVjLS41NSAwLTEtLjQ1LTEtMXMuNDUtMSAxLTFoNWMuNTUgMCAxIC40NSAxIDFzLS40NSAxLTEgMSIvPjxwYXRoIGZpbGw9IiMyOTJGMzMiIGQ9Ik0yMiAyMmMtMS42MTggMC0yLjQzMS4zMDYtMy0xcy0uMDItMiAxLTIgNS43MjgtLjE4MSA4LTFjMi4yNzItLjgxOSAzLjA1My0uODMxIDMgMHMtMSAyLTEgMi0xLjI1NCAyLTggMm0tOC02aC0zLjI1MWMtLjU1IDAtMS0uNDUtMS0xcy40NS0xIDEtMUgxNGMuNTUgMCAxIC40NSAxIDFzLS40NSAxLTEgMSIvPjxwYXRoIGZpbGw9IiNGNDkwMEMiIGQ9Ik03LjUgMTZhLjUwMS41MDEgMCAwIDEtLjUtLjV2LTFjMC0uMjc1LjIyNS0uNS41LS41cy41LjIyNS41LjV2MWMwIC4yNzUtLjIyNS41LS41LjUiLz48cGF0aCBmaWxsPSIjMjkyRjMzIiBkPSJNMTMuMDYyIDEzaC0uMTI1YS45NC45NCAwIDAgMS0uOTM3LS45MzdWOS45MzdBLjk0Ljk0IDAgMCAxIDEyLjkzOCA5aC4xMjVhLjk0Ljk0IDAgMCAxIC45MzcuOTM3djIuMTI2YS45NC45NCAwIDAgMS0uOTM4LjkzNyIvPjxwYXRoIGZpbGw9IiMyOTJGMzMiIGQ9Im05Ljk4MiAxNS4wNjYtLjAyMi0uMDIyYS40ODYuNDg2IDAgMCAxIDAtLjY4NWwyLjg1LTIuODUxYS40ODYuNDg2IDAgMCAxIC42ODUgMGwuMDIzLjAyMmEuNDg2LjQ4NiAwIDAgMSAwIC42ODVsLTIuODUxIDIuODUxYS40ODYuNDg2IDAgMCAxLS42ODUgMCIvPjwvc3ZnPg==" alt="">Pedido #1042 a caminho</h3>
+      <p>O entregador saiu agora há pouco.</p>
+      <ol class="steps">
+        <li class="done"><span class="b"><svg class="i"><use href="#check"/></svg></span>Recebido</li>
+        <li class="done"><span class="b"><svg class="i"><use href="#check"/></svg></span>Preparado</li>
+        <li class="done"><span class="b"><svg class="i"><use href="#check"/></svg></span>Saiu</li>
+        <li class="now" aria-current="step"><span class="b"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNiAzNiI+PHBhdGggZmlsbD0iI0Y0OTAwQyIgZD0iTTMyIDI0aC0xYy0uNTUgMC0xLS40NS0xLTFzLjQ1LTEgMS0xaDFjLjU1IDAgMSAuNDUgMSAxcy0uNDUgMS0xIDEiLz48cGF0aCBmaWxsPSIjMjkyRjMzIiBkPSJNMTAgMzEuNWE0LjUgNC41IDAgMSAxLTkgMCA0LjUgNC41IDAgMCAxIDkgMG0yNCAwYTQuNSA0LjUgMCAxIDEtOSAwIDQuNSA0LjUgMCAwIDEgOSAwIi8+PHBhdGggZmlsbD0iIzk5QUFCNSIgZD0iTTggMzEuNWEyLjUgMi41IDAgMSAxLTUgMCAyLjUgMi41IDAgMCAxIDUgMG0yNCAwYTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAwIDEgNSAwIi8+PHBhdGggZmlsbD0iI0REMkU0NCIgZD0ibTUuODU0IDI0LjA4MiAyLjYxNS02Ljk4OUw4IDE2cy0uOTE2LjAwOC0xLTFjLS4wODMtMS4wMDcgMi40MDgtMy4wNzkgMy0zIC41OTMuMDggMCAyIDAgMnMyLjMyLjU1NyAyIDJjLS4zMTkgMS40NDQtMi4zNzUgOC42ODgtMi4zNzUgOC42ODhTMTEuMzc1IDI1LjU2MyAxMiAyN2MuNDQ5IDEuMDMyIDEuNjgxIDEuMDE4IDMgMSAxLjMxOS0uMDE2IDQuMzkzLS4wMDcgNS0yIC42MDYtMS45OTEgMS0zIDEtM2wtMS0xIDEwLTJzLS44OTEgMS45ODIgMSAzYzIuMTY4IDEuMTY5IDIuODYgMi42NjkgNCA1IC43NDkgMS41MzQuNDQ4IDEuODk3LTEgMi0xLjk0MS4xNC00LjQ0LjM4Ni01Ljc5LjUzNS0xLjE5Ny4xMzQtMi4yODQgMS42NS00LjE2NCAxLjY1cy0xMC4wNTIuMDQ5LTEyLjA0Ni0uMTg2Yy0zLjQ5Ni0uNDA5LTQuNzU4LTMtMTAtMy0yLjA3MiAwLTEuMDYtMS41NjMuMDI4LTIuNjY1IDEuMjA5LTEuMjI2IDMuODAxLTIuNCAzLjgyNi0yLjI1MiIvPjxwYXRoIGZpbGw9IiNCRTE5MzEiIGQ9Ik0yMiAzM2gtM2MtMS4xIDAtMi0uOS0yLTJzLjktMiAyLTJoM2MxLjEgMCAyIC45IDIgMnMtLjkgMi0yIDIiLz48cGF0aCBmaWxsPSIjQkUxOTMxIiBkPSJNMTkgMzNoLTVjLS41NSAwLTEtLjQ1LTEtMXMuNDUtMSAxLTFoNWMuNTUgMCAxIC40NSAxIDFzLS40NSAxLTEgMSIvPjxwYXRoIGZpbGw9IiMyOTJGMzMiIGQ9Ik0yMiAyMmMtMS42MTggMC0yLjQzMS4zMDYtMy0xcy0uMDItMiAxLTIgNS43MjgtLjE4MSA4LTFjMi4yNzItLjgxOSAzLjA1My0uODMxIDMgMHMtMSAyLTEgMi0xLjI1NCAyLTggMm0tOC02aC0zLjI1MWMtLjU1IDAtMS0uNDUtMS0xcy40NS0xIDEtMUgxNGMuNTUgMCAxIC40NSAxIDFzLS40NSAxLTEgMSIvPjxwYXRoIGZpbGw9IiNGNDkwMEMiIGQ9Ik03LjUgMTZhLjUwMS41MDEgMCAwIDEtLjUtLjV2LTFjMC0uMjc1LjIyNS0uNS41LS41cy41LjIyNS41LjV2MWMwIC4yNzUtLjIyNS41LS41LjUiLz48cGF0aCBmaWxsPSIjMjkyRjMzIiBkPSJNMTMuMDYyIDEzaC0uMTI1YS45NC45NCAwIDAgMS0uOTM3LS45MzdWOS45MzdBLjk0Ljk0IDAgMCAxIDEyLjkzOCA5aC4xMjVhLjk0Ljk0IDAgMCAxIC45MzcuOTM3djIuMTI2YS45NC45NCAwIDAgMS0uOTM4LjkzNyIvPjxwYXRoIGZpbGw9IiMyOTJGMzMiIGQ9Im05Ljk4MiAxNS4wNjYtLjAyMi0uMDIyYS40ODYuNDg2IDAgMCAxIDAtLjY4NWwyLjg1LTIuODUxYS40ODYuNDg2IDAgMCAxIC42ODUgMGwuMDIzLjAyMmEuNDg2LjQ4NiAwIDAgMSAwIC42ODVsLTIuODUxIDIuODUxYS40ODYuNDg2IDAgMCAxLS42ODUgMCIvPjwvc3ZnPg==" alt="" style="width:13px;height:13px"></span>Chegando</li>
+      </ol>
+    </div>
+    <div class="map" aria-hidden="true">
+      <svg class="route" viewBox="0 0 104 110"><path d="M14 92 C 30 70, 40 80, 52 58 S 78 40, 86 22" fill="none" stroke="#2BD46B" stroke-width="3" stroke-linecap="round" style="filter: drop-shadow(0 0 4px #2BD46B)"/>
+        <circle cx="14" cy="92" r="5" fill="#FFB547"/><path d="M86 8c-5 0-8 3.5-8 7.5C78 21 86 27 86 27s8-6 8-11.5C94 11.5 91 8 86 8Z" fill="#FF6B5E"/><circle cx="86" cy="15.5" r="2.6" fill="#16201B"/></svg>
+      <div class="eta">Chega em<b>12 min</b></div>
+    </div>
+  </section>
+</main>
+
+<div class="bagbar" role="region" aria-label="Sacola">
+  <div class="cb"><svg class="i"><use href="#coins"/></svg><span>+R$ 2,99<br>cashback</span></div>
+  <span class="sep" aria-hidden="true"></span>
+  <button class="cta">Ver sacola <small>R$ 59,80</small><svg class="i"><use href="#arrow"/></svg></button>
+</div>
+
+<nav class="nav" aria-label="Navegação principal">
+  <a href="#" aria-current="page"><svg class="i"><use href="#home"/></svg>Início</a>
+  <a href="#"><svg class="i"><use href="#utensils"/></svg>Cardápio</a>
+  <a href="#"><svg class="i"><use href="#receipt"/></svg>Pedidos<span class="count" aria-label="1 pedido em andamento">1</span></a>
+  <a href="#"><svg class="i"><use href="#heart"/></svg>Favoritos</a>
+  <a href="#"><svg class="i"><use href="#user"/></svg>Perfil</a>
+</nav>

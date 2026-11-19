@@ -1,0 +1,72 @@
+feature,area,priority,original,clone,notes
+Página pública da loja em /{slug} sem app,cardápio,must,yes,yes,S01 vista
+Cabeçalho com capa logo nome bairro e cidade,cardápio,must,yes,partial,S01 vista; clone: sem capa nem upload de logo; inicial no círculo
+Tempo de entrega e pedido mínimo (ou sem mínimo),cardápio,must,yes,yes,S01 vista
+Estado aberto/fechado pelos horários com próximo horário,cardápio,must,yes,partial,"S01 vista: ""Abrimos hoje (quarta) às 18:00""; clone: abre/fecha por botão no painel; sem grade de horários"
+Bloquear adicionar quando fechado,cardápio,must,yes,yes,"S02 vista: ""Estamos fechados :("""
+Chips de categoria e lista de produtos,cardápio,must,yes,yes,S01 vista
+Card de produto com A partir de / De-por / Serve N,cardápio,must,yes,partial,"S01 vista; clone: sem ""Serve N"""
+Página do produto com rota própria,cardápio,must,yes,partial,/{slug}/produto/{slug} vista; clone: janela (dialog) em vez de rota própria
+Grupos de opção com mín/máx e obrigatório,cardápio,must,yes,yes,"S02 vista: ""0 / 1 Obrigatório"""
+Observação e quantidade no item,cardápio,must,yes,yes,S02 vista
+Pizza: escolher nº de sabores por tamanho,cardápio,must,yes,partial,"S03 vista; clone: grupo ""Sabores"" com 1 a N em vez da tela de nº de sabores"
+Pizza: meias com preço do sabor mais caro,cardápio,must,yes,yes,"S04 vista: ""Preço com base no maior valor""; clone: regra ""cobrar a mais cara"" por grupo"
+Botão fixo Ver sacola com total,cardápio,must,yes,yes,S01 vista
+Sacola com quantidade limpar e adicionar mais,checkout,must,yes,yes,S06 vista
+Subtotal taxa de entrega e total,checkout,must,yes,yes,S06 vista
+Entrega ou retirada,checkout,must,yes,yes,S07 vista
+Endereço por autocompletar e localização do aparelho,checkout,must,yes,partial,S07 vista (Google); clone: localização do aparelho sim; sem autocompletar do Google
+Retirada mostra endereço da loja e mapa,checkout,must,yes,partial,"S07 vista; clone: endereço sim, sem mapa"
+Taxa e prazo pela área de entrega,checkout,must,yes,partial,fonte 7; cálculo não visto; clone: taxa por bairro; prazo é único da loja
+Pagamento na entrega: dinheiro com troco crédito débito,pagamentos,must,yes,yes,S08 vista; clone: cartão na entrega sem separar crédito/débito
+Pix online com confirmação automática,pagamentos,must,yes,partial,"S08 vista; S10 palpite; clone: modo teste funcionando; Asaas escrito, não testado no sandbox"
+Resumo do pedido antes de pagar,checkout,must,yes,partial,"S09 vista; clone: resumo no checkout, sem passo separado"
+Login do cliente por celular com código,conta cliente,must,yes,no,S05 vista; clone: cliente informa nome e WhatsApp a cada pedido (salvos no aparelho)
+Tela de pedido feito com status,pedido,must,palpite,yes,S11; clone: /r/<código> com etapas ao vivo
+Quadro de pedidos com 5 colunas contador e soma,gestor,must,yes,yes,S21 réplica; clone: 4 colunas + aguardando Pix + finalizados
+Aceitar recusar pronto e finalizar,gestor,must,yes,yes,S21 réplica
+Card de pedido com código cronômetro cliente e pagamento,gestor,must,yes,yes,S21 réplica
+Pausar loja,gestor,must,yes,yes,S21 réplica; clone: botão Loja aberta/fechada
+Editor de cardápio (categorias produtos opções sabores),cardápio admin,must,yes,yes,"S27; clone: foto por link, sem upload"
+Administrar loja (perfil horários áreas mínimo pagamentos retirada),configurações,must,yes,partial,S31; clone: sem grade de horários
+Cartão de crédito online,pagamentos,should,yes,no,S08 vista
+Vale refeição na entrega,pagamentos,should,yes,no,S08 vista
+Apple Pay e Google Pay,pagamentos,should,yes,no,taxas na página de planos
+Busca de pedido por nome telefone ou código,gestor,should,yes,no,S21 réplica
+Etiquetas Cliente novo / Segundo pedido / WhatsApp,gestor,should,yes,no,S21 réplica
+Selo A Cobrar para pagamento na entrega,gestor,should,yes,no,S21 réplica
+Novo pedido manual,gestor,should,yes,no,S23
+Informar alta demanda,gestor,should,yes,no,S21 réplica; efeito palpite
+Aviso ao cliente no WhatsApp a cada etapa,notificações,should,yes,yes,toast da réplica; Cloud API oficial; clone: Cloud API ou modo manual; 4 etapas pedidas pelo usuário
+Impressão automática da comanda,gestor,should,yes,no,fonte 6
+Peça também (cross-sell na sacola),checkout,should,yes,no,S06 vista
+Cashback percentual com saldo e validade,fidelidade,should,yes,no,"S01 ""2% de Cashback"" e S09 ""Cashback a receber"""
+Aplicar cashback ou cupom na sacola,checkout,should,yes,no,"S06 vista ""Aplicar benefício"""
+Cupons com mínimo e limite semanal,marketing,should,yes,no,S01 card de cupom; fonte 9
+Carrossel Mais Pedidos e selos Favorito/Recomendado,cardápio,should,yes,no,S01 vista
+Categoria Em falta (itens indisponíveis visíveis),cardápio,should,yes,no,S01 vista
+Link e QR code do cardápio,divulgação,should,yes,partial,"S34; clone: link sim, sem QR"
+Recuperador de inativos e carrinho abandonado,marketing,should,yes,no,S29; fonte 5
+Relatório diário (fechamento de caixa),relatórios,should,yes,no,S24
+Teste grátis 15 dias e assinatura por faixa de faturamento,cobrança,should,yes,no,fonte 2
+Atendente IA no WhatsApp (link do cardápio e dúvidas),ia,could,yes,no,S25; fase 2
+IA fecha o pedido na conversa e manda o Pix,ia,could,yes,no,fonte 2
+IA entende áudio e figurinha e tem tom configurável,ia,could,yes,no,fonte 2
+Assistente de IA para o dono (Brenda Gestora),ia,could,yes,no,S26 palpite
+Disparos personalizados e recompra automática,marketing,could,yes,no,S29
+Fidelidade por pontos,fidelidade,could,yes,no,fonte 10
+Várias lojas na mesma conta,conta,could,yes,no,S20 réplica (Matriz e +)
+Agendamento do pedido,checkout,could,palpite,no,"título ""Entrega e agendamento"""
+Módulo de motoboys,entrega,could,yes,yes,"fonte 6; clone: link por motoboy, rota no Google Maps, localização ao vivo, entregue"
+Financeiro e repasses dos pagamentos online,financeiro,could,yes,no,S32
+Relatórios de lucro e calculadora de CMV,relatórios,could,yes,no,S24
+Pesquisa de satisfação após a entrega,notificações,could,yes,no,fonte 11
+Indique e ganhe,crescimento,could,yes,no,S20 réplica
+Meta Pixel GA e GTM no cardápio,integrações,could,yes,no,S33
+Importar cardápio horários e áreas do iFood,integrações,skip,yes,skip,só com API oficial de parceiro iFood
+Integração com PDV Saipos e Colibri,integrações,skip,yes,skip,depende de parceria
+Receber pedidos de iFood 99Food Foody Pick n Go Glow,integrações,skip,yes,skip,API de parceiro; fase futura
+Tráfego pago gerenciado (R$ 60/semana),serviço,skip,yes,skip,serviço humano
+Taxas de pagamento da Brendi,pagamentos,skip,yes,skip,usar as do PSP escolhido
+Nomes dos agentes e marca Brendi,marca,skip,yes,skip,rebrand com /replica-brand
+Base de restaurantes e clientes,rede,skip,yes,skip,pertence à Brendi

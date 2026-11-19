@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./theme.css";
+
+/* Fontes carregadas pelo next/font (layout.tsx) entram nos tokens de família. */
+:root {
+  --font-display: var(--font-poppins), "Inter", system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-script: var(--font-satisfy), cursive;
+}
+
+@layer base {
+  html { background: var(--bg); color: var(--text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  body { min-height: 100dvh; font-size: var(--type-sm-size); line-height: var(--type-sm-line); }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
+  :focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  input, select, textarea { font: inherit; color: inherit; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+}
+
+@layer components {
+  .glass { background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-highlight);
+           -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: 0 1.1rem;
+         border-radius: var(--radius-pill); font-weight: 600; font-size: var(--type-sm-size); border: 1px solid transparent;
+         transition: transform var(--motion-fast) var(--motion-ease), box-shadow var(--motion-base) var(--motion-ease); white-space: nowrap; }
+  .btn:active:not(:disabled) { transform: scale(.98); }
+  .btn:disabled { opacity: .5; }
+  .btn-cta { background: var(--gradient-accent); color: var(--on-accent); font-family: var(--font-display); font-weight: 700;
+             font-size: 1.1875rem; min-height: 52px; padding: 0 1.4rem; box-shadow: var(--shadow-glow); }
+  .btn-primary { background: var(--accent-strong); color: var(--on-accent); }
+  .btn-outline { border-color: var(--border); background: transparent; color: var(--text); }
+  .btn-outline:hover { border-color: var(--accent-bright); }
+  .btn-danger { border-color: var(--danger); color: var(--danger); background: transparent; }
+  .btn-success { background: var(--success); color: #062012; }
+  .btn-sm { min-height: 36px; padding: 0 .85rem; font-size: var(--type-xs-size); }
+  .field { display: grid; gap: .35rem; }
+  .field > span { font-size: var(--type-xs-size); font-weight: 600; color: var(--text-muted); }
+  .input { width: 100%; min-height: 48px; padding: .6rem .9rem; border-radius: var(--radius-md); background: var(--surface);
+           border: 1px solid var(--border-input); color: var(--text); }
+  .input::placeholder { color: var(--text-muted); opacity: .8; }
+  .input:focus { outline: 2px solid var(--accent-bright); outline-offset: 0; border-color: transparent; }
+  .input[aria-invalid="true"] { border-color: var(--danger); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .chip { display: inline-flex; align-items: center; gap: .3rem; padding: .15rem .6rem; border-radius: var(--radius-pill);
+          font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+  .skeleton { background: linear-gradient(90deg, var(--surface) 0%, var(--surface-raised) 50%, var(--surface) 100%);
+              background-size: 200% 100%; animation: shimmer 1.2s linear infinite; border-radius: var(--radius-md); }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+}
+
+@theme inline {
+  --font-display: var(--font-poppins), "Inter", system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-script: var(--font-satisfy), cursive;
+}
+
+/* Mapa do rastreio: balão "Como chegar" e pins sem o fundo padrão do Leaflet */
+.leaflet-div-icon.dl-pin, .dl-pin { background: transparent; border: 0; }
+.leaflet-tooltip.dl-bubble {
+  background: #fff; color: #1A1512; border: 2px solid #1A1512; border-radius: 16px; padding: 8px 18px;
+  font: 700 17px/1.2 var(--font-display); box-shadow: 0 6px 18px rgba(0,0,0,.18); white-space: nowrap;
+}
+.leaflet-tooltip.dl-bubble::before { display: none; }
+.leaflet-tooltip.dl-bubble a { color: inherit; text-decoration: none; }
+.leaflet-container { font-family: var(--font-sans); background: #E8E4DE; }
