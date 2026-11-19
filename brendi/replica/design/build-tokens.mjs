@@ -42,9 +42,8 @@ const tw = { text: "fg", "text-muted": "muted" };
 const theme = [
   ...Object.keys(t.color).map((k) => `  --color-${tw[k] ?? k}: var(--${k});`),
   ...Object.entries(t.type).flatMap(([k]) => [`  --text-${k}: var(--type-${k}-size);`, `  --text-${k}--line-height: var(--type-${k}-line);`]),
-  ...Object.keys(t.radius).map((k) => `  --radius-${k}: var(--radius-${k});`),
-  ...Object.keys(t.shadow).map((k) => `  --shadow-${k}: var(--shadow-${k});`),
-  `  --font-display: var(--font-display);`, `  --font-sans: var(--font-sans);`, `  --font-script: var(--font-script);`,
+  // raio, sombra e fonte: tokens.css já usa os nomes do Tailwind (--radius-*, --shadow-*, --font-*);
+  // repetir aqui criaria referência circular. Fontes extras (display, script) entram no @theme do app.
   ...Object.entries(t.layout.breakpoints).map(([k, v]) => `  --breakpoint-${k}: ${px(v)};`),
   `  --spacing: 0.25rem; /* base 4px: p-4 = 16px */`,
 ];
