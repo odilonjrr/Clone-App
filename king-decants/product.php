@@ -39,6 +39,9 @@ if (!$product) {
 }
 
 $productId = (int) $product['id'];
+// Decant envasado x perfume inteiro original (Admin -> Produtos -> Tipo do produto)
+$isDecant = (int) ($product['is_decant'] ?? 1) === 1;
+$kindWord = $isDecant ? 'decant' : 'perfume';
 $selfUrl = url('product.php?slug=' . urlencode($product['slug']));
 $user = current_user();
 
@@ -48,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'revie
     if (!$user) {
         flash('error', 'Entre na sua conta para avaliar.');
     } elseif (!user_can_review((int) $user['id'], $productId)) {
-        flash('error', 'Apenas clientes que compraram este decant podem avaliá-lo.');
+        flash('error', 'Apenas clientes que compraram este ' . $kindWord . ' podem avaliá-lo.');
     } else {
         $rating = int_param($_POST, 'rating');
         $comment = clean_text($_POST['comment'] ?? '', 1000);
@@ -246,10 +249,12 @@ require __DIR__ . '/inc/header.php';
 <!-- ======================= DESCRIÇÃO + AVALIAÇÕES ======================= -->
 <section class="mx-auto grid max-w-7xl gap-12 px-5 py-14 lg:grid-cols-2 lg:px-8">
     <div>
-        <h2 class="text-xs font-medium uppercase tracking-[0.28em] text-white">Sobre este decant</h2>
+        <h2 class="text-xs font-medium uppercase tracking-[0.28em] text-white">Sobre este <?= $kindWord ?></h2>
         <p class="mt-5 leading-relaxed text-ink-300"><?= nl2br(e($product['description'] ?: $product['short_description'])) ?></p>
         <ul class="mt-8 space-y-3 text-sm text-ink-400">
+            <?php if ($isDecant): ?>
             <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('shield', 'h-5 w-5') ?></span> Envasado a partir do frasco original, com lote registrado</li>
+            <?php endif; ?>
             <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('truck', 'h-5 w-5') ?></span> Envio para todo o Brasil</li>
             <li class="flex items-center gap-3"><span class="text-gold-400"><?= icon('card', 'h-5 w-5') ?></span> Pagamento seguro via <?= e(payment_provider_name()) ?> (PIX e cartão)</li>
         </ul>
@@ -277,7 +282,7 @@ require __DIR__ . '/inc/header.php';
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <p class="mt-6 text-sm text-ink-400">Este decant ainda não recebeu avaliações.</p>
+            <p class="mt-6 text-sm text-ink-400">Este <?= $kindWord ?> ainda não recebeu avaliações.</p>
         <?php endif; ?>
 
         <!-- Formulário: somente compradores verificados -->
@@ -285,7 +290,7 @@ require __DIR__ . '/inc/header.php';
             <form method="post" class="panel mt-8 space-y-4 p-5" data-loading>
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="review">
-                <p class="text-sm text-white"><?= $myReview ? 'Editar sua avaliação' : 'Avalie este decant' ?></p>
+                <p class="text-sm text-white"><?= $myReview ? 'Editar sua avaliação' : 'Avalie este ' . $kindWord ?></p>
                 <fieldset class="star-input" aria-label="Nota">
                     <?php for ($i = 5; $i >= 1; $i--): ?>
                         <input type="radio" id="rate-<?= $i ?>" name="rating" value="<?= $i ?>" <?= (int) ($myReview['rating'] ?? 0) === $i ? 'checked' : '' ?> required>
@@ -296,9 +301,9 @@ require __DIR__ . '/inc/header.php';
                 <button class="btn-gold btn-sm" data-loading-text="Enviando…">Publicar avaliação</button>
             </form>
         <?php elseif ($user): ?>
-            <p class="mt-8 text-xs text-ink-500">Somente clientes que compraram este decant com a conta podem avaliá-lo.</p>
+            <p class="mt-8 text-xs text-ink-500">Somente clientes que compraram este <?= $kindWord ?> com a conta podem avaliá-lo.</p>
         <?php else: ?>
-            <p class="mt-8 text-xs text-ink-500">Comprou este decant? <button type="button" class="text-gold-400 hover:text-gold-300" data-open-modal="login-modal">Entre na sua conta</button> para avaliar.</p>
+            <p class="mt-8 text-xs text-ink-500">Comprou este <?= $kindWord ?>? <button type="button" class="text-gold-400 hover:text-gold-300" data-open-modal="login-modal">Entre na sua conta</button> para avaliar.</p>
         <?php endif; ?>
     </div>
 </section>

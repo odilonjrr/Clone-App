@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const KD_SCHEMA_VERSION = 9;
+const KD_SCHEMA_VERSION = 10;
 
 function kd_schema_marker(): string
 {
@@ -235,6 +235,11 @@ function kd_ensure_schema(): void
         foreach (collections_default() as $slug => $c) {
             $ins->execute([$slug, $c['label'], $c['icon'], $n++]);
         }
+    }
+
+    // ---------------- Versão 10: tipo do produto (decant envasado x perfume inteiro original)
+    if (!$hasColumn('products', 'is_decant')) {
+        $pdo->exec('ALTER TABLE products ADD COLUMN is_decant TINYINT(1) NOT NULL DEFAULT 1');
     }
 
     @file_put_contents($marker, (string) KD_SCHEMA_VERSION, LOCK_EX);

@@ -119,6 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'partner_url'       => trim(clean_string($_POST['partner_url'] ?? '', 500)),
         'partner_variant'   => clean_string($_POST['partner_variant'] ?? '', 100),
         'is_active'         => isset($_POST['is_active']) ? 1 : 0,
+        'is_decant'         => ($_POST['is_decant'] ?? '1') === '0' ? 0 : 1,
         'image_url'         => $product['image_url'] ?? '',
         'concentration'     => clean_string($_POST['concentration'] ?? '', 60),
         'notes_top'         => clean_string($_POST['notes_top'] ?? '', 255),
@@ -355,6 +356,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('success', 'Produto cadastrado.');
         }
 
+        // Tipo: decant (envasado) ou perfume inteiro original
+        db()->prepare('UPDATE products SET is_decant = ? WHERE id = ?')->execute([$old['is_decant'], $id]);
+
         // Loja parceira: link e variação (zera a última leitura se o link mudou)
         $linkChanged = ($product['partner_url'] ?? '') !== $old['partner_url'] || ($product['partner_variant'] ?? '') !== $old['partner_variant'];
         db()->prepare('UPDATE products SET partner_url = ?, partner_variant = ?' . ($linkChanged ? ', partner_status = NULL, partner_checked_at = NULL, partner_price = NULL' : '') . ' WHERE id = ?')
@@ -535,6 +539,15 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 <input type="checkbox" name="is_active" value="1" class="accent-[#d4af37]" <?= (int) $old['is_active'] ? 'checked' : '' ?>>
                 Visível na loja
             </label>
+            <div class="sm:col-span-4">
+                <span class="field-label">Tipo do produto</span>
+                <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-200">
+                    <?php $isDecant = (int) ($old['is_decant'] ?? 1) === 1; ?>
+                    <label class="flex items-center gap-2"><input type="radio" name="is_decant" value="1" class="accent-[#d4af37]" <?= $isDecant ? 'checked' : '' ?>> Decant (envasado)</label>
+                    <label class="flex items-center gap-2"><input type="radio" name="is_decant" value="0" class="accent-[#d4af37]" <?= $isDecant ? '' : 'checked' ?>> Perfume inteiro original</label>
+                </div>
+                <p class="mt-1 text-[11px] text-ink-500">Em "Perfume inteiro original" a página do produto não mostra "Envasado a partir do frasco original" e usa "perfume" no lugar de "decant".</p>
+            </div>
         </div>
 
         <!-- Tamanhos e preços (variações) -->
