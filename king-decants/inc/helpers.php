@@ -537,8 +537,8 @@ function app_log(string $channel, string $message, array $context = []): void
 // CATÁLOGO / STATUS
 // ===========================================================================
 
-/** Coleções exibidas na faixa de navegação da home. */
-function collections(): array
+/** Coleções padrão (usadas para criar a tabela e se o banco ainda não tiver a tabela). */
+function collections_default(): array
 {
     return [
         'floral'     => ['label' => 'Floral',           'icon' => 'flower'],
@@ -547,6 +547,44 @@ function collections(): array
         'noturno'    => ['label' => 'Noturno',          'icon' => 'moon'],
         'assinatura' => ['label' => 'Assinatura King',  'icon' => 'crown'],
     ];
+}
+
+/**
+ * Coleções (Admin -> Coleções), na ordem definida.
+ * $includeHidden = true também traz as ocultas (admin, página de produto).
+ * Cada item: label, icon, image (caminho do upload ou null), is_active, id.
+ */
+function collections(bool $includeHidden = false): array
+{
+    static $cache = null;
+    if ($cache === null) {
+        $cache = [];
+        try {
+            foreach (db()->query('SELECT id, slug, label, icon, image, is_active FROM collections ORDER BY sort_order, id')->fetchAll() as $r) {
+                $cache[$r['slug']] = ['id' => (int) $r['id'], 'label' => $r['label'], 'icon' => $r['icon'] ?: 'crown', 'image' => $r['image'], 'is_active' => (int) $r['is_active']];
+            }
+        } catch (Throwable $e) {
+            $cache = []; // tabela ainda não criada
+        }
+        if (!$cache) {
+            foreach (collections_default() as $slug => $c) {
+                $cache[$slug] = $c + ['id' => 0, 'image' => null, 'is_active' => 1];
+            }
+        }
+    }
+    return $includeHidden ? $cache : array_filter($cache, fn($c) => (int) $c['is_active'] === 1);
+}
+
+/** Imagem do círculo da coleção: enviada no admin > ilustração padrão > null (usa o ícone). */
+function collection_image_url(string $slug, array $c): ?string
+{
+    if (!empty($c['image'])) {
+        return product_image_src($c['image']);
+    }
+    if (is_file(dirname(__DIR__) . '/assets/img/collections/' . $slug . '.svg')) {
+        return asset('img/collections/' . $slug . '.svg');
+    }
+    return null;
 }
 
 function order_statuses(): array

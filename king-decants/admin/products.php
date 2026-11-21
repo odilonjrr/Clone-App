@@ -71,7 +71,7 @@ $total = (int) $count->fetchColumn();
 $stmt = db()->prepare("SELECT * FROM products WHERE $whereSql ORDER BY sort_order ASC, id ASC LIMIT $perPage OFFSET $offset");
 $stmt->execute($params);
 $products = $stmt->fetchAll();
-$collections = collections();
+$collections = collections(true);
 
 $pageTitle = 'Produtos';
 $adminNav = 'products';

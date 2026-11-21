@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const KD_SCHEMA_VERSION = 8;
+const KD_SCHEMA_VERSION = 9;
 
 function kd_schema_marker(): string
 {
@@ -215,6 +215,26 @@ function kd_ensure_schema(): void
             ADD COLUMN partner_status VARCHAR(12) NULL,
             ADD COLUMN partner_checked_at DATETIME NULL,
             ADD COLUMN partner_price DECIMAL(10,2) NULL');
+    }
+
+    // ---------------- Versão 9: coleções editáveis no admin
+    $pdo->exec("CREATE TABLE IF NOT EXISTS collections (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        slug VARCHAR(30) NOT NULL,
+        label VARCHAR(60) NOT NULL,
+        icon VARCHAR(20) NOT NULL DEFAULT 'crown',
+        image VARCHAR(255) NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_collections_slug (slug)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    if ((int) $pdo->query('SELECT COUNT(*) FROM collections')->fetchColumn() === 0) {
+        $ins = $pdo->prepare('INSERT INTO collections (slug, label, icon, sort_order) VALUES (?, ?, ?, ?)');
+        $n = 0;
+        foreach (collections_default() as $slug => $c) {
+            $ins->execute([$slug, $c['label'], $c['icon'], $n++]);
+        }
     }
 
     @file_put_contents($marker, (string) KD_SCHEMA_VERSION, LOCK_EX);

@@ -34,7 +34,7 @@ if ($id) {
         redirect(url('admin/products.php'));
     }
 }
-$collections = collections();
+$collections = collections(true);
 
 /** Gera slug ASCII a partir do nome ("Decants Básicos" -> "decants-basicos"). */
 function slugify(string $text): string
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'tagline'           => clean_string($_POST['tagline'] ?? '', 160),
         'short_description' => clean_string($_POST['short_description'] ?? '', 255),
         'description'       => clean_text($_POST['description'] ?? '', 5000),
-        'collection'        => array_key_exists($_POST['collection'] ?? '', $collections) ? $_POST['collection'] : 'assinatura',
+        'collection'        => array_key_exists($_POST['collection'] ?? '', $collections) ? $_POST['collection'] : (string) array_key_first($collections),
         'price'             => $priceRaw,
         'stock'             => (string) ($_POST['stock'] ?? '0'),
         'volume_ml'         => (string) ($_POST['volume_ml'] ?? ''),
@@ -526,9 +526,10 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 <label class="field-label" for="collection">Coleção</label>
                 <select id="collection" name="collection" class="field">
                     <?php foreach ($collections as $slug => $c): ?>
-                        <option value="<?= e($slug) ?>" <?= $old['collection'] === $slug ? 'selected' : '' ?>><?= e($c['label']) ?></option>
+                        <option value="<?= e($slug) ?>" <?= $old['collection'] === $slug ? 'selected' : '' ?>><?= e($c['label']) ?><?= (int) ($c['is_active'] ?? 1) ? '' : ' (oculta)' ?></option>
                     <?php endforeach; ?>
                 </select>
+                <a href="<?= e(url('admin/collections.php')) ?>" class="mt-1 inline-block text-[11px] uppercase tracking-wider text-gold-400 hover:text-gold-300">+ Adicionar coleção</a>
             </div>
             <label class="flex items-center gap-3 self-end pb-3 text-sm text-ink-200 sm:col-span-2">
                 <input type="checkbox" name="is_active" value="1" class="accent-[#d4af37]" <?= (int) $old['is_active'] ? 'checked' : '' ?>>
