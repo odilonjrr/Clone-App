@@ -226,8 +226,9 @@ require __DIR__ . '/inc/header.php';
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="product_id" value="<?= $productId ?>">
                     <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="btn-gold btn-lg w-full" <?= $inStock ? '' : 'disabled' ?> data-loading-text="Adicionando…" data-add-button>
-                        <?= $inStock ? 'Adicionar à sacola' : 'Esgotado' ?>
+                    <?php $partnerOut = partner_known_out($product); $hasPartner = trim((string) ($product['partner_url'] ?? '')) !== ''; ?>
+                    <button type="submit" class="btn-gold btn-lg w-full" <?= $inStock && !$partnerOut ? '' : 'disabled' ?> data-loading-text="<?= $hasPartner ? 'Buscando estoque…' : 'Adicionando…' ?>" data-add-button>
+                        <?= $partnerOut ? 'Sem estoque no momento' : ($inStock ? 'Adicionar à sacola' : 'Esgotado') ?>
                     </button>
                 </form>
             </div>

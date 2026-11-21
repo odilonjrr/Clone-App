@@ -422,6 +422,13 @@ Dica: em hospedagem compartilhada, se o `session.save_path` for compartilhado, o
 - **Pedido (admin):** "Gerar e pagar etiqueta" cria a etiqueta e paga com o saldo SuperFrete (`api/v0/cart` + `api/v0/checkout`); o rastreio é gravado no pedido. Também há imprimir (PDF), atualizar situação e cancelar (antes da postagem; o valor volta ao saldo).
 - **Avisos automáticos:** em Admin → Frete, "Ativar avisos automáticos" cadastra `webhook-superfrete.php` (precisa de https). Ao receber um aviso, o site consulta a SuperFrete (`order/info`) e nunca confia no conteúdo do aviso. Postado → pedido "Enviado" (e-mail com rastreio); entregue → "Entregue".
 
+**Loja parceira (estoque de revenda, Nuvemshop):** `inc/partner.php`.
+- No cadastro do produto: "Link do produto na loja parceira" e, se houver opções lá, "Variação no parceiro". O botão "Testar link" mostra o que foi lido (disponível/esgotado, variações, preço).
+- Ao clicar em "Adicionar à sacola", o botão mostra "Buscando estoque…" e o site lê a página do parceiro (dados `data-variants` da Nuvemshop; alternativa: JSON-LD `availability`). Esgotado → "Sem estoque no momento". A leitura fica guardada por 10 min (configurável) e é conferida de novo ao criar o pedido.
+- Parceiro sem resposta: Admin → Produtos → Loja parceira → "Vender (com aviso no pedido)" (padrão) ou "Não vender". Se a última leitura foi "esgotado", nunca vende.
+- O pedido mostra "Comprar no parceiro" em cada item revendido (a compra lá é feita manualmente, com o endereço do cliente).
+- Verificação automática: `partner-sync.php?key=...` (a chave aparece em Admin → Produtos) no Cron Jobs da Hostinger, por exemplo a cada hora.
+
 **Cupons de desconto:** **Admin → Cupons** cria códigos de % ou valor fixo, com pedido mínimo, limite de usos e validade opcionais. O cliente aplica o código no resumo do checkout (campo "Cupom de desconto"), antes de ir para o pagamento. O desconto vale sobre os produtos (não sobre o frete), é revalidado com bloqueio de linha ao criar o pedido e o uso é devolvido se o pedido for cancelado. Com cupom, a InfinitePay/Mercado Pago recebe os produtos numa linha única ("Pedido KD-123 (cupom X)") com o valor já descontado, mais a linha de frete. Cupom já usado não é excluído, só desativado. Troque pela API dos Correios, Melhor Envio ou Frenet quando precisar.
 
 **ViaCEP:** o checkout preenche o endereço automaticamente ao sair do campo CEP (atributo `data-viacep`; remova-o para desativar). Há também a versão servidor `viacep_lookup()`, com um bloco comentado em `checkout.php` para ativá-la.

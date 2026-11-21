@@ -132,6 +132,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ------------------------------------------------------------------ Dados
 $items = order_items($id);
+// Itens revendidos de loja parceira: link para comprar lá (com o endereço do cliente)
+$partnerLinks = [];
+$pids = array_values(array_unique(array_filter(array_map(fn($it) => (int) ($it['product_id'] ?? 0), $items))));
+if ($pids) {
+    $pl = db()->prepare('SELECT id, partner_url FROM products WHERE id IN (' . implode(',', array_fill(0, count($pids), '?')) . ") AND partner_url IS NOT NULL AND partner_url <> ''");
+    $pl->execute($pids);
+    $partnerLinks = array_column($pl->fetchAll(), 'partner_url', 'id');
+}
 $payments = db()->prepare('SELECT id, mp_payment_id, method, status, status_detail, amount, created_at, updated_at FROM payments WHERE order_id = ? ORDER BY id DESC');
 $payments->execute([$id]);
 $payments = $payments->fetchAll();
@@ -202,7 +210,10 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 <thead><tr><th>Produto</th><th>SKU</th><th class="text-right">Qtd.</th><th class="text-right">Unitário</th><th class="text-right">Total</th></tr></thead>
                 <tbody>
                 <?php foreach ($items as $it): ?>
-                    <tr><td class="text-white"><?= e($it['name']) ?></td><td class="text-ink-400"><?= e($it['sku']) ?></td><td class="text-right"><?= (int) $it['quantity'] ?></td><td class="text-right"><?= money($it['unit_price']) ?></td><td class="text-right"><?= money($it['line_total']) ?></td></tr>
+                    <tr><td class="text-white"><?= e($it['name']) ?>
+                        <?php if (!empty($partnerLinks[(int) $it['product_id']])): ?>
+                            <a href="<?= e($partnerLinks[(int) $it['product_id']]) ?>" target="_blank" rel="noopener noreferrer" class="mt-1 inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-gold-400 hover:text-gold-300"><?= icon('bag', 'h-3.5 w-3.5') ?> Comprar no parceiro</a>
+                        <?php endif; ?></td><td class="text-ink-400"><?= e($it['sku']) ?></td><td class="text-right"><?= (int) $it['quantity'] ?></td><td class="text-right"><?= money($it['unit_price']) ?></td><td class="text-right"><?= money($it['line_total']) ?></td></tr>
                 <?php endforeach; ?>
                 <tr><td colspan="4" class="text-right text-ink-400">Subtotal</td><td class="text-right"><?= money($order['subtotal']) ?></td></tr>
                 <?php if ((float) ($order['discount'] ?? 0) > 0): ?>

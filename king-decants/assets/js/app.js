@@ -128,6 +128,7 @@
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const btn = form.querySelector('[type=submit]');
+      let soldOut = false;
       setLoading(btn, true);
       try {
         const data = await postForm(form);
@@ -135,12 +136,18 @@
           updateCartCount(data.count);
           kdToast('success', data.message || 'Adicionado à sacola.');
         } else {
+          soldOut = !!data.partner_out;
           kdToast('error', data.error || 'Não foi possível adicionar.');
         }
       } catch (e) {
         kdToast('error', 'Falha de conexão. Tente novamente.');
       } finally {
         setLoading(btn, false);
+        // Loja parceira sem estoque: o botão passa a indicar isso
+        if (soldOut && btn) {
+          btn.disabled = true;
+          if (btn.hasAttribute('data-add-button')) btn.textContent = 'Sem estoque no momento';
+        }
       }
     })
   );

@@ -28,6 +28,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     switch ($action) {
         case 'add':
+            // Produto revendido de loja parceira: confere o estoque lá antes de adicionar
+            $pp = db()->prepare('SELECT * FROM products WHERE id = ? AND is_active = 1');
+            $pp->execute([$productId]);
+            if (($prow = $pp->fetch()) && trim((string) ($prow['partner_url'] ?? '')) !== '') {
+                $chk = partner_can_sell($prow);
+                if (!$chk['ok']) {
+                    $result = ['ok' => false, 'error' => $chk['error'], 'partner_out' => true];
+                    break;
+                }
+            }
             $result = cart_add($productId, max(1, $qty), $variantId);
             $message = $result['ok'] ? ($result['notice'] ?? 'Adicionado à sacola.') : null;
             break;
@@ -53,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'ok'       => (bool) $result['ok'],
             'message'  => $message,
             'error'    => $result['error'] ?? null,
+            'partner_out' => !empty($result['partner_out']),
             'count'    => $cart['count'],
             'subtotal' => money($cart['subtotal']),
         ], $result['ok'] ? 200 : 422);

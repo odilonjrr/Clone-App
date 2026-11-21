@@ -41,7 +41,7 @@ $subtitle = trim((string) ($product['concentration'] ?? '')) ?: (string) $produc
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
             <input type="hidden" name="quantity" value="1">
-            <button type="submit" class="btn-gold w-full" <?= $inStock ? '' : 'disabled' ?> data-loading-text="Adicionando…">
+            <button type="submit" class="btn-gold w-full" <?= $inStock && !partner_known_out($product) ? '' : 'disabled' ?> data-loading-text="<?= trim((string) ($product['partner_url'] ?? '')) !== '' ? 'Buscando estoque…' : 'Adicionando…' ?>">
                 <?= $inStock ? 'Adicionar à sacola' : 'Esgotado' ?>
             </button>
         </form>

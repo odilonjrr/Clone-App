@@ -18,7 +18,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const KD_SCHEMA_VERSION = 7;
+const KD_SCHEMA_VERSION = 8;
 
 function kd_schema_marker(): string
 {
@@ -205,6 +205,16 @@ function kd_ensure_schema(): void
             ADD COLUMN sf_price DECIMAL(10,2) NULL,
             ADD COLUMN sf_label_url VARCHAR(500) NULL,
             ADD INDEX idx_orders_sf (sf_order_id)');
+    }
+
+    // ---------------- Versão 8: estoque da loja parceira (link + última leitura)
+    if (!$hasColumn('products', 'partner_url')) {
+        $pdo->exec('ALTER TABLE products
+            ADD COLUMN partner_url VARCHAR(500) NULL,
+            ADD COLUMN partner_variant VARCHAR(100) NULL,
+            ADD COLUMN partner_status VARCHAR(12) NULL,
+            ADD COLUMN partner_checked_at DATETIME NULL,
+            ADD COLUMN partner_price DECIMAL(10,2) NULL');
     }
 
     @file_put_contents($marker, (string) KD_SCHEMA_VERSION, LOCK_EX);

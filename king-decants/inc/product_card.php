@@ -42,7 +42,7 @@ $productUrl = url('product.php?slug=' . urlencode($product['slug']));
                 <input type="hidden" name="action" value="add">
                 <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
                 <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="btn-outline btn-sm" <?= $inStock ? '' : 'disabled' ?> data-loading-text="…" aria-label="Adicionar <?= e($product['name']) ?> à sacola">
+                <button type="submit" class="btn-outline btn-sm" <?= $inStock && !partner_known_out($product) ? '' : 'disabled' ?> data-loading-text="<?= trim((string) ($product['partner_url'] ?? '')) !== '' ? 'Buscando…' : '…' ?>" aria-label="Adicionar <?= e($product['name']) ?> à sacola">
                     <?= icon('bag', 'h-4 w-4') ?> <span class="hidden sm:inline">Adicionar</span>
                 </button>
             </form>

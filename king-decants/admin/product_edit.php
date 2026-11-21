@@ -116,6 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'stock'             => (string) ($_POST['stock'] ?? '0'),
         'volume_ml'         => (string) ($_POST['volume_ml'] ?? ''),
         'sort_order'        => (string) ($_POST['sort_order'] ?? '0'),
+        'partner_url'       => trim(clean_string($_POST['partner_url'] ?? '', 500)),
+        'partner_variant'   => clean_string($_POST['partner_variant'] ?? '', 100),
         'is_active'         => isset($_POST['is_active']) ? 1 : 0,
         'image_url'         => $product['image_url'] ?? '',
         'concentration'     => clean_string($_POST['concentration'] ?? '', 60),
@@ -159,6 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($old['volume_ml'] !== '' && filter_var($old['volume_ml'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 1000]]) === false) {
         $errors['volume_ml'] = 'Volume entre 1 e 1000 ml.';
+    }
+    if ($old['partner_url'] !== '' && (!filter_var($old['partner_url'], FILTER_VALIDATE_URL) || !partner_url_valid($old['partner_url']))) {
+        $errors['partner_url'] = 'Link inválido. Cole o endereço completo do produto na loja parceira (https://...).';
     }
     if (filter_var($old['sort_order'], FILTER_VALIDATE_INT) === false) {
         $errors['sort_order'] = 'Ordem deve ser um número inteiro.';
@@ -350,6 +355,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('success', 'Produto cadastrado.');
         }
 
+        // Loja parceira: link e variação (zera a última leitura se o link mudou)
+        $linkChanged = ($product['partner_url'] ?? '') !== $old['partner_url'] || ($product['partner_variant'] ?? '') !== $old['partner_variant'];
+        db()->prepare('UPDATE products SET partner_url = ?, partner_variant = ?' . ($linkChanged ? ', partner_status = NULL, partner_checked_at = NULL, partner_price = NULL' : '') . ' WHERE id = ?')
+            ->execute([$old['partner_url'] ?: null, $old['partner_variant'] ?: null, $id]);
+
         // Tamanhos: atualiza, cria e exclui. Tamanho já vendido não é apagado
         // (fica inativo) para preservar o histórico dos pedidos.
         foreach ($variantInput as $vi) {
@@ -528,6 +538,31 @@ require dirname(__DIR__) . '/inc/admin_header.php';
 
         <!-- Tamanhos e preços (variações) -->
         <div class="gold-divider"></div>
+        <!-- Loja parceira (estoque lido da página do produto na Nuvemshop) -->
+        <div id="parceiro" class="rounded-lg border border-white/10 p-4">
+            <h3 class="text-xs font-medium uppercase tracking-[0.22em] text-white">Loja parceira (opcional)</h3>
+            <p class="mt-1 text-xs text-ink-400">Se este perfume é comprado de uma loja parceira, cole o link do produto lá. Ao clicar em "Adicionar à sacola", o site confere se o parceiro tem estoque.</p>
+            <div class="mt-3 grid gap-3 sm:grid-cols-[1fr_200px]">
+                <div>
+                    <label class="field-label" for="partner_url">Link do produto na loja parceira</label>
+                    <input id="partner_url" name="partner_url" type="url" maxlength="500" class="field<?= $inv('partner_url') ?>" placeholder="https://lojaparceira.com.br/produtos/nome-do-perfume/" value="<?= $v('partner_url') ?>">
+                    <?= $err('partner_url') ?>
+                </div>
+                <div>
+                    <label class="field-label" for="partner_variant">Variação no parceiro</label>
+                    <input id="partner_variant" name="partner_variant" maxlength="100" class="field" placeholder="Ex.: 100 ml (opcional)" value="<?= $v('partner_variant') ?>">
+                </div>
+            </div>
+            <div class="mt-3 flex flex-wrap items-center gap-3">
+                <button type="button" class="btn-outline btn-sm" data-partner-test data-url="<?= e(url('admin/partner_test.php')) ?>">Testar link</button>
+                <?php if (!empty($product['partner_url'])): ?>
+                    <span class="text-xs text-ink-400">Última leitura: <strong class="<?= ($product['partner_status'] ?? '') === 'out' ? 'text-red-300' : (($product['partner_status'] ?? '') === 'available' ? 'text-emerald-300' : 'text-ink-200') ?>"><?= e(partner_status_label($product['partner_status'] ?? null)) ?></strong><?= !empty($product['partner_checked_at']) ? ' · ' . e(date_br($product['partner_checked_at'])) : '' ?></span>
+                <?php endif; ?>
+            </div>
+            <div class="mt-3 hidden text-sm" data-partner-result></div>
+            <p class="mt-2 text-[11px] text-ink-500">"Variação": se o produto lá tem opções (ex.: 50 ml / 100 ml), escreva qual corresponde. Use o "Testar link" para ver as variações encontradas.</p>
+        </div>
+
         <div id="tamanhos">
             <h2 class="text-xs font-medium uppercase tracking-[0.22em] text-white">Tamanhos e preços</h2>
             <p class="mt-1 text-xs text-ink-500">Cadastre cada tamanho (ex.: 5 ml e 10 ml) com preço e estoque próprios. O cliente escolhe o tamanho na página do produto.
@@ -696,6 +731,39 @@ document.querySelector('[data-add-variant]')?.addEventListener('click', function
     var body = document.querySelector('[data-variant-rows]');
     body.insertAdjacentHTML('beforeend', tpl.innerHTML.split('__i__').join('n' + Date.now()));
     body.lastElementChild.querySelector('input[name$="[label]"]').focus();
+});
+
+// Testa o link da loja parceira sem salvar (mostra o que foi encontrado na página).
+document.querySelector('[data-partner-test]')?.addEventListener('click', async function () {
+    var btn = this, box = document.querySelector('[data-partner-result]');
+    var url = document.getElementById('partner_url').value.trim();
+    if (!url) { box.className = 'mt-3 text-sm text-red-300'; box.textContent = 'Cole o link do produto primeiro.'; return; }
+    var fd = new FormData();
+    fd.append('_csrf', document.querySelector('meta[name="csrf-token"]').content);
+    fd.append('url', url);
+    fd.append('variant', document.getElementById('partner_variant').value);
+    var old = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Buscando estoque…';
+    box.className = 'mt-3 hidden text-sm';
+    try {
+        var r = await fetch(btn.dataset.url, { method: 'POST', body: fd, headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+        var d = await r.json();
+        var el = function (t, c) { var p = document.createElement('p'); p.textContent = t; if (c) p.className = c; return p; };
+        box.innerHTML = '';
+        box.className = 'mt-3 space-y-1 rounded-md border border-white/10 bg-black/30 p-3 text-sm';
+        if (d.error && !d.status) { box.appendChild(el(d.error, 'text-red-300')); return; }
+        var colors = { available: 'text-emerald-300', out: 'text-red-300', unknown: 'text-amber-300' };
+        box.appendChild(el(d.status_label, 'font-medium ' + (colors[d.status] || '')));
+        if (d.name) box.appendChild(el('Produto: ' + d.name, 'text-ink-300'));
+        if (d.price) box.appendChild(el('Preço no parceiro: ' + d.price, 'text-ink-300'));
+        if (d.matched) box.appendChild(el('Variação usada: ' + d.matched, 'text-ink-300'));
+        if (d.source) box.appendChild(el('Lido de: ' + d.source, 'text-xs text-ink-500'));
+        if (d.error) box.appendChild(el(d.error, 'text-amber-300'));
+        (d.variants || []).forEach(function (v) {
+            box.appendChild(el('• ' + v.label + ' — ' + (v.available ? 'disponível' : 'esgotado') + (v.stock !== null ? ' (' + v.stock + ' un.)' : ''), 'text-xs ' + (v.available ? 'text-ink-200' : 'text-ink-500')));
+        });
+    } catch (e) {
+        box.className = 'mt-3 text-sm text-red-300'; box.textContent = 'Falha ao testar. Tente novamente.';
+    } finally { btn.disabled = false; btn.innerHTML = old; }
 });
 </script>
 <?php require dirname(__DIR__) . '/inc/admin_footer.php'; ?>

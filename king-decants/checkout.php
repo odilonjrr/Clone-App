@@ -193,6 +193,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
         $errors['_global'] = 'Cupom removido: ' . $totals['coupon_error'] . ' Confira o novo total e tente de novo.';
     }
 
+    // Loja parceira: confere de novo (normalmente usa a leitura feita ao adicionar à sacola)
+    $partnerUnconfirmed = [];
+    if (!$errors) {
+        $ids = array_values(array_unique(array_map(fn($it) => (int) $it['id'], $cart['items'])));
+        $pq = db()->prepare("SELECT * FROM products WHERE id IN (" . implode(',', array_fill(0, count($ids), '?')) . ") AND partner_url IS NOT NULL AND partner_url <> ''");
+        $pq->execute($ids);
+        foreach ($pq->fetchAll() as $prow) {
+            $chk = partner_can_sell($prow);
+            if (!$chk['ok']) {
+                $errors['_global'] = $prow['name'] . ': ' . $chk['error'] . ' Remova o item da sacola para continuar.';
+                break;
+            }
+            if ($chk['unconfirmed']) {
+                $partnerUnconfirmed[] = $prow['name'];
+            }
+        }
+    }
+
     if (!$errors) {
         $shipping = $totals['shipping'];
         $orderRef = null;
@@ -201,6 +219,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$showChoice) {
             // 3) Pedido "pending"
             $orderRef = order_create($old, $cart, $shipping, $old['payment_method'], $isGuest, $totals['coupon']['code'] ?? null);
             $order = order_find($orderRef['id']);
+            if ($partnerUnconfirmed) {
+                order_add_history_note((int) $order['id'], 'Atenção: estoque do parceiro não confirmado (parceiro não respondeu) para: ' . implode(', ', $partnerUnconfirmed) . '.', 'system');
+            }
             $orderUrl = url('callback.php?order=' . $order['id'] . '&token=' . $order['access_token']);
 
             // Completa o cadastro do usuário logado (telefone/CPF) se estiver vazio.

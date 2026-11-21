@@ -25,6 +25,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'toggl
     redirect(url('admin/products.php') . query_with([]));
 }
 
+// ---------------- Loja parceira: verificar todos / configuração
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'partner_sync') {
+    csrf_require();
+    @set_time_limit(120);
+    $c = partner_sync_all();
+    admin_log('partner_sync', 'products', null, json_encode($c));
+    flash('success', "Estoque dos parceiros verificado: {$c['available']} disponível(is), {$c['out']} esgotado(s)" . ($c['unknown'] ? ", {$c['unknown']} sem confirmação" : '') . '.');
+    redirect(url('admin/products.php') . '#parceiros');
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'partner_settings') {
+    csrf_require();
+    setting_set('partner_fail_mode', ($_POST['partner_fail_mode'] ?? '') === 'block' ? 'block' : 'allow');
+    setting_set('partner_cache_minutes', (string) max(1, min(1440, (int) ($_POST['partner_cache_minutes'] ?? 10))));
+    if (!setting('partner_sync_key')) {
+        setting_set('partner_sync_key', bin2hex(random_bytes(16)));
+    }
+    admin_log('partner_settings', 'settings', null, $_POST['partner_fail_mode'] ?? '');
+    flash('success', 'Configuração da loja parceira salva.');
+    redirect(url('admin/products.php') . '#parceiros');
+}
+$partnerCount = (int) db()->query("SELECT COUNT(*) FROM products WHERE partner_url IS NOT NULL AND partner_url <> ''")->fetchColumn();
+
 $where = ['1=1'];
 $params = [];
 $term = clean_string($_GET['q'] ?? '', 100);
@@ -74,6 +96,32 @@ require dirname(__DIR__) . '/inc/admin_header.php';
     <button class="btn-gold btn-sm"><?= icon('search', 'h-4 w-4') ?> Buscar</button>
 </form>
 
+<?php if ($partnerCount): $syncKey = setting('partner_sync_key');
+    if (!$syncKey) { $syncKey = bin2hex(random_bytes(16)); setting_set('partner_sync_key', $syncKey); } ?>
+<div id="parceiros" class="panel mt-6 flex flex-wrap items-end gap-4 p-4">
+    <div class="min-w-[220px] flex-1">
+        <p class="text-xs font-medium uppercase tracking-[0.22em] text-white">Loja parceira</p>
+        <p class="mt-1 text-xs text-ink-400"><?= $partnerCount ?> produto(s) com link de parceiro. O estoque é conferido ao adicionar à sacola e guardado por alguns minutos.</p>
+        <?php if ($syncKey): ?><p class="mt-1 break-all text-[11px] text-ink-500">Verificação automática (cron da Hostinger, a cada hora): <span class="font-mono text-ink-300"><?= e(absolute_url('partner-sync.php?key=' . $syncKey)) ?></span></p><?php endif; ?>
+    </div>
+    <form method="post" class="flex flex-wrap items-end gap-2">
+        <?= csrf_field() ?><input type="hidden" name="action" value="partner_settings">
+        <div><label class="field-label" for="pfm">Se o parceiro não responder</label>
+            <select id="pfm" name="partner_fail_mode" class="field !py-2 !pr-9 text-sm">
+                <option value="allow" <?= partner_fail_mode() === 'allow' ? 'selected' : '' ?>>Vender (com aviso no pedido)</option>
+                <option value="block" <?= partner_fail_mode() === 'block' ? 'selected' : '' ?>>Não vender</option>
+            </select></div>
+        <div><label class="field-label" for="pcm">Guardar leitura (min)</label>
+            <input id="pcm" name="partner_cache_minutes" type="number" min="1" max="1440" class="field !w-24 !py-2" value="<?= partner_cache_minutes() ?>"></div>
+        <button class="btn-outline btn-sm">Salvar</button>
+    </form>
+    <form method="post" data-loading>
+        <?= csrf_field() ?><input type="hidden" name="action" value="partner_sync">
+        <button class="btn-gold btn-sm" data-loading-text="Buscando estoque…">Verificar estoque agora</button>
+    </form>
+</div>
+<?php endif; ?>
+
 <div class="panel mt-6 overflow-x-auto">
     <table class="table-lux">
         <thead><tr><th>Produto</th><th>Coleção</th><th class="text-right">Preço</th><th class="text-right">Estoque</th><th class="text-right">Vendidos</th><th>Loja</th><th class="text-right">Ações</th></tr></thead>
@@ -91,7 +139,8 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                 </td>
                 <td class="text-ink-400"><?= e($collections[$p['collection']]['label'] ?? $p['collection']) ?></td>
                 <td class="whitespace-nowrap text-right text-gold-300"><?= money($p['price']) ?></td>
-                <td class="text-right <?= (int) $p['stock'] <= 0 ? 'text-red-300' : ((int) $p['stock'] <= 5 ? 'text-amber-300' : '') ?>"><?= (int) $p['stock'] ?></td>
+                <td class="text-right <?= (int) $p['stock'] <= 0 ? 'text-red-300' : ((int) $p['stock'] <= 5 ? 'text-amber-300' : '') ?>"><?= (int) $p['stock'] ?>
+                    <?php if (!empty($p['partner_url'])): ?><span class="block text-[10px] uppercase tracking-wider <?= $p['partner_status'] === 'out' ? 'text-red-300' : ($p['partner_status'] === 'available' ? 'text-emerald-300' : 'text-ink-500') ?>" title="<?= e(partner_status_label($p['partner_status'])) ?>">Parceiro: <?= $p['partner_status'] === 'out' ? 'esgotado' : ($p['partner_status'] === 'available' ? 'ok' : '?') ?></span><?php endif; ?></td>
                 <td class="text-right text-ink-400"><?= (int) $p['sold_count'] ?></td>
                 <td><?= (int) $p['is_active']
                         ? '<span class="text-xs uppercase tracking-wider text-emerald-300">Ativo</span>'
