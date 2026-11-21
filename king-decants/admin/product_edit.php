@@ -502,13 +502,13 @@ require dirname(__DIR__) . '/inc/admin_header.php';
         <div class="grid gap-5 sm:grid-cols-4">
             <div>
                 <label class="field-label" for="price">Preço (R$) *</label>
-                <input id="price" name="price" inputmode="decimal" class="field<?= $inv('price') ?>" required placeholder="49,90" value="<?= e($priceDisplay) ?>" <?= $hasVariants ? 'readonly title="Calculado pelos tamanhos (menor preço)"' : '' ?>>
+                <input id="price" name="price" inputmode="decimal" autocomplete="off" class="field<?= $inv('price') ?>" required placeholder="49,90" value="<?= e($priceDisplay) ?>" <?= $hasVariants ? 'readonly title="Calculado pelos tamanhos (menor preço)"' : '' ?>>
                 <?php if ($hasVariants): ?><p class="mt-1 text-[11px] text-ink-500">Menor preço dos tamanhos</p><?php endif; ?>
                 <?= $err('price') ?>
             </div>
             <div>
                 <label class="field-label" for="stock">Estoque *</label>
-                <input id="stock" name="stock" type="number" min="0" class="field<?= $inv('stock') ?>" required value="<?= $v('stock') ?>" <?= $hasVariants ? 'readonly title="Soma do estoque dos tamanhos"' : '' ?>>
+                <input id="stock" name="stock" type="number" min="0" autocomplete="off" class="field<?= $inv('stock') ?>" required value="<?= $v('stock') ?>" <?= $hasVariants ? 'readonly title="Soma do estoque dos tamanhos"' : '' ?>>
                 <?php if ($hasVariants): ?><p class="mt-1 text-[11px] text-ink-500">Soma dos tamanhos</p><?php endif; ?>
                 <?= $err('stock') ?>
             </div>
@@ -580,8 +580,8 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                             <td><input type="hidden" name="variants[<?= (int) $vi ?>][id]" value="<?= (int) ($vr['id'] ?? 0) ?>">
                                 <input name="variants[<?= (int) $vi ?>][label]" class="field !px-2.5 !py-2 !w-20" placeholder="5 ml" maxlength="40" value="<?= e($vr['label'] ?? '') ?>" aria-label="Tamanho"></td>
                             <td><input name="variants[<?= (int) $vi ?>][volume_ml]" type="number" min="1" max="1000" class="field !px-2.5 !py-2 !w-14" placeholder="5" value="<?= e($vr['volume_ml'] ?? '') ?>" aria-label="Volume em ml"></td>
-                            <td><input name="variants[<?= (int) $vi ?>][price]" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset($vr['price']) && is_numeric($vr['price']) ? number_format((float) $vr['price'], 2, ',', '') : ($vr['price'] ?? '')) ?>" aria-label="Preço"></td>
-                            <td><input name="variants[<?= (int) $vi ?>][stock]" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e($vr['stock'] ?? '') ?>" aria-label="Estoque"></td>
+                            <td><input name="variants[<?= (int) $vi ?>][price]" autocomplete="off" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset($vr['price']) && is_numeric($vr['price']) ? number_format((float) $vr['price'], 2, ',', '') : ($vr['price'] ?? '')) ?>" aria-label="Preço"></td>
+                            <td><input name="variants[<?= (int) $vi ?>][stock]" autocomplete="off" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e($vr['stock'] ?? '') ?>" aria-label="Estoque"></td>
                             <td><input name="variants[<?= (int) $vi ?>][sku]" class="field !px-2 !py-2 !w-32 !text-xs uppercase" placeholder="automático" maxlength="40" value="<?= e($vr['sku'] ?? '') ?>" aria-label="SKU"></td>
                             <td class="text-center"><input type="checkbox" name="variants[<?= (int) $vi ?>][is_active]" value="1" class="accent-[#d4af37]" <?= !isset($vr['label']) || !empty($vr['is_active']) ? 'checked' : '' ?> aria-label="Ativo"></td>
                             <td class="text-center"><input type="checkbox" name="variants[<?= (int) $vi ?>][delete]" value="1" class="accent-red-400" aria-label="Excluir"></td>
@@ -592,8 +592,8 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                             <td><input type="hidden" name="variants[0][id]" value="<?= (int) ($vr['id'] ?? 0) ?>">
                                 <input name="variants[0][label]" class="field !px-2.5 !py-2 !w-20" placeholder="5 ml" maxlength="40" value="<?= e($vr['label'] ?? '') ?>" aria-label="Tamanho"></td>
                             <td><input name="variants[0][volume_ml]" type="number" min="1" max="1000" class="field !px-2.5 !py-2 !w-14" placeholder="5" value="<?= e($vr['volume_ml'] ?? '') ?>" aria-label="Volume em ml"></td>
-                            <td><input name="variants[0][price]" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset($vr['price']) && is_numeric($vr['price']) ? number_format((float) $vr['price'], 2, ',', '') : ($vr['price'] ?? '')) ?>" aria-label="Preço"></td>
-                            <td><input name="variants[0][stock]" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e($vr['stock'] ?? '') ?>" aria-label="Estoque"></td>
+                            <td><input name="variants[0][price]" autocomplete="off" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset($vr['price']) && is_numeric($vr['price']) ? number_format((float) $vr['price'], 2, ',', '') : ($vr['price'] ?? '')) ?>" aria-label="Preço"></td>
+                            <td><input name="variants[0][stock]" autocomplete="off" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e($vr['stock'] ?? '') ?>" aria-label="Estoque"></td>
                             <td><input name="variants[0][sku]" class="field !px-2 !py-2 !w-32 !text-xs uppercase" placeholder="automático" maxlength="40" value="<?= e($vr['sku'] ?? '') ?>" aria-label="SKU"></td>
                             <td class="text-center"><input type="checkbox" name="variants[0][is_active]" value="1" class="accent-[#d4af37]" <?= !isset($vr['label']) || !empty($vr['is_active']) ? 'checked' : '' ?> aria-label="Ativo"></td>
                             <td class="text-center"><input type="checkbox" name="variants[0][delete]" value="1" class="accent-red-400" aria-label="Excluir"></td>
@@ -608,8 +608,8 @@ require dirname(__DIR__) . '/inc/admin_header.php';
                             <td><input type="hidden" name="variants[__i__][id]" value="<?= (int) ([]['id'] ?? 0) ?>">
                                 <input name="variants[__i__][label]" class="field !px-2.5 !py-2 !w-20" placeholder="5 ml" maxlength="40" value="<?= e([]['label'] ?? '') ?>" aria-label="Tamanho"></td>
                             <td><input name="variants[__i__][volume_ml]" type="number" min="1" max="1000" class="field !px-2.5 !py-2 !w-14" placeholder="5" value="<?= e([]['volume_ml'] ?? '') ?>" aria-label="Volume em ml"></td>
-                            <td><input name="variants[__i__][price]" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset([]['price']) && is_numeric([]['price']) ? number_format((float) []['price'], 2, ',', '') : ([]['price'] ?? '')) ?>" aria-label="Preço"></td>
-                            <td><input name="variants[__i__][stock]" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e([]['stock'] ?? '') ?>" aria-label="Estoque"></td>
+                            <td><input name="variants[__i__][price]" autocomplete="off" inputmode="decimal" class="field !px-2.5 !py-2 !w-24" placeholder="49,90" value="<?= e(isset([]['price']) && is_numeric([]['price']) ? number_format((float) []['price'], 2, ',', '') : ([]['price'] ?? '')) ?>" aria-label="Preço"></td>
+                            <td><input name="variants[__i__][stock]" autocomplete="off" type="number" min="0" class="field !px-2.5 !py-2 !w-20" placeholder="0" value="<?= e([]['stock'] ?? '') ?>" aria-label="Estoque"></td>
                             <td><input name="variants[__i__][sku]" class="field !px-2 !py-2 !w-32 !text-xs uppercase" placeholder="automático" maxlength="40" value="<?= e([]['sku'] ?? '') ?>" aria-label="SKU"></td>
                             <td class="text-center"><input type="checkbox" name="variants[__i__][is_active]" value="1" class="accent-[#d4af37]" <?= !isset([]['label']) || !empty([]['is_active']) ? 'checked' : '' ?> aria-label="Ativo"></td>
                             <td class="text-center"><input type="checkbox" name="variants[__i__][delete]" value="1" class="accent-red-400" aria-label="Excluir"></td>
