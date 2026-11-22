@@ -28,6 +28,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_require();
     $current = setting('hero_image');
 
+    // ---------------- Banner: vídeo com rolagem ou imagem
+    if (($_POST['action'] ?? '') === 'hero_mode') {
+        $mode = ($_POST['hero_mode'] ?? '') === 'image' ? 'image' : 'video';
+        setting_set('hero_mode', $mode);
+        admin_log('appearance_hero_mode', 'settings', null, $mode);
+        flash('success', $mode === 'video' ? 'Banner com vídeo ativado.' : 'Banner com imagem ativado.');
+        redirect(url('admin/appearance.php'));
+    }
+
     // ---------------- Botão flutuante do WhatsApp
     if (($_POST['action'] ?? '') === 'whatsapp') {
         $waNumber = whatsapp_normalize((string) ($_POST['whatsapp_number'] ?? ''));
@@ -53,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect(url('admin/appearance.php'));
     }
 
-    if (($_POST['action'] ?? '') !== 'whatsapp') {
+    if (!in_array($_POST['action'] ?? '', ['whatsapp', 'hero_mode'], true)) {
     $alt = clean_string($_POST['hero_image_alt'] ?? '', 150);
     $productId = int_param($_POST, 'hero_product');
     $link = null;
@@ -142,6 +151,24 @@ require dirname(__DIR__) . '/inc/admin_header.php';
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Banner: vídeo com rolagem x imagem -->
+<?php $heroMode = setting('hero_mode', 'video'); $hasVideo = is_file(dirname(__DIR__) . '/assets/video/hero-scroll.mp4'); ?>
+<form method="post" class="panel mt-6 max-w-3xl space-y-4 p-6" data-loading>
+    <?= csrf_field() ?><input type="hidden" name="action" value="hero_mode">
+    <h2 class="text-xs font-medium uppercase tracking-[0.22em] text-white">Primeira dobra da home</h2>
+    <label class="choice flex items-start gap-4">
+        <input type="radio" name="hero_mode" value="video" class="mt-1 accent-[#d4af37]" <?= $heroMode !== 'image' ? 'checked' : '' ?> <?= $hasVideo ? '' : 'disabled' ?>>
+        <span><span class="block text-white">Vídeo com rolagem</span>
+            <span class="mt-1 block text-xs text-ink-400">O vídeo fica parado e avança conforme o cliente desce a página<?= $hasVideo ? '' : ' (arquivo assets/video/hero-scroll.mp4 não encontrado)' ?>.</span></span>
+    </label>
+    <label class="choice flex items-start gap-4">
+        <input type="radio" name="hero_mode" value="image" class="mt-1 accent-[#d4af37]" <?= $heroMode === 'image' ? 'checked' : '' ?>>
+        <span><span class="block text-white">Imagem</span>
+            <span class="mt-1 block text-xs text-ink-400">Usa a imagem do banner configurada acima, com as luzes douradas.</span></span>
+    </label>
+    <button class="btn-gold btn-sm" data-loading-text="Salvando…">Salvar</button>
+</form>
 
 <!-- Botão do WhatsApp -->
 <form method="post" action="<?= e(url('admin/appearance.php#whatsapp')) ?>" id="whatsapp" class="panel mt-6 max-w-3xl space-y-5 p-6" data-loading novalidate>

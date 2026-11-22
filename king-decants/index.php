@@ -51,19 +51,11 @@ require __DIR__ . '/inc/header.php';
 ?>
 
 <!-- ======================= BANNER PRINCIPAL ======================= -->
-<!-- Banner de largura total: raios de luz dourada à direita com o frasco ao centro
-     dessa luz; texto editorial à esquerda. Troque assets/img/hero-bottle.svg por
-     uma fotografia (PNG/WebP com fundo preto) quando tiver. -->
-<section class="hero relative overflow-hidden border-b border-white/10">
-    <!-- Luzes animadas (SVG inline para as animações CSS internas rodarem em todos os navegadores) -->
-    <div class="hero-rays pointer-events-none absolute inset-y-0 right-0 w-full lg:w-[68%]">
-        <?= file_get_contents(__DIR__ . '/assets/img/hero-lights.svg') ?>
-    </div>
-    <!-- Sombra para legibilidade do texto: de cima para baixo no celular (raios simétricos),
-         da esquerda para a direita no desktop (texto à esquerda). -->
-    <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950/90 lg:bg-gradient-to-r lg:from-ink-950 lg:via-ink-950/40 lg:to-transparent"></div>
-
-    <div class="relative mx-auto grid max-w-7xl items-center gap-2 px-5 pb-10 pt-4 lg:min-h-[520px] lg:grid-cols-[1.1fr_1fr] lg:gap-4 lg:px-8 lg:py-16">
+<?php
+// Vídeo com rolagem (Admin -> Aparência -> Banner: "Vídeo"): o vídeo fica parado
+// e avança quadro a quadro conforme o cliente desce a página.
+$heroVideo = setting('hero_mode', 'video') === 'video' && is_file(__DIR__ . '/assets/video/hero-scroll.mp4');
+ob_start(); ?>
         <div class="relative z-10 order-2 text-center lg:order-1 lg:text-left">
             <p class="eyebrow animate-fade-up">Decants de alta perfumaria</p>
             <h1 class="mt-3 font-serif text-5xl lg:mt-6 font-normal leading-[1.02] text-white animate-fade-up sm:text-6xl xl:text-7xl" style="animation-delay:.1s">
@@ -77,6 +69,38 @@ require __DIR__ . '/inc/header.php';
                 <a href="#colecoes" class="text-xs uppercase tracking-[0.22em] text-ink-400 transition-colors hover:text-gold-300">Explorar coleções</a>
             </div>
         </div>
+<?php $heroText = ob_get_clean(); ?>
+
+<?php if ($heroVideo): ?>
+<section class="hero-scrub relative border-b border-white/10" data-hero-scrub>
+    <div class="hero-scrub-stage">
+        <!-- Vídeo: 720 px no celular, 1140 px no computador; sem som; avançado pelo scroll (assets/js/app.js) -->
+        <video class="hero-scrub-video" muted playsinline preload="auto" poster="<?= e(asset('img/hero-video-poster.webp')) ?>"
+               aria-label="Frasco King Decants envolto em ouro líquido" data-src-mobile="<?= e(asset('video/hero-scroll-720.mp4')) ?>" data-src-desktop="<?= e(asset('video/hero-scroll.mp4')) ?>"></video>
+        <div class="hero-scrub-shade pointer-events-none absolute inset-0"></div>
+        <div class="relative mx-auto flex h-full max-w-7xl items-end px-5 pb-8 lg:items-center lg:px-8 lg:pb-0">
+            <div class="w-full lg:max-w-[46%]">
+<?= $heroText ?>
+            </div>
+        </div>
+        <span class="hero-scrub-hint pointer-events-none" aria-hidden="true"><?= icon('chevron', 'h-5 w-5 rotate-90') ?></span>
+    </div>
+</section>
+<?php else: ?>
+<!-- Banner de largura total: raios de luz dourada à direita com o frasco ao centro
+     dessa luz; texto editorial à esquerda. Troque assets/img/hero-bottle.svg por
+     uma fotografia (PNG/WebP com fundo preto) quando tiver. -->
+<section class="hero relative overflow-hidden border-b border-white/10">
+    <!-- Luzes animadas (SVG inline para as animações CSS internas rodarem em todos os navegadores) -->
+    <div class="hero-rays pointer-events-none absolute inset-y-0 right-0 w-full lg:w-[68%]">
+        <?= file_get_contents(__DIR__ . '/assets/img/hero-lights.svg') ?>
+    </div>
+    <!-- Sombra para legibilidade do texto: de cima para baixo no celular (raios simétricos),
+         da esquerda para a direita no desktop (texto à esquerda). -->
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950/90 lg:bg-gradient-to-r lg:from-ink-950 lg:via-ink-950/40 lg:to-transparent"></div>
+
+    <div class="relative mx-auto grid max-w-7xl items-center gap-2 px-5 pb-10 pt-4 lg:min-h-[520px] lg:grid-cols-[1.1fr_1fr] lg:gap-4 lg:px-8 lg:py-16">
+<?= $heroText ?>
         <div class="hero-bottle-wrap relative order-1 mx-auto w-full max-w-[210px] sm:max-w-[250px] lg:order-2 lg:max-w-[400px]">
             <?php
             // Imagem do banner: a enviada em Admin -> Aparência, ou o frasco ilustrado padrão.
@@ -92,6 +116,7 @@ require __DIR__ . '/inc/header.php';
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- ======================= EXPLORAR COLEÇÕES ======================= -->
 <section id="colecoes" class="scroll-mt-24 border-b border-white/10">

@@ -152,6 +152,58 @@
     })
   );
 
+  // ---------------------------------------------------------------- Banner: vídeo avançado pelo scroll
+  // O vídeo fica parado; a posição da rolagem dentro da seção define o quadro exibido.
+  (function heroScrub() {
+    const sec = document.querySelector('[data-hero-scrub]');
+    const video = sec && sec.querySelector('video');
+    if (!video) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mobile = window.matchMedia('(max-width: 1023px)').matches;
+    const src = mobile ? video.dataset.srcMobile : video.dataset.srcDesktop;
+    video.muted = true;
+    if (reduce) return; // mostra só a imagem inicial (poster)
+    // Baixa o vídeo inteiro (1,8 MB no celular / 3,6 MB no computador) e usa da memória:
+    // assim qualquer quadro pode ser exibido na hora, mesmo em servidores sem suporte a
+    // download parcial. Se falhar, usa o endereço direto.
+    fetch(src).then((r) => (r.ok ? r.blob() : Promise.reject())).then((blob) => {
+      video.src = URL.createObjectURL(blob);
+    }).catch(() => { video.src = src; });
+
+    // iOS/Safari só carrega os quadros depois de um play(): toca e pausa em seguida (sem som)
+    const prime = () => { const p = video.play(); if (p && p.then) p.then(() => video.pause()).catch(() => {}); };
+    video.addEventListener('loadedmetadata', prime, { once: true });
+
+    let target = 0, current = 0, ticking = false;
+    const progress = () => {
+      const r = sec.getBoundingClientRect();
+      const stage = sec.firstElementChild.offsetHeight;
+      const total = Math.max(1, sec.offsetHeight - stage);
+      return Math.min(1, Math.max(0, (80 - r.top) / total));
+    };
+    const frame = () => {
+      ticking = false;
+      if (!video.duration) return;
+      // suaviza a aproximação para o quadro-alvo (evita "saltos" com rolagem rápida)
+      current += (target - current) * 0.35;
+      if (Math.abs(target - current) < 0.002) current = target;
+      if (!video.seeking && Math.abs(video.currentTime - current) > 1 / 60) {
+        video.currentTime = current;
+      }
+      if (current !== target) request();
+    };
+    const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+    const onScroll = () => {
+      const p = progress();
+      sec.classList.toggle('is-moving', p > 0.03);
+      if (video.duration) target = p * Math.max(0, video.duration - 0.05);
+      request();
+    };
+    video.addEventListener('loadeddata', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+  })();
+
   // ---------------------------------------------------------------- 6. Login rápido (modal)
   $$('form[data-ajax-login]').forEach((form) =>
     form.addEventListener('submit', async (ev) => {
