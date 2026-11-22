@@ -602,3 +602,20 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
 @media (prefers-reduced-motion: reduce) {
   .btn-gold:hover, .btn-outline:hover, .btn-gold.is-pressed, .btn-outline.is-pressed { transform: none; }
 }
+
+/* Hover: uma faixa de luz dourada atravessa o botão (efeito "shimmer":
+   gradiente 110° com a faixa clara entre 45% e 55%, 200% de largura,
+   deslocado de 0 a -200% em 2 s, linear, contínuo enquanto o mouse está em cima).
+   Fica numa camada por cima do botão; cores e fundo do botão não mudam. */
+.btn-gold, .btn-outline { overflow: hidden; isolation: isolate; }
+.btn-gold::after, .btn-outline::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(110deg, transparent 0%, transparent 45%, rgba(255, 246, 214, .75) 50%, transparent 55%, transparent 100%);
+  background-size: 200% 100%; background-position: 0 0;
+  opacity: 0; transition: opacity .25s ease;
+}
+.btn-outline::after { background-image: linear-gradient(110deg, transparent 0%, transparent 45%, rgba(230, 199, 111, .38) 50%, transparent 55%, transparent 100%); }
+.btn-gold:hover::after, .btn-outline:hover::after { opacity: 1; animation: kd-shimmer 2s linear infinite; }
+.btn-gold:disabled::after, .btn-gold[aria-busy="true"]::after, .btn-outline:disabled::after { display: none; }
+@keyframes kd-shimmer { from { background-position: 0 0; } to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .btn-gold:hover::after, .btn-outline:hover::after { animation: none; opacity: 0; } }
