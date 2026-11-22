@@ -1,0 +1,140 @@
+<?php
+/**
+ * King Decants — inc/footer.php
+ * ---------------------------------------------------------------------------
+ * Rodapé da loja + MODAL DE LOGIN RÁPIDO (disponível em todas as páginas
+ * para visitantes) + scripts.
+ *
+ * O modal envia o formulário via fetch() para auth/login.php com
+ * "Accept: application/json". Em caso de sucesso, recarrega a página atual,
+ * mantendo o usuário onde estava (o carrinho de convidado é migrado no login).
+ * ---------------------------------------------------------------------------
+ */
+// Página atual (com query string) para voltar a ela após o login rápido.
+$currentPath = ltrim(substr((string) ($_SERVER['REQUEST_URI'] ?? ''), strlen(base_path())), '/');
+if (strlen($currentPath) > 300) {
+    $currentPath = 'index.php';
+}
+?>
+</main>
+
+<!-- ======================= RODAPÉ ======================= -->
+<footer class="mt-24 border-t border-gold-400/15">
+    <div class="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
+        <div class="space-y-4">
+            <a href="<?= e(url('index.php')) ?>" class="inline-block" aria-label="King Decants e Perfumaria — início">
+                <picture>
+                    <source srcset="<?= e(asset('img/logo-king-decants.webp')) ?>" type="image/webp">
+                    <img src="<?= e(asset('img/logo-king-decants.png')) ?>" alt="King Decants e Perfumaria" class="h-[37px] w-auto" width="640" height="129" loading="lazy">
+                </picture>
+            </a>
+            <p class="max-w-xs text-sm leading-relaxed text-ink-400">Fragrâncias icônicas em decants envasados com precisão. Luxo em cada gota.</p>
+        </div>
+        <div>
+            <h4 class="mb-4 text-xs uppercase tracking-[0.22em] text-gold-400">Loja</h4>
+            <ul class="space-y-2.5 text-sm text-ink-400">
+                <li><a class="hover:text-white" href="<?= e(url('index.php#mais-vendidos')) ?>">Mais vendidos</a></li>
+                <li><a class="hover:text-white" href="<?= e(url('index.php#colecoes')) ?>">Coleções</a></li>
+                <li><a class="hover:text-white" href="<?= e(url('cart.php')) ?>">Sacola</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="mb-4 text-xs uppercase tracking-[0.22em] text-gold-400">Atendimento</h4>
+            <ul class="space-y-2.5 text-sm text-ink-400">
+                <li><a class="hover:text-white" href="<?= e(url('account.php')) ?>">Minha conta</a></li>
+                <li>contato@seudominio.com.br</li>
+                <li>Seg. a sex., 9h às 18h</li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="mb-4 text-xs uppercase tracking-[0.22em] text-gold-400">Pagamento seguro</h4>
+            <div class="flex items-center gap-3 text-gold-400">
+                <?= icon('pix', 'h-6 w-6') ?><?= icon('card', 'h-6 w-6') ?><?= icon('shield', 'h-6 w-6') ?>
+            </div>
+            <p class="mt-3 text-sm text-ink-400">PIX e cartão via <?= e(payment_provider_name()) ?>.</p>
+        </div>
+    </div>
+    <div class="gold-divider"></div>
+    <p class="py-6 text-center text-xs tracking-wider text-ink-500">© <?= date('Y') ?> King Decants. Todos os direitos reservados.</p>
+</footer>
+
+<?php if (!current_user()): ?>
+<!-- ======================= MODAL DE LOGIN RÁPIDO ======================= -->
+<div id="login-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel">
+        <button type="button" class="absolute right-4 top-4 text-ink-400 hover:text-white" data-close-modal aria-label="Fechar"><?= icon('close') ?></button>
+        <p class="eyebrow">Bem-vindo de volta</p>
+        <h2 id="login-modal-title" class="mt-2 font-serif text-3xl text-white">Entrar na <em class="text-gold-gradient">sua conta</em></h2>
+
+        <form action="<?= e(url('auth/login.php')) ?>" method="post" class="mt-6 space-y-4" data-ajax-login>
+            <?= csrf_field() ?>
+            <input type="hidden" name="redirect" value="<?= e($currentPath ?: 'index.php') ?>">
+            <div>
+                <label class="field-label" for="modal-email">E-mail</label>
+                <input id="modal-email" type="email" name="email" required autocomplete="email" class="field">
+            </div>
+            <div>
+                <label class="field-label" for="modal-password">Senha</label>
+                <input id="modal-password" type="password" name="password" required autocomplete="current-password" class="field">
+            </div>
+            <p class="hidden rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-300" data-error></p>
+            <button type="submit" class="btn-gold w-full" data-loading-text="Entrando…">Entrar</button>
+        </form>
+        <p class="mt-6 text-center text-sm text-ink-400">
+            Ainda não tem conta?
+            <a href="<?= e(url('auth/register.php?redirect=' . urlencode($currentPath ?: 'index.php'))) ?>" class="text-gold-400 hover:text-gold-300">Criar conta</a>
+        </p>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php
+// ======================= BARRA DE NAVEGAÇÃO INFERIOR (celular) =======================
+// Fixa no rodapé da tela em telas < 1024px. Item ativo em dourado.
+$script = basename($_SERVER['SCRIPT_NAME'] ?? '');
+$secao = $_GET['secao'] ?? '';
+$bnActive = match (true) {
+    $script === 'index.php' && ($activeNav ?? '') === 'inicio' => 'inicio',
+    $script === 'product.php'                                  => 'descobrir',
+    $script === 'account.php' && $secao === 'favoritos'        => 'favoritos',
+    in_array($script, ['cart.php', 'checkout.php'], true)       => 'sacola',
+    $script === 'account.php' || str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/auth/') => 'perfil',
+    default => '',
+};
+$bnUser = current_user();
+$bnCount = cart_count();
+$bnItem = function (string $key, string $label, string $iconName, ?string $href, bool $loginModal = false, string $extra = '') use ($bnActive): string {
+    $cls = 'bottom-nav-item' . ($bnActive === $key ? ' is-active' : '');
+    $inner = '<span class="relative">' . icon($iconName, 'h-6 w-6') . $extra . '</span><span>' . e($label) . '</span>';
+    if ($loginModal) {
+        return '<button type="button" data-open-modal="login-modal" class="' . $cls . '">' . $inner . '</button>';
+    }
+    return '<a href="' . e($href) . '" class="' . $cls . '"' . ($bnActive === $key ? ' aria-current="page"' : '') . '>' . $inner . '</a>';
+};
+$badge = '<span data-cart-count class="absolute -right-2 -top-1.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-gold-400 px-1 text-[10px] font-semibold text-black transition-transform ' . ($bnCount ? '' : 'scale-0') . '">' . (int) $bnCount . '</span>';
+?>
+<nav class="bottom-nav lg:hidden" aria-label="Navegação principal (celular)">
+    <?= $bnItem('inicio', 'Início', 'home', url('index.php')) ?>
+    <?= $bnItem('descobrir', 'Descobrir', 'search', url('index.php#colecoes')) ?>
+    <?= $bnItem('favoritos', 'Favoritos', 'heart', url('account.php?secao=favoritos'), !$bnUser) ?>
+    <?= $bnItem('sacola', 'Sacola', 'cart', url('cart.php'), false, $badge) ?>
+    <?= $bnItem('perfil', 'Perfil', 'user', url('account.php'), !$bnUser) ?>
+</nav>
+
+<?php
+// Botão flutuante do WhatsApp (Admin -> Aparência). Na página do produto, a
+// mensagem já menciona o perfume.
+$waText = isset($product['name']) && basename($_SERVER['SCRIPT_NAME'] ?? '') === 'product.php'
+    ? 'Olá! Tenho interesse no ' . $product['name'] . '.'
+    : null;
+if ($waLink = whatsapp_link($waText)): ?>
+<a href="<?= e($waLink) ?>" target="_blank" rel="noopener" class="wa-float" aria-label="Fale conosco pelo WhatsApp">
+    <span class="wa-float-label">Fale conosco</span>
+    <span class="wa-float-btn"><?= icon('whatsapp', 'h-7 w-7') ?></span>
+</a>
+<?php endif; ?>
+
+<script src="<?= e(asset('js/app.js')) ?>" defer></script>
+</body>
+</html>

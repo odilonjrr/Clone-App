@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Notas de fundo: madeiras, âmbar e baunilha">
+  <!-- Ilustração padrão das NOTAS DE FUNDO (madeiras/âmbar). Substituível por foto no admin. -->
+  <defs>
+    <linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#3b2416"/><stop offset=".5" stop-color="#6b4226"/><stop offset="1" stop-color="#2e1b10"/></linearGradient>
+    <radialGradient id="amber" cx="40%" cy="35%" r="65%"><stop offset="0" stop-color="#ffd27a"/><stop offset=".6" stop-color="#e08a1e"/><stop offset="1" stop-color="#8a4a0a"/></radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#d4af37" stop-opacity=".3"/><stop offset="1" stop-color="#d4af37" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse cx="80" cy="42" rx="78" ry="38" fill="url(#glow)"/>
+  <path d="M12 52 l52 -18 l8 8 l-52 20z" fill="url(#wood)"/>
+  <path d="M18 60 l46 -12 l5 7 l-46 13z" fill="url(#wood)" opacity=".9"/>
+  <g stroke="#8a5a34" stroke-width=".8" opacity=".7"><line x1="20" y1="52" x2="60" y2="38"/><line x1="24" y1="61" x2="62" y2="51"/></g>
+  <path d="M78 58 l10 -20 l16 4 l4 16 l-14 10z" fill="url(#amber)"/>
+  <path d="M86 42 l6 -2 l-4 8z" fill="#fff" opacity=".5"/>
+  <g fill="#f6efd9" stroke="#d9c79a" stroke-width=".6">
+    <ellipse cx="130" cy="30" rx="5" ry="12" transform="rotate(0 130 42)"/>
+    <ellipse cx="130" cy="30" rx="5" ry="12" transform="rotate(72 130 42)"/>
+    <ellipse cx="130" cy="30" rx="5" ry="12" transform="rotate(144 130 42)"/>
+    <ellipse cx="130" cy="30" rx="5" ry="12" transform="rotate(216 130 42)"/>
+    <ellipse cx="130" cy="30" rx="5" ry="12" transform="rotate(288 130 42)"/>
+  </g>
+  <circle cx="130" cy="42" r="3.5" fill="#e2b13a"/>
+  <path d="M112 66 q20 -6 44 2" stroke="#2a1a10" stroke-width="3" fill="none"/>
+</svg>

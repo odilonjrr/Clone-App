@@ -1,0 +1,19 @@
+{
+    "name": "kingdecants/store",
+    "description": "King Decants — e-commerce MVP em PHP puro. Dependências OPCIONAIS (Opção A do Mercado Pago e SMTP).",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.0",
+        "ext-pdo": "*",
+        "ext-curl": "*",
+        "ext-mbstring": "*"
+    },
+    "suggest": {
+        "mercadopago/dx-php": "SDK oficial do Mercado Pago (Opção A): composer require mercadopago/dx-php",
+        "phpmailer/phpmailer": "Envio de e-mail via SMTP (MAIL_DRIVER=smtp): composer require phpmailer/phpmailer"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

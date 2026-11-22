@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" role="img" aria-label="Notas de coração: flores">
+  <!-- Ilustração padrão das NOTAS DE CORAÇÃO (florais). Substituível por foto no admin. -->
+  <defs>
+    <radialGradient id="petal" cx="45%" cy="40%" r="60%"><stop offset="0" stop-color="#ff5a5a"/><stop offset=".6" stop-color="#c8102e"/><stop offset="1" stop-color="#6e0a18"/></radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#d4af37" stop-opacity=".3"/><stop offset="1" stop-color="#d4af37" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse cx="80" cy="42" rx="78" ry="38" fill="url(#glow)"/>
+  <path d="M50 66 q10 -10 22 -12" stroke="#2f6b2a" stroke-width="3" fill="none"/>
+  <path d="M46 62 q-8 -10 4 -14 q6 6 -4 14z" fill="#3f8a33"/>
+  <circle cx="74" cy="38" r="24" fill="url(#petal)"/>
+  <g fill="none" stroke="#5a0614" stroke-width="1.6" opacity=".8">
+    <path d="M60 36 q14 -18 28 0"/><path d="M64 44 q10 -16 20 0"/><path d="M68 40 q6 -8 12 0"/><path d="M56 30 q18 -14 36 2"/>
+  </g>
+  <g stroke="#c8102e" stroke-width="1.2" opacity=".85">
+    <line x1="124" y1="40" x2="110" y2="26"/><line x1="124" y1="40" x2="126" y2="20"/><line x1="124" y1="40" x2="140" y2="26"/>
+    <line x1="124" y1="40" x2="144" y2="42"/><line x1="124" y1="40" x2="138" y2="56"/><line x1="124" y1="40" x2="122" y2="60"/>
+    <line x1="124" y1="40" x2="108" y2="54"/><line x1="124" y1="40" x2="104" y2="38"/>
+  </g>
+  <circle cx="124" cy="40" r="3" fill="#e2a33a"/>
+</svg>

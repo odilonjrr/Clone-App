@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" role="img" aria-label="Decant King Decants">
+  <!-- Fallback local usado quando a imagem externa (via.placeholder.com) não carrega. -->
+  <defs>
+    <radialGradient id="g" cx="50%" cy="45%" r="55%">
+      <stop offset="0" stop-color="#d4af37" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#0b0b0b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" x2="1">
+      <stop offset="0" stop-color="#6e5615"/><stop offset=".45" stop-color="#f1dfa6"/><stop offset="1" stop-color="#6e5615"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="750" fill="#0b0b0b"/>
+  <ellipse cx="300" cy="360" rx="260" ry="300" fill="url(#g)"/>
+  <rect x="270" y="170" width="60" height="70" rx="6" fill="url(#gold)"/>
+  <rect x="240" y="240" width="120" height="300" rx="14" fill="#070707" stroke="#d4af37" stroke-opacity=".6"/>
+  <rect x="254" y="256" width="6" height="268" rx="3" fill="#fff" opacity=".08"/>
+  <text x="300" y="400" text-anchor="middle" font-family="Georgia,serif" font-size="18" letter-spacing="6" fill="#d4af37">KING</text>
+  <ellipse cx="300" cy="560" rx="110" ry="10" fill="#d4af37" opacity=".18"/>
+</svg>

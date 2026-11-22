@@ -1,0 +1,51 @@
+# =============================================================================
+# King Decants — .htaccess (Apache 2.4)
+# -----------------------------------------------------------------------------
+# - Força HTTPS (descomente após instalar o certificado SSL)
+# - Bloqueia acesso direto a pastas internas e arquivos sensíveis
+# - Cabeçalhos de segurança e cache de assets
+# Em Nginx, veja o bloco equivalente no README.md.
+# =============================================================================
+
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # --- Força HTTPS (recomendado em produção) ---
+    # RewriteCond %{HTTPS} !=on
+    # RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # --- Bloqueia pastas internas e dependências ---
+    RewriteRule ^(inc|storage|tools|vendor)(/|$) - [F,L]
+</IfModule>
+
+# --- Bloqueia arquivos sensíveis (schema, composer, dotfiles, logs, markdown) ---
+<FilesMatch "(^\.|\.(sql|md|log|lock|ini|sh|bak|dist)$|^composer\.json$)">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    # Ative SOMENTE quando todo o site estiver em HTTPS:
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 30 days"
+    ExpiresByType application/javascript "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
+
+# --- Ajustes de PHP (se o host permitir php_value; senão use php.ini/.user.ini) ---
+<IfModule mod_php.c>
+    php_flag  display_errors Off
+    php_value session.cookie_httponly 1
+    php_value session.use_strict_mode 1
+</IfModule>
