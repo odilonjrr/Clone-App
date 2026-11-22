@@ -152,6 +152,40 @@
     })
   );
 
+  // ---------------------------------------------------------------- Movimento dos botões
+  // Baseado no "Botão Explosão" (Upward Creative Academy): o botão "afunda" no clique e
+  // solta partículas nas cores douradas do site. Só na loja (no admin, só o "afundar").
+  (function buttonBurst() {
+    const COLORS = ['#d4af37', '#e6c76f', '#f1dfa6', '#ffffff'];
+    const PARTICLES = 22;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isAdmin = !!document.getElementById('admin-nav');
+    function burst(btn) {
+      btn.classList.add('is-pressed');
+      setTimeout(() => btn.classList.remove('is-pressed'), 160);
+      if (still || isAdmin || !btn.animate) return;
+      const r = btn.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      for (let i = 0; i < PARTICLES; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'kd-burst-dot';
+        const size = 4 + Math.random() * 7, angle = Math.PI * 2 * i / PARTICLES + Math.random() * 0.4, dist = 60 + Math.random() * 90;
+        const color = COLORS[i % COLORS.length];
+        dot.style.cssText = 'left:' + (cx - size / 2) + 'px;top:' + (cy - size / 2) + 'px;width:' + size + 'px;height:' + size + 'px;background:' + color + ';box-shadow:0 0 12px ' + color;
+        document.body.appendChild(dot);
+        dot.animate([
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: 'translate(' + Math.cos(angle) * dist + 'px,' + (Math.sin(angle) * dist + 30) + 'px) scale(.2)', opacity: 0 },
+        ], { duration: 700 + Math.random() * 400, easing: 'cubic-bezier(.15,.7,.3,1)' }).onfinish = () => dot.remove();
+      }
+    }
+    // Delegação: vale também para botões criados depois (ex.: opções de frete)
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('.btn-gold, .btn-outline');
+      if (!btn || btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
+      burst(btn);
+    }, true);
+  })();
+
   // ---------------------------------------------------------------- Banner: vídeo avançado pelo scroll
   // O vídeo fica parado; a posição da rolagem dentro da seção define o quadro exibido.
   (function heroScrub() {

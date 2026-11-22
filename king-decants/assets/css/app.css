@@ -584,3 +584,21 @@ a.account-card:hover { border-color: rgba(212,175,55,.6); transform: translateY(
   .hero-scrub-stage { position: relative; top: 0; }
   .hero-scrub-hint { display: none; }
 }
+
+/* =========================================================================
+   Movimento dos botões (baseado no "Botão Explosão" da Upward Creative Academy,
+   uso liberado em projetos próprios). Só o movimento: subir no hover,
+   "afundar" no clique e partículas douradas. Cores e fontes do site mantidas.
+   ========================================================================= */
+.btn-gold, .btn-outline {
+  position: relative; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform .18s cubic-bezier(.2, .8, .2, 1), box-shadow .18s, filter .3s ease, opacity .2s,
+              background .3s, color .3s, border-color .3s;
+}
+.btn-gold:hover, .btn-outline:hover { transform: translateY(-2px); }
+.btn-gold.is-pressed, .btn-outline.is-pressed { transform: translateY(4px) scale(.97); }
+.btn-gold:disabled, .btn-gold[aria-busy="true"], .btn-outline:disabled { transform: none; }
+.kd-burst-dot { position: fixed; z-index: 9999; width: 8px; height: 8px; border-radius: 50%; pointer-events: none; will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) {
+  .btn-gold:hover, .btn-outline:hover, .btn-gold.is-pressed, .btn-outline.is-pressed { transform: none; }
+}
